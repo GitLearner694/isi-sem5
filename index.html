@@ -54,7 +54,7 @@ h2:first-of-type { margin-top:8px }
 .panel li:first-child { border-top:0 }
 .panel li > .lab { flex:1; min-width:0 }
 .due-d { flex:0 0 auto; font-variant-numeric:tabular-nums; color:var(--warn);
-  font-size:12px; min-width:64px }
+  font-size:12px; min-width:104px }
 .panel .meta { flex:0 1 auto; color:var(--dim); font-size:11.5px;
   text-align:right }
 .sub-note { display:block; font-size:11.5px; color:var(--dim); font-style:normal }
@@ -186,6 +186,23 @@ details.week summary::-webkit-details-marker { display:none }
   border:1px solid var(--line); color:var(--dim) }
 .flag.now { border-color:var(--accent); color:var(--accent) }
 .flag.task { border-color:var(--warn); color:var(--warn) }
+.flag.exam { border-color:var(--mid); color:var(--mid) }
+.flag.hol { border-color:var(--proj); color:var(--proj) }
+details.week:not(.current) .flag.now { display:none }
+
+.phases { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:10px; overflow:hidden }
+.phase { background:var(--panel); padding:11px 13px 12px }
+.phase.on { background:color-mix(in srgb, var(--accent) 12%, var(--panel)) }
+.phase.done { opacity:.55 }
+.ph-lab { font-size:12.5px; font-weight:600; line-height:1.3 }
+.phase.on .ph-lab { color:var(--accent) }
+.ph-date { font-size:11.5px; color:var(--dim); margin-top:3px;
+  font-variant-numeric:tabular-nums }
+.away { flex:0 0 auto; font-size:11px; color:var(--dim); white-space:nowrap }
+.away.soon { color:var(--warn) }
+.away.now { color:var(--accent) }
 .wnote { padding:0 15px 10px; font-size:13px; color:var(--dim) }
 .wgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
   gap:1px; background:var(--line); border-top:1px solid var(--line) }
@@ -216,8 +233,8 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 
 <header class="top"><div class="wrap">
   <h1>B.Stat 3rd Year &middot; Semester 5</h1>
-  <span class="sub">Semester 1, 2026–27 &middot; Week 1 of 16 &middot; Friday, 24 July 2026</span>
-  <nav><a href="#c-lsm">LSM</a><a href="#c-pi">PI</a><a href="#c-ss">SS</a><a href="#c-eosd">EOS&amp;D</a><a href="#c-daa">DAA</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
+  <span class="sub">Semester 1, 2026–27 &middot; <span id="sub-week">Week 1 of 16</span> &middot; <span id="sub-date">Friday, 24 July 2026</span></span>
+  <nav><a href="#c-lsm">LSM</a><a href="#c-pi">PI</a><a href="#c-ss">SS</a><a href="#c-eosd">EOS&amp;D</a><a href="#c-daa">DAA</a><a href="#term">Term</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
 </div></header>
 
 <div class="wrap">
@@ -225,17 +242,20 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 <h2>At a glance</h2>
 <div class="stats">
   <div class="stat"><b>5</b><span>courses &middot; 6 taught units</span></div>
-  <div class="stat"><b>1</b><span>files filed</span></div>
+  <div class="stat"><b>2</b><span>files filed</span></div>
   <div class="stat"><b>0</b><span>weeks logged</span></div>
   <div class="stat"><b>0</b><span>open tasks</span></div>
 </div>
 
 <div class="two" style="margin-top:14px">
   <div class="panel"><h4>Next up</h4><ul><li class="empty">nothing with a due date yet</li></ul></div>
-  <div class="panel"><h4>Milestones</h4><ul><li class="stack"><span class="due-d">TBD</span><span class="lab">Mid-Semester Examinations<em class="sub-note">date TBD — fill in when announced</em></span></li><li class="stack"><span class="due-d">TBD</span><span class="lab">Project submissions (SS / EOS&amp;D / DAA)<em class="sub-note">date TBD</em></span></li><li class="stack"><span class="due-d">TBD</span><span class="lab">Semester Examinations<em class="sub-note">date TBD</em></span></li></ul></div>
+  <div class="panel"><h4>Milestones</h4><ul><li class="stack" data-start="2026-08-03" data-end="2026-08-03"><span class="due-d">03 Aug 2026</span><span class="lab">Confirmation of credit / non-credit courses<em class="sub-note">on or before this date</em></span><span class="away"></span></li><li class="stack" data-start="2026-09-07" data-end="2026-09-11"><span class="due-d">07 &ndash; 11 Sep 2026</span><span class="lab">Mid-Semester Examinations<em class="sub-note">held in the least number of consecutive working days required</em></span><span class="away"></span></li><li class="stack" data-start="2026-11-06" data-end="2026-11-06"><span class="due-d">06 Nov 2026</span><span class="lab">Last day of classes</span><span class="away"></span></li><li class="stack" data-start="2026-11-09" data-end="2026-11-13"><span class="due-d">09 &ndash; 13 Nov 2026</span><span class="lab">Study Leave<em class="sub-note">shortened if the mid-semester exams spill over</em></span><span class="away"></span></li><li class="stack" data-start="2026-11-16" data-end="2026-11-27"><span class="due-d">16 &ndash; 27 Nov 2026</span><span class="lab">End-Semester Examinations</span><span class="away"></span></li><li class="stack"><span class="due-d">TBD</span><span class="lab">Project submissions (SS / EOS&amp;D / DAA)<em class="sub-note">date TBD — not on the institute calendar</em></span><span class="away"></span></li><li class="stack" data-start="2026-12-16" data-end="2026-12-22"><span class="due-d">16 &ndash; 22 Dec 2026</span><span class="lab">Backpaper Examinations</span><span class="away"></span></li><li class="stack" data-start="2027-01-04" data-end="2027-01-04"><span class="due-d">04 Jan 2027</span><span class="lab">Next semester begins<em class="sub-note">tentative</em></span><span class="away"></span></li></ul></div>
 </div>
 
-<div style="margin-top:14px"><div class="panel"><h4>Course information</h4><ul class="files"><li><a href="00%20Course%20Information/Revised-Brochure-BStat%282016%29.pdf">Revised-Brochure-BStat(2016).pdf</a><span class="meta">304.7 KB &middot; 24 Jul</span></li></ul></div></div>
+<div style="margin-top:14px"><div class="panel"><h4>Course information</h4><ul class="files"><li><a href="00%20Course%20Information/1st%20Semester%20Academic%20Calendar.pdf">1st Semester Academic Calendar.pdf</a><span class="meta">81.9 KB &middot; 24 Jul</span></li><li><a href="00%20Course%20Information/Revised-Brochure-BStat%282016%29.pdf">Revised-Brochure-BStat(2016).pdf</a><span class="meta">304.7 KB &middot; 24 Jul</span></li></ul></div></div>
+
+<h2 id="term">Term dates</h2>
+<p class="src">ISI First Semester (2026–2027) Academic Calendar, dated 19/06/2026</p><div class="phases"><div class="phase" data-start="2026-07-20" data-end="2026-11-06"><div class="ph-lab">Classes</div><div class="ph-date">20 Jul &ndash; 06 Nov 2026</div></div><div class="phase" data-start="2026-09-07" data-end="2026-09-11"><div class="ph-lab">Mid-Semester Examination</div><div class="ph-date">07 &ndash; 11 Sep 2026</div></div><div class="phase" data-start="2026-11-09" data-end="2026-11-13"><div class="ph-lab">Study Leave</div><div class="ph-date">09 &ndash; 13 Nov 2026</div></div><div class="phase" data-start="2026-11-16" data-end="2026-11-27"><div class="ph-lab">End-Semester Examination</div><div class="ph-date">16 &ndash; 27 Nov 2026</div></div><div class="phase" data-start="2026-12-16" data-end="2026-12-22"><div class="ph-lab">Backpaper Examination</div><div class="ph-date">16 &ndash; 22 Dec 2026</div></div></div>
 
 <h2 id="schedule">Class schedule</h2>
 <p class="src">Semester timetable; slot initials resolved against the LSM handout.</p><div class="timetable"><div class="day"><div class="day-h">Monday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">DAA</span><span class="lab">Design and Analysis of Algorithms</span></span></li><li><span class="time">14:15 – 15:05</span><span class="slot"><span class="badge sm">EOS&amp;D</span><span class="lab">Demography</span></span></li><li><span class="time">15:10 – 16:55</span><span class="slot"><span class="badge sm">LSM</span><span class="lab">Linear Statistical Models</span></span><span class="room">508, S. N. Bose Bhavan</span></li></ul></div><div class="day"><div class="day-h">Tuesday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">PI</span><span class="lab">Parametric Inference</span></span></li><li><span class="time">14:15 – 16:00</span><span class="slot"><span class="badge sm">EOS&amp;D</span><span class="lab">Economic and Official Statistics</span></span></li></ul></div><div class="day"><div class="day-h">Wednesday</div><ul><li><span class="time">11:10 – 12:00</span><span class="slot"><span class="badge sm">EOS&amp;D</span><span class="lab">Demography</span></span></li><li><span class="time">14:15 – 16:00</span><span class="slot"><span class="badge sm">LSM</span><span class="lab">Linear Statistical Models</span></span><span class="room">508, S. N. Bose Bhavan</span></li><li><span class="time">16:05 – 17:50</span><span class="slot"><span class="badge sm">SS</span><span class="lab">Sample Surveys</span></span></li></ul></div><div class="day"><div class="day-h">Thursday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">DAA</span><span class="lab">Design and Analysis of Algorithms</span></span></li></ul></div><div class="day"><div class="day-h">Friday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">PI</span><span class="lab">Parametric Inference</span></span></li><li><span class="time">16:05 – 17:50</span><span class="slot"><span class="badge sm">SS</span><span class="lab">Sample Surveys</span></span></li></ul></div></div>
@@ -316,108 +336,125 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   <button data-f="future">Upcoming</button>
 </div>
 
-<details class="week current" open data-state="current">
+<details class="week current" open
+         data-state="current" data-n="1">
   <summary><span class="wn">Week 1</span><span class="wr">20 Jul &ndash; 26 Jul 2026</span>
   <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="2">
   <summary><span class="wn">Week 2</span><span class="wr">27 Jul &ndash; 02 Aug 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="3">
   <summary><span class="wn">Week 3</span><span class="wr">03 Aug &ndash; 09 Aug 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="4">
   <summary><span class="wn">Week 4</span><span class="wr">10 Aug &ndash; 16 Aug 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
-  
+  <span class="flags"><span class="flag now">this week</span><span class="flag hol">holiday</span><span class="flag empty-f">not logged</span></span></summary>
+  <div class="wnote">Independence Day: Sat 15 Aug</div>
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="5">
   <summary><span class="wn">Week 5</span><span class="wr">17 Aug &ndash; 23 Aug 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="6">
   <summary><span class="wn">Week 6</span><span class="wr">24 Aug &ndash; 30 Aug 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
-  
+  <span class="flags"><span class="flag now">this week</span><span class="flag hol">holiday &middot; 1 class day off</span><span class="flag empty-f">not logged</span></span></summary>
+  <div class="wnote">Institute holiday: Wed 26 Aug</div>
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="7">
   <summary><span class="wn">Week 7</span><span class="wr">31 Aug &ndash; 06 Sep 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="8">
   <summary><span class="wn">Week 8</span><span class="wr">07 Sep &ndash; 13 Sep 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag exam">Mid-Semester Examination</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="9">
   <summary><span class="wn">Week 9</span><span class="wr">14 Sep &ndash; 20 Sep 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="10">
   <summary><span class="wn">Week 10</span><span class="wr">21 Sep &ndash; 27 Sep 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="11">
   <summary><span class="wn">Week 11</span><span class="wr">28 Sep &ndash; 04 Oct 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
-  
+  <span class="flags"><span class="flag now">this week</span><span class="flag hol">holiday &middot; 1 class day off</span><span class="flag empty-f">not logged</span></span></summary>
+  <div class="wnote">Gandhi Jayanti: Fri 02 Oct</div>
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="12">
   <summary><span class="wn">Week 12</span><span class="wr">05 Oct &ndash; 11 Oct 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="13">
   <summary><span class="wn">Week 13</span><span class="wr">12 Oct &ndash; 18 Oct 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="14">
   <summary><span class="wn">Week 14</span><span class="wr">19 Oct &ndash; 25 Oct 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
-  
+  <span class="flags"><span class="flag now">this week</span><span class="flag hol">holiday &middot; 5 class days off</span><span class="flag empty-f">not logged</span></span></summary>
+  <div class="wnote">Puja break: Mon 19 Oct, Tue 20 Oct, Wed 21 Oct, Thu 22 Oct, Fri 23 Oct</div>
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="15">
   <summary><span class="wn">Week 15</span><span class="wr">26 Oct &ndash; 01 Nov 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
-<details class="week future" data-state="future">
+<details class="week future"
+         data-state="future" data-n="16">
   <summary><span class="wn">Week 16</span><span class="wr">02 Nov &ndash; 08 Nov 2026</span>
-  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
   
   <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
 </details>
 
 <h2 id="syllabus">Syllabus &amp; reference texts</h2>
 <p style="font-size:12.5px;color:var(--dim);margin:-6px 0 14px">
-  Official syllabus and reference texts as printed in the B.Stat (2016) brochure.
-  A topic ticks off when its index is listed under a week&rsquo;s
-  <code>syllabus</code> field in <code>_dashboard/plan.json</code>.</p>
+  Each track cites its own source &mdash; the instructor&rsquo;s handout where one has been
+  given, otherwise the B.Stat (2016) brochure. A topic ticks off when its index is
+  listed under a week&rsquo;s <code>syllabus</code> field in
+  <code>_dashboard/plan.json</code>.</p>
 
 <details class="syl">
   <summary>
@@ -493,13 +530,58 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 </details>
 
 <footer>
-  Generated 24 Jul 2026, 22:52 from
+  Generated 24 Jul 2026, 23:01 from
   <code>_dashboard/plan.json</code>. Edit that file, then run
   <code>python _dashboard/build.py</code> to refresh this page.
 </footer>
 </div>
 
 <script>
+// The page is regenerated on a schedule, so anything relative to "today" is
+// recomputed here on load -- otherwise it would drift between rebuilds.
+(function () {
+  var START = "2026-07-20", NW = 16;
+  var DAY = 864e5;
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var start = new Date(START + "T00:00:00");
+
+  var wk = Math.floor((today - start) / (7 * DAY)) + 1;
+  wk = Math.max(1, Math.min(NW, wk));
+
+  var sw = document.getElementById('sub-week');
+  if (sw) sw.textContent = 'Week ' + wk + ' of ' + NW;
+  var sd = document.getElementById('sub-date');
+  if (sd) sd.textContent = today.toLocaleDateString(undefined,
+    { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+  document.querySelectorAll('details.week').forEach(function (w) {
+    var n = +w.dataset.n;
+    var st = n < wk ? 'past' : (n === wk ? 'current' : 'future');
+    w.dataset.state = st;
+    w.classList.remove('past', 'current', 'future');
+    w.classList.add(st);
+    w.open = (st === 'current');
+  });
+
+  document.querySelectorAll('.phase').forEach(function (p) {
+    var s = new Date(p.dataset.start + "T00:00:00");
+    var e = new Date(p.dataset.end + "T00:00:00");
+    if (today > e) p.classList.add('done');
+    else if (today >= s) p.classList.add('on');
+  });
+
+  document.querySelectorAll('li[data-start] .away').forEach(function (el) {
+    var li = el.closest('li');
+    var s = new Date(li.dataset.start + "T00:00:00");
+    var e = new Date(li.dataset.end + "T00:00:00");
+    var d = Math.round((s - today) / DAY);
+    if (today > e) { el.textContent = 'done'; li.style.opacity = .5; return; }
+    if (d <= 0) { el.textContent = 'now'; el.className = 'away now'; return; }
+    el.textContent = d === 1 ? 'tomorrow' : 'in ' + d + ' days';
+    if (d <= 14) el.className = 'away soon';
+  });
+})();
+
 document.querySelectorAll('.filters button').forEach(function (b) {
   b.addEventListener('click', function () {
     document.querySelectorAll('.filters button').forEach(x => x.classList.remove('on'));

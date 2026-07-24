@@ -7,23 +7,54 @@
     "num_weeks": 16,
     "info_folder": "00 Course Information",
     "academic_year": "2026–27",
-    "also_known_as": "Semester 1, 2026–27"
+    "also_known_as": "Semester 1, 2026–27",
+    "classes_end": "2026-11-06",
+    "calendar_source": "ISI First Semester (2026–2027) Academic Calendar, dated 19/06/2026"
   },
   "milestones": [
     {
-      "date": null,
+      "start": "2026-08-03",
+      "label": "Confirmation of credit / non-credit courses",
+      "note": "on or before this date"
+    },
+    {
+      "start": "2026-09-07",
+      "end": "2026-09-11",
       "label": "Mid-Semester Examinations",
-      "note": "date TBD — fill in when announced"
+      "note": "held in the least number of consecutive working days required"
     },
     {
-      "date": null,
+      "start": "2026-11-06",
+      "label": "Last day of classes",
+      "note": ""
+    },
+    {
+      "start": "2026-11-09",
+      "end": "2026-11-13",
+      "label": "Study Leave",
+      "note": "shortened if the mid-semester exams spill over"
+    },
+    {
+      "start": "2026-11-16",
+      "end": "2026-11-27",
+      "label": "End-Semester Examinations",
+      "note": ""
+    },
+    {
+      "start": null,
       "label": "Project submissions (SS / EOS&D / DAA)",
-      "note": "date TBD"
+      "note": "date TBD — not on the institute calendar"
     },
     {
-      "date": null,
-      "label": "Semester Examinations",
-      "note": "date TBD"
+      "start": "2026-12-16",
+      "end": "2026-12-22",
+      "label": "Backpaper Examinations",
+      "note": ""
+    },
+    {
+      "start": "2027-01-04",
+      "label": "Next semester begins",
+      "note": "tentative"
     }
   ],
   "courses": [
@@ -1081,5 +1112,59 @@
         }
       ]
     }
-  }
+  },
+  "term": [
+    {
+      "label": "Classes",
+      "start": "2026-07-20",
+      "end": "2026-11-06"
+    },
+    {
+      "label": "Mid-Semester Examination",
+      "start": "2026-09-07",
+      "end": "2026-09-11"
+    },
+    {
+      "label": "Study Leave",
+      "start": "2026-11-09",
+      "end": "2026-11-13"
+    },
+    {
+      "label": "End-Semester Examination",
+      "start": "2026-11-16",
+      "end": "2026-11-27"
+    },
+    {
+      "label": "Backpaper Examination",
+      "start": "2026-12-16",
+      "end": "2026-12-22"
+    }
+  ],
+  "holidays": [
+    {
+      "start": "2026-08-15",
+      "label": "Independence Day"
+    },
+    {
+      "start": "2026-08-26",
+      "label": "Institute holiday"
+    },
+    {
+      "start": "2026-10-02",
+      "label": "Gandhi Jayanti"
+    },
+    {
+      "start": "2026-10-19",
+      "end": "2026-10-23",
+      "label": "Puja break"
+    },
+    {
+      "start": "2026-11-24",
+      "label": "Institute holiday"
+    },
+    {
+      "start": "2026-12-25",
+      "label": "Christmas Day"
+    }
+  ]
 }

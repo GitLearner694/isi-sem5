@@ -258,6 +258,60 @@ def render_course_card(plan, course, scans):
 </section>"""
 
 
+def fmt_range(s, e=None):
+    ds = dt.date.fromisoformat(s)
+    if not e or e == s:
+        return ds.strftime("%d %b %Y")
+    de = dt.date.fromisoformat(e)
+    if (ds.year, ds.month) == (de.year, de.month):
+        return f'{ds.strftime("%d")} &ndash; {de.strftime("%d %b %Y")}'
+    if ds.year == de.year:
+        return f'{ds.strftime("%d %b")} &ndash; {de.strftime("%d %b %Y")}'
+    return f'{ds.strftime("%d %b %Y")} &ndash; {de.strftime("%d %b %Y")}'
+
+
+def render_term(plan):
+    ph = []
+    for p in plan.get("term", []):
+        ph.append(f'<div class="phase" data-start="{p["start"]}" data-end="{p["end"]}">'
+                  f'<div class="ph-lab">{esc(p["label"])}</div>'
+                  f'<div class="ph-date">{fmt_range(p["start"], p.get("end"))}</div></div>')
+    if not ph:
+        return ""
+    src = plan["semester"].get("calendar_source")
+    note = f'<p class="src">{esc(src)}</p>' if src else ""
+    return f'{note}<div class="phases">{"".join(ph)}</div>'
+
+
+def week_overlays(plan, start, num_weeks):
+    """Per week: holidays falling in it, and any exam/leave phase overlapping it."""
+    hol, phase = {}, {}
+    teaching = set((plan.get("schedule") or {}).get("days") or {})
+
+    for h in plan.get("holidays", []):
+        s = dt.date.fromisoformat(h["start"])
+        e = dt.date.fromisoformat(h.get("end") or h["start"])
+        d = s
+        while d <= e:
+            wk = (d - start).days // 7 + 1
+            if 1 <= wk <= num_weeks:
+                rec = hol.setdefault(wk, {}).setdefault(h["label"], [])
+                rec.append((d, d.strftime("%A") in teaching))
+            d += dt.timedelta(days=1)
+
+    for p in plan.get("term", []):
+        if p["label"] == "Classes":
+            continue
+        s = dt.date.fromisoformat(p["start"])
+        e = dt.date.fromisoformat(p.get("end") or p["start"])
+        for wk in range(1, num_weeks + 1):
+            ws = start + dt.timedelta(days=7 * (wk - 1))
+            we = ws + dt.timedelta(days=6)
+            if s <= we and e >= ws:
+                phase.setdefault(wk, []).append(p["label"])
+    return hol, phase
+
+
 def render_books(track):
     groups = track.get("books") or []
     if not groups:
@@ -322,7 +376,7 @@ def render_schedule(plan):
     return f'{note}<div class="timetable">{"".join(cols)}</div>' if cols else ""
 
 
-def render_weeks(plan, cur_week):
+def render_weeks(plan, cur_week, hol, phase):
     tmap = {t["id"]: (c, t) for c, t in all_tracks(plan)}
     out = []
     for w in plan["weeks"]:
@@ -361,17 +415,31 @@ def render_weeks(plan, cur_week):
                         f'<span class="badge sm">{esc(c["short"])}</span>{esc(name)}</div>'
                         f'{"".join(body)}</div>')
 
-        flags = []
-        if state == "current":
-            flags.append('<span class="flag now">this week</span>')
+        flags = ['<span class="flag now">this week</span>']
+        for label in phase.get(w["n"], []):
+            flags.append(f'<span class="flag exam">{esc(label)}</span>')
+        hits = hol.get(w["n"], {})
+        if hits:
+            lost = sum(1 for days in hits.values() for _, t in days if t)
+            flags.append(f'<span class="flag hol">holiday'
+                         f'{f" &middot; {lost} class day{'' if lost == 1 else 's'} off" if lost else ""}'
+                         f'</span>')
         if open_tasks:
             flags.append(f'<span class="flag task">{open_tasks} open</span>')
         if filled == 0:
             flags.append('<span class="flag empty-f">not logged</span>')
 
-        note = f'<div class="wnote">{esc(w["note"])}</div>' if w.get("note") else ""
+        notes = []
+        if w.get("note"):
+            notes.append(esc(w["note"]))
+        for label, days in hits.items():
+            ds = ", ".join(d.strftime("%a %d %b") for d, _ in days)
+            notes.append(f"{esc(label)}: {ds}")
+        note = f'<div class="wnote">{" &middot; ".join(notes)}</div>' if notes else ""
+
         out.append(f"""
-<details class="week {state}"{" open" if state == "current" else ""} data-state="{state}">
+<details class="week {state}"{" open" if state == "current" else ""}
+         data-state="{state}" data-n="{w['n']}">
   <summary><span class="wn">Week {w['n']}</span><span class="wr">{rng}</span>
   <span class="flags">{''.join(flags)}</span></summary>
   {note}
@@ -420,18 +488,26 @@ def render(plan, cur_week, scans):
         for d, sh, txt, wn in upcoming[:8]
     ) or '<li class="empty">nothing with a due date yet</li>'
 
-    ms_html = "".join(
-        f'<li class="stack"><span class="due-d">{esc(m["date"]) if m.get("date") else "TBD"}</span>'
-        f'<span class="lab">{esc(m["label"])}'
-        + (f'<em class="sub-note">{esc(m["note"])}</em>' if m.get("note") else "")
-        + '</span></li>'
-        for m in plan.get("milestones", [])
-    ) or '<li class="empty">none set</li>'
+    ms_rows = []
+    for m in plan.get("milestones", []):
+        s, e = m.get("start"), m.get("end")
+        when = fmt_range(s, e) if s else "TBD"
+        attrs = f' data-start="{s}" data-end="{e or s}"' if s else ""
+        ms_rows.append(
+            f'<li class="stack"{attrs}><span class="due-d">{when}</span>'
+            f'<span class="lab">{esc(m["label"])}'
+            + (f'<em class="sub-note">{esc(m["note"])}</em>' if m.get("note") else "")
+            + '</span><span class="away"></span></li>')
+    ms_html = "".join(ms_rows) or '<li class="empty">none set</li>'
+
+    start_d = dt.date.fromisoformat(sem["start"])
+    hol, phase = week_overlays(plan, start_d, sem["num_weeks"])
 
     cards = "".join(render_course_card(plan, c, scans) for c in plan["courses"])
-    weeks_html = render_weeks(plan, cur_week)
+    weeks_html = render_weeks(plan, cur_week, hol, phase)
     syl_html = render_syllabus(plan, covered)
     sched_html = render_schedule(plan)
+    term_html = render_term(plan)
 
     info_folder = plan["semester"].get("info_folder")
     info_files = scan(ROOT / info_folder) if info_folder else []
@@ -497,7 +573,7 @@ h2:first-of-type {{ margin-top:8px }}
 .panel li:first-child {{ border-top:0 }}
 .panel li > .lab {{ flex:1; min-width:0 }}
 .due-d {{ flex:0 0 auto; font-variant-numeric:tabular-nums; color:var(--warn);
-  font-size:12px; min-width:64px }}
+  font-size:12px; min-width:104px }}
 .panel .meta {{ flex:0 1 auto; color:var(--dim); font-size:11.5px;
   text-align:right }}
 .sub-note {{ display:block; font-size:11.5px; color:var(--dim); font-style:normal }}
@@ -629,6 +705,23 @@ details.week summary::-webkit-details-marker {{ display:none }}
   border:1px solid var(--line); color:var(--dim) }}
 .flag.now {{ border-color:var(--accent); color:var(--accent) }}
 .flag.task {{ border-color:var(--warn); color:var(--warn) }}
+.flag.exam {{ border-color:var(--mid); color:var(--mid) }}
+.flag.hol {{ border-color:var(--proj); color:var(--proj) }}
+details.week:not(.current) .flag.now {{ display:none }}
+
+.phases {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:10px; overflow:hidden }}
+.phase {{ background:var(--panel); padding:11px 13px 12px }}
+.phase.on {{ background:color-mix(in srgb, var(--accent) 12%, var(--panel)) }}
+.phase.done {{ opacity:.55 }}
+.ph-lab {{ font-size:12.5px; font-weight:600; line-height:1.3 }}
+.phase.on .ph-lab {{ color:var(--accent) }}
+.ph-date {{ font-size:11.5px; color:var(--dim); margin-top:3px;
+  font-variant-numeric:tabular-nums }}
+.away {{ flex:0 0 auto; font-size:11px; color:var(--dim); white-space:nowrap }}
+.away.soon {{ color:var(--warn) }}
+.away.now {{ color:var(--accent) }}
 .wnote {{ padding:0 15px 10px; font-size:13px; color:var(--dim) }}
 .wgrid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
   gap:1px; background:var(--line); border-top:1px solid var(--line) }}
@@ -659,8 +752,8 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 
 <header class="top"><div class="wrap">
   <h1>{esc(sem['program'])} &middot; {esc(sem['name'])}</h1>
-  <span class="sub">{esc(sem['also_known_as']) + ' &middot; ' if sem.get('also_known_as') else ''}Week {cur_week} of {sem['num_weeks']} &middot; {today.strftime('%A, %d %B %Y')}</span>
-  <nav>{nav}<a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
+  <span class="sub">{esc(sem['also_known_as']) + ' &middot; ' if sem.get('also_known_as') else ''}<span id="sub-week">Week {cur_week} of {sem['num_weeks']}</span> &middot; <span id="sub-date">{today.strftime('%A, %d %B %Y')}</span></span>
+  <nav>{nav}<a href="#term">Term</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
 </div></header>
 
 <div class="wrap">
@@ -680,6 +773,9 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 
 <div style="margin-top:14px">{info_html}</div>
 
+<h2 id="term">Term dates</h2>
+{term_html}
+
 <h2 id="schedule">Class schedule</h2>
 {sched_html}
 
@@ -697,9 +793,10 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 
 <h2 id="syllabus">Syllabus &amp; reference texts</h2>
 <p style="font-size:12.5px;color:var(--dim);margin:-6px 0 14px">
-  Official syllabus and reference texts as printed in the B.Stat (2016) brochure.
-  A topic ticks off when its index is listed under a week&rsquo;s
-  <code>syllabus</code> field in <code>_dashboard/plan.json</code>.</p>
+  Each track cites its own source &mdash; the instructor&rsquo;s handout where one has been
+  given, otherwise the B.Stat (2016) brochure. A topic ticks off when its index is
+  listed under a week&rsquo;s <code>syllabus</code> field in
+  <code>_dashboard/plan.json</code>.</p>
 {syl_html}
 
 <footer>
@@ -710,6 +807,51 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 </div>
 
 <script>
+// The page is regenerated on a schedule, so anything relative to "today" is
+// recomputed here on load -- otherwise it would drift between rebuilds.
+(function () {{
+  var START = "{sem['start']}", NW = {sem['num_weeks']};
+  var DAY = 864e5;
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var start = new Date(START + "T00:00:00");
+
+  var wk = Math.floor((today - start) / (7 * DAY)) + 1;
+  wk = Math.max(1, Math.min(NW, wk));
+
+  var sw = document.getElementById('sub-week');
+  if (sw) sw.textContent = 'Week ' + wk + ' of ' + NW;
+  var sd = document.getElementById('sub-date');
+  if (sd) sd.textContent = today.toLocaleDateString(undefined,
+    {{ weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }});
+
+  document.querySelectorAll('details.week').forEach(function (w) {{
+    var n = +w.dataset.n;
+    var st = n < wk ? 'past' : (n === wk ? 'current' : 'future');
+    w.dataset.state = st;
+    w.classList.remove('past', 'current', 'future');
+    w.classList.add(st);
+    w.open = (st === 'current');
+  }});
+
+  document.querySelectorAll('.phase').forEach(function (p) {{
+    var s = new Date(p.dataset.start + "T00:00:00");
+    var e = new Date(p.dataset.end + "T00:00:00");
+    if (today > e) p.classList.add('done');
+    else if (today >= s) p.classList.add('on');
+  }});
+
+  document.querySelectorAll('li[data-start] .away').forEach(function (el) {{
+    var li = el.closest('li');
+    var s = new Date(li.dataset.start + "T00:00:00");
+    var e = new Date(li.dataset.end + "T00:00:00");
+    var d = Math.round((s - today) / DAY);
+    if (today > e) {{ el.textContent = 'done'; li.style.opacity = .5; return; }}
+    if (d <= 0) {{ el.textContent = 'now'; el.className = 'away now'; return; }}
+    el.textContent = d === 1 ? 'tomorrow' : 'in ' + d + ' days';
+    if (d <= 14) el.className = 'away soon';
+  }});
+}})();
+
 document.querySelectorAll('.filters button').forEach(function (b) {{
   b.addEventListener('click', function () {{
     document.querySelectorAll('.filters button').forEach(x => x.classList.remove('on'));
