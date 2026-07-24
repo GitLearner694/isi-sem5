@@ -5,7 +5,9 @@
     "institute": "Indian Statistical Institute",
     "start": "2026-07-20",
     "num_weeks": 16,
-    "info_folder": "00 Course Information"
+    "info_folder": "00 Course Information",
+    "academic_year": "2026–27",
+    "also_known_as": "Semester 1, 2026–27"
   },
   "milestones": [
     {
@@ -32,7 +34,7 @@
       "folder": "01 Linear Statistical Models",
       "weights": {
         "Mid-Semester": 40,
-        "Semester": 50,
+        "Final Exam": 50,
         "Project": 0,
         "Assignments": 10
       },
@@ -44,29 +46,42 @@
           "unit": "ASU",
           "subfolder": "",
           "syllabus": [
-            "Introduction to stochastic models; formulation and illustrations. Linear statistical models; illustrations.",
-            "Least square estimation, estimable linear functions, normal equations, Best Linear Unbiased Estimates (BLUEs). Gauss–Markov Theorem.",
-            "Degrees of freedom. Fundamental Theorems of Least Squares. Testing of linear hypotheses. One-way and two-way classification models, ANOVA and ANCOVA. Nested models. Multiple comparisons.",
-            "Introduction to random effect models.",
-            "Illustration with specific examples and numerical exercises using statistical packages, preferably R."
+            "Gauss–Markov framework for linear statistical models.",
+            "Least squares estimation; normal equations; algebraic properties of residuals; degrees of freedom.",
+            "Estimability of linear functions; best linear unbiased estimator (BLUE); Gauss–Markov Theorem.",
+            "Considerations for linear regression: categorical predictors; variable influence; outliers.",
+            "Analysis of variance approach to linear models; Fisher–Cochran Theorem.",
+            "Testing of linear hypotheses; equivalence of classical test procedures for linear hypotheses.",
+            "Confidence sets for linear functionals.",
+            "Resampling-based inference techniques.",
+            "One-way and two-way classified data; ANOVA and ANCOVA.",
+            "Multiple comparisons with applications to regression and ANOVA.",
+            "Introduction to random and mixed effects models.",
+            "Regularization and model selection schemes for linear regression."
           ],
           "books": [
             {
               "group": "",
               "items": [
-                "S. R. Searle — Linear Models",
-                "F. A. Graybill — An Introduction to Linear Statistical Models, Vol. I",
-                "J. H. Stapleton — Linear Statistical Models",
-                "R. R. Hocking — Methods and Applications of Linear Models",
-                "R. Christensen — Plane Answers to Complex Questions: The Theory of Linear Models",
-                "C. R. Rao — Linear Statistical Inference and its Applications",
-                "D. Sengupta and S. R. Jammalamadaka — Linear Models: An Integrated Approach"
+                "R. Christensen — Plane Answers to Complex Questions: The Theory of Linear Models (Springer)",
+                "J. Faraway — Linear Models with R (Taylor & Francis)",
+                "J. Jiang — Linear and Generalized Linear Mixed Models and Their Applications (Springer)",
+                "C. R. Rao and H. Toutenburg — Linear Models: Least Squares and Alternatives (Springer)",
+                "S. R. Searle — Linear Models (Wiley)",
+                "D. Sengupta and S. R. Jammalamadaka — Linear Models: An Integrated Approach (World Scientific)"
               ]
             }
           ],
-          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+          "syllabus_source": "Instructor's handout — Debashis Paul, Semester 1, 2026–27",
+          "email": "debpaul.isi@gmail.com",
+          "room": "508, S. N. Bose Bhavan",
+          "class_times": [
+            "Mon 3:10 – 4:55 pm",
+            "Wed 2:15 – 4:00 pm"
+          ]
         }
-      ]
+      ],
+      "weights_note": "Per the instructor's handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing."
     },
     {
       "id": "pi",
@@ -986,13 +1001,85 @@
     }
   ],
   "schedule": {
-    "note": "Class schedule not yet filed — add the slots here and rebuild.",
+    "note": "",
+    "source": "Semester timetable; slot initials resolved against the LSM handout.",
     "days": {
-      "Monday": [],
-      "Tuesday": [],
-      "Wednesday": [],
-      "Thursday": [],
-      "Friday": []
+      "Monday": [
+        {
+          "time": "11:10 – 12:55",
+          "short": "DAA",
+          "course": "Design and Analysis of Algorithms",
+          "room": ""
+        },
+        {
+          "time": "14:15 – 15:05",
+          "short": "EOS&D",
+          "course": "Demography",
+          "room": ""
+        },
+        {
+          "time": "15:10 – 16:55",
+          "short": "LSM",
+          "course": "Linear Statistical Models",
+          "room": "508, S. N. Bose Bhavan"
+        }
+      ],
+      "Tuesday": [
+        {
+          "time": "11:10 – 12:55",
+          "short": "PI",
+          "course": "Parametric Inference",
+          "room": ""
+        },
+        {
+          "time": "14:15 – 16:00",
+          "short": "EOS&D",
+          "course": "Economic and Official Statistics",
+          "room": ""
+        }
+      ],
+      "Wednesday": [
+        {
+          "time": "11:10 – 12:00",
+          "short": "EOS&D",
+          "course": "Demography",
+          "room": ""
+        },
+        {
+          "time": "14:15 – 16:00",
+          "short": "LSM",
+          "course": "Linear Statistical Models",
+          "room": "508, S. N. Bose Bhavan"
+        },
+        {
+          "time": "16:05 – 17:50",
+          "short": "SS",
+          "course": "Sample Surveys",
+          "room": ""
+        }
+      ],
+      "Thursday": [
+        {
+          "time": "11:10 – 12:55",
+          "short": "DAA",
+          "course": "Design and Analysis of Algorithms",
+          "room": ""
+        }
+      ],
+      "Friday": [
+        {
+          "time": "11:10 – 12:55",
+          "short": "PI",
+          "course": "Parametric Inference",
+          "room": ""
+        },
+        {
+          "time": "16:05 – 17:50",
+          "short": "SS",
+          "course": "Sample Surveys",
+          "room": ""
+        }
+      ]
     }
   }
 }

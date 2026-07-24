@@ -86,6 +86,7 @@ h2:first-of-type { margin-top:8px }
 .wkeys { display:flex; flex-wrap:wrap; gap:10px; font-size:11px; color:var(--dim) }
 .dot { display:inline-block; width:7px; height:7px; border-radius:2px;
   margin-right:4px }
+.wtot { color:var(--warn) }
 .note { font-size:11.5px; color:var(--warn); margin:8px 0 0 }
 
 .tracks { margin-top:14px; display:flex; flex-direction:column; gap:14px }
@@ -97,6 +98,11 @@ h2:first-of-type { margin-top:8px }
 .unit { border:1px solid var(--line); border-radius:4px; padding:0 5px;
   font-size:10.5px }
 .fcount { margin-left:auto }
+.track-extra { display:flex; flex-wrap:wrap; gap:5px 10px; margin:-3px 0 9px;
+  font-size:11.5px; color:var(--dim) }
+.track-extra .ct { color:var(--warn) }
+.track-extra .em { text-decoration:none; border-bottom:1px solid transparent }
+.track-extra .em:hover { color:var(--accent); border-bottom-color:var(--accent) }
 
 details.sec { border-top:1px solid var(--line) }
 details.sec summary { cursor:pointer; padding:6px 0; font-size:13px;
@@ -153,9 +159,11 @@ ul.bk-list li { padding:2px 0 }
 .day-h { font-size:11px; text-transform:uppercase; letter-spacing:.06em;
   color:var(--dim); font-weight:600; margin-bottom:7px }
 .day ul { list-style:none; margin:0; padding:0 }
-.day li { display:flex; flex-direction:column; gap:1px; padding:5px 0;
+.day li { display:flex; flex-direction:column; gap:2px; padding:7px 0;
   border-top:1px solid var(--line); font-size:13px }
 .day li:first-child { border-top:0 }
+.slot { display:flex; align-items:baseline; gap:6px }
+.slot .lab { line-height:1.3 }
 .time { font-size:11px; color:var(--warn); font-variant-numeric:tabular-nums }
 .room { font-size:11px; color:var(--dim) }
 .day .empty { margin:0 }
@@ -208,7 +216,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 
 <header class="top"><div class="wrap">
   <h1>B.Stat 3rd Year &middot; Semester 5</h1>
-  <span class="sub">Week 1 of 16 &middot; Friday, 24 July 2026</span>
+  <span class="sub">Semester 1, 2026–27 &middot; Week 1 of 16 &middot; Friday, 24 July 2026</span>
   <nav><a href="#c-lsm">LSM</a><a href="#c-pi">PI</a><a href="#c-ss">SS</a><a href="#c-eosd">EOS&amp;D</a><a href="#c-daa">DAA</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
 </div></header>
 
@@ -230,7 +238,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 <div style="margin-top:14px"><div class="panel"><h4>Course information</h4><ul class="files"><li><a href="00%20Course%20Information/Revised-Brochure-BStat%282016%29.pdf">Revised-Brochure-BStat(2016).pdf</a><span class="meta">304.7 KB &middot; 24 Jul</span></li></ul></div></div>
 
 <h2 id="schedule">Class schedule</h2>
-<p class="src">Class schedule not yet filed — add the slots here and rebuild.</p><div class="timetable"><div class="day"><div class="day-h">Monday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Tuesday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Wednesday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Thursday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Friday</div><p class="empty">&mdash;</p></div></div>
+<p class="src">Semester timetable; slot initials resolved against the LSM handout.</p><div class="timetable"><div class="day"><div class="day-h">Monday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">DAA</span><span class="lab">Design and Analysis of Algorithms</span></span></li><li><span class="time">14:15 – 15:05</span><span class="slot"><span class="badge sm">EOS&amp;D</span><span class="lab">Demography</span></span></li><li><span class="time">15:10 – 16:55</span><span class="slot"><span class="badge sm">LSM</span><span class="lab">Linear Statistical Models</span></span><span class="room">508, S. N. Bose Bhavan</span></li></ul></div><div class="day"><div class="day-h">Tuesday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">PI</span><span class="lab">Parametric Inference</span></span></li><li><span class="time">14:15 – 16:00</span><span class="slot"><span class="badge sm">EOS&amp;D</span><span class="lab">Economic and Official Statistics</span></span></li></ul></div><div class="day"><div class="day-h">Wednesday</div><ul><li><span class="time">11:10 – 12:00</span><span class="slot"><span class="badge sm">EOS&amp;D</span><span class="lab">Demography</span></span></li><li><span class="time">14:15 – 16:00</span><span class="slot"><span class="badge sm">LSM</span><span class="lab">Linear Statistical Models</span></span><span class="room">508, S. N. Bose Bhavan</span></li><li><span class="time">16:05 – 17:50</span><span class="slot"><span class="badge sm">SS</span><span class="lab">Sample Surveys</span></span></li></ul></div><div class="day"><div class="day-h">Thursday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">DAA</span><span class="lab">Design and Analysis of Algorithms</span></span></li></ul></div><div class="day"><div class="day-h">Friday</div><ul><li><span class="time">11:10 – 12:55</span><span class="slot"><span class="badge sm">PI</span><span class="lab">Parametric Inference</span></span></li><li><span class="time">16:05 – 17:50</span><span class="slot"><span class="badge sm">SS</span><span class="lab">Sample Surveys</span></span></li></ul></div></div>
 
 <h2>Courses</h2>
 <div class="cards">
@@ -242,9 +250,9 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
     </div>
     <span class="badge">LSM</span>
   </header>
-  <div class="wbar"><div class="wseg w-mid" style="flex:40" title="Mid-Semester: 40%">40</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-asg" style="flex:10" title="Assignments: 10%">10</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 40%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-asg"></i>Assignments 10%</span></div>
-  
-  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Debashis Paul</span><span class="unit">ASU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  <div class="wbar"><div class="wseg w-mid" style="flex:40" title="Mid-Semester: 40%">40</div><div class="wseg w-sem" style="flex:50" title="Final Exam: 50%">50</div><div class="wseg w-asg" style="flex:10" title="Assignments: 10%">10</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 40%</span><span class="wkey"><i class="dot w-sem"></i>Final Exam 50%</span><span class="wkey"><i class="dot w-asg"></i>Assignments 10%</span></div>
+  <p class="note">Per the instructor&#x27;s handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing.</p>
+  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Debashis Paul</span><span class="unit">ASU</span><span class="fcount">0 files</span></div><div class="track-extra"><span class="ct">Mon 3:10 – 4:55 pm &middot; Wed 2:15 – 4:00 pm</span><span class="rm">508, S. N. Bose Bhavan</span><a class="em" href="mailto:debpaul.isi@gmail.com">debpaul.isi@gmail.com</a></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
   
 </section>
 <section class="card" id="c-pi">
@@ -415,12 +423,12 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   <summary>
     <span class="syl-name">Linear Statistical Models</span>
     <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
-    <span class="pct">0/5</span>
+    <span class="pct">0/12</span>
   </summary>
   <div class="syl-body">
-    <p class="src">B.Stat (2016) brochure — official syllabus</p>
-    <ol class="syl-list"><li class="">Introduction to stochastic models; formulation and illustrations. Linear statistical models; illustrations.</li><li class="">Least square estimation, estimable linear functions, normal equations, Best Linear Unbiased Estimates (BLUEs). Gauss–Markov Theorem.</li><li class="">Degrees of freedom. Fundamental Theorems of Least Squares. Testing of linear hypotheses. One-way and two-way classification models, ANOVA and ANCOVA. Nested models. Multiple comparisons.</li><li class="">Introduction to random effect models.</li><li class="">Illustration with specific examples and numerical exercises using statistical packages, preferably R.</li></ol>
-    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>S. R. Searle — Linear Models</li><li>F. A. Graybill — An Introduction to Linear Statistical Models, Vol. I</li><li>J. H. Stapleton — Linear Statistical Models</li><li>R. R. Hocking — Methods and Applications of Linear Models</li><li>R. Christensen — Plane Answers to Complex Questions: The Theory of Linear Models</li><li>C. R. Rao — Linear Statistical Inference and its Applications</li><li>D. Sengupta and S. R. Jammalamadaka — Linear Models: An Integrated Approach</li></ul></div>
+    <p class="src">Instructor&#x27;s handout — Debashis Paul, Semester 1, 2026–27</p>
+    <ol class="syl-list"><li class="">Gauss–Markov framework for linear statistical models.</li><li class="">Least squares estimation; normal equations; algebraic properties of residuals; degrees of freedom.</li><li class="">Estimability of linear functions; best linear unbiased estimator (BLUE); Gauss–Markov Theorem.</li><li class="">Considerations for linear regression: categorical predictors; variable influence; outliers.</li><li class="">Analysis of variance approach to linear models; Fisher–Cochran Theorem.</li><li class="">Testing of linear hypotheses; equivalence of classical test procedures for linear hypotheses.</li><li class="">Confidence sets for linear functionals.</li><li class="">Resampling-based inference techniques.</li><li class="">One-way and two-way classified data; ANOVA and ANCOVA.</li><li class="">Multiple comparisons with applications to regression and ANOVA.</li><li class="">Introduction to random and mixed effects models.</li><li class="">Regularization and model selection schemes for linear regression.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>R. Christensen — Plane Answers to Complex Questions: The Theory of Linear Models (Springer)</li><li>J. Faraway — Linear Models with R (Taylor &amp; Francis)</li><li>J. Jiang — Linear and Generalized Linear Mixed Models and Their Applications (Springer)</li><li>C. R. Rao and H. Toutenburg — Linear Models: Least Squares and Alternatives (Springer)</li><li>S. R. Searle — Linear Models (Wiley)</li><li>D. Sengupta and S. R. Jammalamadaka — Linear Models: An Integrated Approach (World Scientific)</li></ul></div>
   </div>
 </details>
 <details class="syl">
@@ -485,7 +493,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 </details>
 
 <footer>
-  Generated 24 Jul 2026, 22:13 from
+  Generated 24 Jul 2026, 22:52 from
   <code>_dashboard/plan.json</code>. Edit that file, then run
   <code>python _dashboard/build.py</code> to refresh this page.
 </footer>

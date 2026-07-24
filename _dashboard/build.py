@@ -154,20 +154,30 @@ def esc(s):
     return html.escape(str(s), quote=True)
 
 
+WEIGHT_CLS = {
+    "Mid-Semester": "w-mid", "Mid-Semester Exam": "w-mid",
+    "Semester": "w-sem", "Final Exam": "w-sem", "Semester Exam": "w-sem",
+    "Project": "w-proj",
+    "Assignments": "w-asg", "Homework Assignments": "w-asg",
+}
+FALLBACK_CLS = ["w-mid", "w-sem", "w-proj", "w-asg"]
+
+
 def weight_bar(weights):
-    order = ["Mid-Semester", "Semester", "Project", "Assignments"]
-    cls = {"Mid-Semester": "w-mid", "Semester": "w-sem", "Project": "w-proj",
-           "Assignments": "w-asg"}
-    if all(weights.get(k) in (None, 0) for k in order):
+    """Renders whatever components a course actually has, in plan.json order."""
+    items = [(k, v) for k, v in (weights or {}).items() if v]
+    if not items:
         return '<div class="wbar unknown"><span>weighting not specified</span></div>'
     segs, keys = [], []
-    for k in order:
-        v = weights.get(k)
-        if not v:
-            continue
-        segs.append(f'<div class="wseg {cls[k]}" style="flex:{v}" title="{esc(k)}: {v}%">{v}</div>')
-        keys.append(f'<span class="wkey"><i class="dot {cls[k]}"></i>{esc(k)} {v}%</span>')
-    return f'<div class="wbar">{"".join(segs)}</div><div class="wkeys">{"".join(keys)}</div>'
+    for i, (k, v) in enumerate(items):
+        c = WEIGHT_CLS.get(k, FALLBACK_CLS[i % len(FALLBACK_CLS)])
+        segs.append(f'<div class="wseg {c}" style="flex:{v}" title="{esc(k)}: {v}%">{v}</div>')
+        keys.append(f'<span class="wkey"><i class="dot {c}"></i>{esc(k)} {v}%</span>')
+    total = sum(v for _, v in items)
+    warn = ("" if total == 100 else
+            f'<span class="wkey wtot">components sum to {total}%</span>')
+    return (f'<div class="wbar">{"".join(segs)}</div>'
+            f'<div class="wkeys">{"".join(keys)}{warn}</div>')
 
 
 def file_list(files, empty_msg):
@@ -192,6 +202,15 @@ def render_course_card(plan, course, scans):
         head = ""
         if t.get("name"):
             head = f'<div class="track-name">{esc(t["name"])}</div>'
+        extra = []
+        if t.get("class_times"):
+            extra.append('<span class="ct">' +
+                         " &middot; ".join(esc(x) for x in t["class_times"]) + "</span>")
+        if t.get("room"):
+            extra.append(f'<span class="rm">{esc(t["room"])}</span>')
+        if t.get("email"):
+            extra.append(f'<a class="em" href="mailto:{esc(t["email"])}">{esc(t["email"])}</a>')
+        extra_html = f'<div class="track-extra">{"".join(extra)}</div>' if extra else ""
         secs = []
         for name in SECTIONS:
             files = s[name]
@@ -206,6 +225,7 @@ def render_course_card(plan, course, scans):
             f'<div class="track-meta"><span class="teacher">{esc(t["teacher"])}</span>'
             f'<span class="unit">{esc(t["unit"])}</span>'
             f'<span class="fcount">{total} file{"" if total == 1 else "s"}</span></div>'
+            f'{extra_html}'
             f'<div class="secs">{"".join(secs)}</div>'
             f'</div>'
         )
@@ -291,11 +311,14 @@ def render_schedule(plan):
         for s in slots:
             any_slot = True
             room = f'<span class="room">{esc(s["room"])}</span>' if s.get("room") else ""
+            tag = f'<span class="badge sm">{esc(s["short"])}</span>' if s.get("short") else ""
             rows.append(f'<li><span class="time">{esc(s.get("time", ""))}</span>'
-                        f'<span class="lab">{esc(s.get("course", ""))}</span>{room}</li>')
+                        f'<span class="slot">{tag}<span class="lab">'
+                        f'{esc(s.get("course", ""))}</span></span>{room}</li>')
         body = f'<ul>{"".join(rows)}</ul>' if rows else '<p class="empty">&mdash;</p>'
         cols.append(f'<div class="day"><div class="day-h">{esc(day)}</div>{body}</div>')
-    note = f'<p class="src">{esc(sch["note"])}</p>' if sch.get("note") and not any_slot else ""
+    msg = sch.get("note") if not any_slot else sch.get("source")
+    note = f'<p class="src">{esc(msg)}</p>' if msg else ""
     return f'{note}<div class="timetable">{"".join(cols)}</div>' if cols else ""
 
 
@@ -506,6 +529,7 @@ h2:first-of-type {{ margin-top:8px }}
 .wkeys {{ display:flex; flex-wrap:wrap; gap:10px; font-size:11px; color:var(--dim) }}
 .dot {{ display:inline-block; width:7px; height:7px; border-radius:2px;
   margin-right:4px }}
+.wtot {{ color:var(--warn) }}
 .note {{ font-size:11.5px; color:var(--warn); margin:8px 0 0 }}
 
 .tracks {{ margin-top:14px; display:flex; flex-direction:column; gap:14px }}
@@ -517,6 +541,11 @@ h2:first-of-type {{ margin-top:8px }}
 .unit {{ border:1px solid var(--line); border-radius:4px; padding:0 5px;
   font-size:10.5px }}
 .fcount {{ margin-left:auto }}
+.track-extra {{ display:flex; flex-wrap:wrap; gap:5px 10px; margin:-3px 0 9px;
+  font-size:11.5px; color:var(--dim) }}
+.track-extra .ct {{ color:var(--warn) }}
+.track-extra .em {{ text-decoration:none; border-bottom:1px solid transparent }}
+.track-extra .em:hover {{ color:var(--accent); border-bottom-color:var(--accent) }}
 
 details.sec {{ border-top:1px solid var(--line) }}
 details.sec summary {{ cursor:pointer; padding:6px 0; font-size:13px;
@@ -573,9 +602,11 @@ ul.bk-list li {{ padding:2px 0 }}
 .day-h {{ font-size:11px; text-transform:uppercase; letter-spacing:.06em;
   color:var(--dim); font-weight:600; margin-bottom:7px }}
 .day ul {{ list-style:none; margin:0; padding:0 }}
-.day li {{ display:flex; flex-direction:column; gap:1px; padding:5px 0;
+.day li {{ display:flex; flex-direction:column; gap:2px; padding:7px 0;
   border-top:1px solid var(--line); font-size:13px }}
 .day li:first-child {{ border-top:0 }}
+.slot {{ display:flex; align-items:baseline; gap:6px }}
+.slot .lab {{ line-height:1.3 }}
 .time {{ font-size:11px; color:var(--warn); font-variant-numeric:tabular-nums }}
 .room {{ font-size:11px; color:var(--dim) }}
 .day .empty {{ margin:0 }}
@@ -628,7 +659,7 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 
 <header class="top"><div class="wrap">
   <h1>{esc(sem['program'])} &middot; {esc(sem['name'])}</h1>
-  <span class="sub">Week {cur_week} of {sem['num_weeks']} &middot; {today.strftime('%A, %d %B %Y')}</span>
+  <span class="sub">{esc(sem['also_known_as']) + ' &middot; ' if sem.get('also_known_as') else ''}Week {cur_week} of {sem['num_weeks']} &middot; {today.strftime('%A, %d %B %Y')}</span>
   <nav>{nav}<a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
 </div></header>
 
