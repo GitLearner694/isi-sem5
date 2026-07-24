@@ -1,0 +1,27 @@
+# Windows / editor cruft
+desktop.ini
+Thumbs.db
+.DS_Store
+~$*
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+
+# Claude Code local settings
+.claude/
+
+# ---------------------------------------------------------------------------
+# Copyright note
+#
+# Anything committed here becomes PUBLIC once the repo is pushed and Pages is
+# enabled. Scanned textbooks and other copyrighted PDFs must not be published.
+# Keep them out of the repo by uncommenting the rules below — the dashboard
+# will still list them when you open index.html locally, but they will not be
+# uploaded.
+#
+# */Study Material/*.pdf
+# */*/Study Material/*.pdf
+# */Study Material/*.djvu
+# */Study Material/*.epub

@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Semester 5 &middot; Dashboard</title>
+<style>
+:root {
+  --bg:#f7f7f5; --panel:#fff; --ink:#1a1a18; --dim:#6b6b66; --line:#e3e2dd;
+  --accent:#8a5a2b; --ok:#3d7a4e; --warn:#a8622a;
+  --mid:#c26a4a; --sem:#4a6fa5; --proj:#6b8e5a; --asg:#a58a4a;
+}
+@media (prefers-color-scheme:dark) {
+  :root { --bg:#161614; --panel:#1e1e1c; --ink:#e8e7e2; --dim:#95948d; --line:#33322e;
+    --accent:#d3a06a; --ok:#79b98c; --warn:#d9a05f;
+    --mid:#d98a6a; --sem:#7a9fd5; --proj:#93b982; --asg:#c9ae6e; }
+}
+* { box-sizing:border-box }
+body { margin:0; background:var(--bg); color:var(--ink);
+  font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif; }
+a { color:inherit }
+.wrap { max-width:1180px; margin:0 auto; padding:0 20px 80px }
+
+header.top { position:sticky; top:0; z-index:20; background:var(--bg);
+  border-bottom:1px solid var(--line); padding:14px 0 10px; margin-bottom:24px }
+header.top .wrap { padding-bottom:0; display:flex; align-items:baseline;
+  gap:16px; flex-wrap:wrap }
+header.top h1 { font-size:17px; margin:0; letter-spacing:-.01em }
+header.top .sub { color:var(--dim); font-size:13px }
+nav { margin-left:auto; display:flex; gap:4px; flex-wrap:wrap }
+nav a { font-size:12px; padding:3px 9px; border:1px solid var(--line);
+  border-radius:99px; text-decoration:none; color:var(--dim) }
+nav a:hover { color:var(--ink); border-color:var(--accent) }
+
+h2 { font-size:13px; text-transform:uppercase; letter-spacing:.09em;
+  color:var(--dim); font-weight:600; margin:38px 0 14px }
+h2:first-of-type { margin-top:8px }
+
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px; margin-bottom:8px }
+.stat { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:13px 15px }
+.stat b { display:block; font-size:24px; font-weight:600; letter-spacing:-.02em }
+.stat span { font-size:12px; color:var(--dim) }
+
+.two { display:grid; grid-template-columns:1fr 1fr; gap:14px }
+@media (max-width:760px) { .two { grid-template-columns:1fr } }
+.panel { background:var(--panel); border:1px solid var(--line);
+  border-radius:10px; padding:14px 16px }
+.panel h4 { margin:0 0 10px; font-size:12px; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--dim); font-weight:600 }
+.panel ul { list-style:none; margin:0; padding:0 }
+.panel li { display:flex; align-items:baseline; gap:9px; padding:5px 0;
+  border-top:1px solid var(--line); font-size:13.5px }
+.panel li:first-child { border-top:0 }
+.panel li > .lab { flex:1; min-width:0 }
+.due-d { flex:0 0 auto; font-variant-numeric:tabular-nums; color:var(--warn);
+  font-size:12px; min-width:64px }
+.panel .meta { flex:0 1 auto; color:var(--dim); font-size:11.5px;
+  text-align:right }
+.sub-note { display:block; font-size:11.5px; color:var(--dim); font-style:normal }
+
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+  gap:14px; align-items:start }
+.card { background:var(--panel); border:1px solid var(--line);
+  border-radius:12px; padding:16px 17px; scroll-margin-top:74px }
+.card-head { display:flex; justify-content:space-between; align-items:flex-start;
+  gap:10px; margin-bottom:12px }
+.card h3 { margin:0; font-size:16.5px; letter-spacing:-.01em; line-height:1.3 }
+.folder { font-size:11.5px; color:var(--dim); text-decoration:none;
+  font-family:ui-monospace,Consolas,monospace }
+.folder:hover { color:var(--accent) }
+.badge { font-size:11px; font-weight:600; letter-spacing:.04em; padding:2px 8px;
+  border-radius:5px; background:var(--bg); border:1px solid var(--line);
+  color:var(--dim); white-space:nowrap }
+.badge.sm { font-size:10px; padding:1px 6px }
+
+.wbar { display:flex; height:20px; border-radius:5px; overflow:hidden;
+  margin-bottom:7px }
+.wseg { display:flex; align-items:center; justify-content:center; color:#fff;
+  font-size:10.5px; font-weight:600 }
+.w-mid { background:var(--mid) } .w-sem { background:var(--sem) }
+.w-proj { background:var(--proj) } .w-asg { background:var(--asg) }
+.wbar.unknown { background:repeating-linear-gradient(45deg,var(--bg),var(--bg) 6px,
+  var(--line) 6px,var(--line) 12px); align-items:center; justify-content:center }
+.wbar.unknown span { font-size:11px; color:var(--dim) }
+.wkeys { display:flex; flex-wrap:wrap; gap:10px; font-size:11px; color:var(--dim) }
+.dot { display:inline-block; width:7px; height:7px; border-radius:2px;
+  margin-right:4px }
+.note { font-size:11.5px; color:var(--warn); margin:8px 0 0 }
+
+.tracks { margin-top:14px; display:flex; flex-direction:column; gap:14px }
+.track + .track { border-top:1px dashed var(--line); padding-top:14px }
+.track-name { font-size:13.5px; font-weight:600; margin-bottom:3px }
+.track-meta { display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  font-size:12px; color:var(--dim); margin-bottom:8px }
+.teacher { color:var(--ink) }
+.unit { border:1px solid var(--line); border-radius:4px; padding:0 5px;
+  font-size:10.5px }
+.fcount { margin-left:auto }
+
+details.sec { border-top:1px solid var(--line) }
+details.sec summary { cursor:pointer; padding:6px 0; font-size:13px;
+  display:flex; align-items:center; gap:7px; list-style:none }
+details.sec summary::-webkit-details-marker { display:none }
+details.sec summary::before { content:"\25B8"; color:var(--dim); font-size:10px;
+  transition:transform .12s }
+details.sec[open] summary::before { transform:rotate(90deg) }
+.ico { opacity:.6 }
+.count { margin-left:auto; font-size:11px; color:var(--dim);
+  background:var(--bg); border-radius:99px; padding:0 7px; min-width:20px;
+  text-align:center }
+details.proj { margin-top:12px; border-top:1px solid var(--line) }
+
+ul.files { list-style:none; margin:0 0 8px; padding:0 0 0 17px }
+ul.files li { display:flex; gap:9px; align-items:baseline; padding:2.5px 0;
+  font-size:13px }
+ul.files a { text-decoration:none; border-bottom:1px solid transparent;
+  overflow-wrap:anywhere }
+ul.files a:hover { border-bottom-color:var(--accent); color:var(--accent) }
+ul.files .sub { color:var(--dim) }
+ul.files .meta { margin-left:auto; color:var(--dim); font-size:11px;
+  white-space:nowrap }
+.empty { color:var(--dim); font-size:12.5px; font-style:italic;
+  margin:2px 0 8px 17px }
+
+details.syl { background:var(--panel); border:1px solid var(--line);
+  border-radius:10px; margin-bottom:9px }
+details.syl summary { cursor:pointer; padding:11px 15px; display:flex;
+  align-items:center; gap:13px; list-style:none; font-size:14px }
+details.syl summary::-webkit-details-marker { display:none }
+.syl-name { font-weight:500; flex:0 0 auto }
+.prog { flex:1; height:5px; background:var(--bg); border-radius:99px;
+  overflow:hidden; min-width:60px }
+.prog-fill { display:block; height:100%; background:var(--ok) }
+.pct { font-size:11.5px; color:var(--dim); font-variant-numeric:tabular-nums }
+.syl-body { padding:0 18px 14px }
+.src { margin:0 0 10px 20px; font-size:11.5px; color:var(--dim);
+  font-style:italic }
+ol.syl-list { margin:0; padding:0 0 0 20px; font-size:13.5px;
+  color:var(--dim) }
+ol.syl-list li { padding:3px 0 }
+.books { margin-top:14px; padding-top:12px; border-top:1px dashed var(--line) }
+.books .lbl { font-size:10.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--dim); margin-bottom:6px }
+.bk-group { font-size:12px; font-weight:600; margin:9px 0 3px; color:var(--ink) }
+ul.bk-list { margin:0; padding-left:20px; font-size:13px; color:var(--dim) }
+ul.bk-list li { padding:2px 0 }
+
+.timetable { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:10px; overflow:hidden }
+.day { background:var(--panel); padding:11px 13px 13px; min-height:78px }
+.day-h { font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--dim); font-weight:600; margin-bottom:7px }
+.day ul { list-style:none; margin:0; padding:0 }
+.day li { display:flex; flex-direction:column; gap:1px; padding:5px 0;
+  border-top:1px solid var(--line); font-size:13px }
+.day li:first-child { border-top:0 }
+.time { font-size:11px; color:var(--warn); font-variant-numeric:tabular-nums }
+.room { font-size:11px; color:var(--dim) }
+.day .empty { margin:0 }
+ol.syl-list li.done { color:var(--ink) }
+ol.syl-list li.done::marker { color:var(--ok) }
+.wk { font-size:10.5px; color:var(--ok); border:1px solid var(--ok);
+  border-radius:4px; padding:0 5px; margin-left:8px; white-space:nowrap }
+
+details.week { background:var(--panel); border:1px solid var(--line);
+  border-radius:10px; margin-bottom:8px }
+details.week.current { border-color:var(--accent) }
+details.week.past { opacity:.82 }
+details.week summary { cursor:pointer; padding:11px 15px; display:flex;
+  align-items:center; gap:13px; list-style:none; font-size:14px }
+details.week summary::-webkit-details-marker { display:none }
+.wn { font-weight:600; min-width:66px }
+.wr { color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums }
+.flags { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap }
+.flag { font-size:10.5px; padding:1px 7px; border-radius:99px;
+  border:1px solid var(--line); color:var(--dim) }
+.flag.now { border-color:var(--accent); color:var(--accent) }
+.flag.task { border-color:var(--warn); color:var(--warn) }
+.wnote { padding:0 15px 10px; font-size:13px; color:var(--dim) }
+.wgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+  gap:1px; background:var(--line); border-top:1px solid var(--line) }
+.wcol { background:var(--panel); padding:12px 14px 14px }
+.wcol-h { display:flex; align-items:center; gap:7px; font-size:12.5px;
+  font-weight:600; margin-bottom:8px; line-height:1.3 }
+.wcol .lbl { font-size:10.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--dim); margin-top:9px }
+.wcol ul { margin:3px 0 0; padding-left:16px; font-size:13px }
+.wcol li { padding:1.5px 0 }
+.wcol .empty { margin-left:0 }
+ul.tasks { list-style:none; padding-left:0 }
+ul.tasks li.tdone { color:var(--dim); text-decoration:line-through }
+.due { font-size:10.5px; color:var(--warn) }
+
+.filters { display:flex; gap:6px; margin-bottom:12px }
+.filters button { font:inherit; font-size:12px; padding:3px 11px;
+  border:1px solid var(--line); background:var(--panel); color:var(--dim);
+  border-radius:99px; cursor:pointer }
+.filters button.on { border-color:var(--accent); color:var(--accent) }
+footer { margin-top:44px; padding-top:16px; border-top:1px solid var(--line);
+  font-size:11.5px; color:var(--dim) }
+code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
+  background:var(--panel); border:1px solid var(--line); border-radius:4px;
+  padding:1px 5px }
+</style>
+</head><body>
+
+<header class="top"><div class="wrap">
+  <h1>B.Stat 3rd Year &middot; Semester 5</h1>
+  <span class="sub">Week 1 of 16 &middot; Friday, 24 July 2026</span>
+  <nav><a href="#c-lsm">LSM</a><a href="#c-pi">PI</a><a href="#c-ss">SS</a><a href="#c-eosd">EOS&amp;D</a><a href="#c-daa">DAA</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
+</div></header>
+
+<div class="wrap">
+
+<h2>At a glance</h2>
+<div class="stats">
+  <div class="stat"><b>5</b><span>courses &middot; 6 taught units</span></div>
+  <div class="stat"><b>1</b><span>files filed</span></div>
+  <div class="stat"><b>0</b><span>weeks logged</span></div>
+  <div class="stat"><b>0</b><span>open tasks</span></div>
+</div>
+
+<div class="two" style="margin-top:14px">
+  <div class="panel"><h4>Next up</h4><ul><li class="empty">nothing with a due date yet</li></ul></div>
+  <div class="panel"><h4>Milestones</h4><ul><li class="stack"><span class="due-d">TBD</span><span class="lab">Mid-Semester Examinations<em class="sub-note">date TBD — fill in when announced</em></span></li><li class="stack"><span class="due-d">TBD</span><span class="lab">Project submissions (SS / EOS&amp;D / DAA)<em class="sub-note">date TBD</em></span></li><li class="stack"><span class="due-d">TBD</span><span class="lab">Semester Examinations<em class="sub-note">date TBD</em></span></li></ul></div>
+</div>
+
+<div style="margin-top:14px"><div class="panel"><h4>Course information</h4><ul class="files"><li><a href="00%20Course%20Information/Revised-Brochure-BStat%282016%29.pdf">Revised-Brochure-BStat(2016).pdf</a><span class="meta">304.7 KB &middot; 24 Jul</span></li></ul></div></div>
+
+<h2 id="schedule">Class schedule</h2>
+<p class="src">Class schedule not yet filed — add the slots here and rebuild.</p><div class="timetable"><div class="day"><div class="day-h">Monday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Tuesday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Wednesday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Thursday</div><p class="empty">&mdash;</p></div><div class="day"><div class="day-h">Friday</div><p class="empty">&mdash;</p></div></div>
+
+<h2>Courses</h2>
+<div class="cards">
+<section class="card" id="c-lsm">
+  <header class="card-head">
+    <div>
+      <h3>Linear Statistical Models</h3>
+      <a class="folder" href="01%20Linear%20Statistical%20Models">01 Linear Statistical Models/</a>
+    </div>
+    <span class="badge">LSM</span>
+  </header>
+  <div class="wbar"><div class="wseg w-mid" style="flex:40" title="Mid-Semester: 40%">40</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-asg" style="flex:10" title="Assignments: 10%">10</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 40%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-asg"></i>Assignments 10%</span></div>
+  
+  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Debashis Paul</span><span class="unit">ASU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  
+</section>
+<section class="card" id="c-pi">
+  <header class="card-head">
+    <div>
+      <h3>Parametric Inference</h3>
+      <a class="folder" href="02%20Parametric%20Inference">02 Parametric Inference/</a>
+    </div>
+    <span class="badge">PI</span>
+  </header>
+  <div class="wbar unknown"><span>weighting not specified</span></div>
+  <p class="note">Not specified on the course sheet — confirm with the instructor.</p>
+  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Probal Chaudhuri</span><span class="unit">SMU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  
+</section>
+<section class="card" id="c-ss">
+  <header class="card-head">
+    <div>
+      <h3>Sample Surveys</h3>
+      <a class="folder" href="03%20Sample%20Surveys">03 Sample Surveys/</a>
+    </div>
+    <span class="badge">SS</span>
+  </header>
+  <div class="wbar"><div class="wseg w-mid" style="flex:30" title="Mid-Semester: 30%">30</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-proj" style="flex:20" title="Project: 20%">20</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 30%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-proj"></i>Project 20%</span></div>
+  
+  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Ambarish Chattopadhyay</span><span class="unit">ASU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  <details class="sec proj"><summary><span class="ico">&#128203;</span>Project<span class="count">0</span></summary><p class="empty">no project files yet</p></details>
+</section>
+<section class="card" id="c-eosd">
+  <header class="card-head">
+    <div>
+      <h3>Economic and Official Statistics and Demography</h3>
+      <a class="folder" href="04%20Economic%20and%20Official%20Statistics%20and%20Demography">04 Economic and Official Statistics and Demography/</a>
+    </div>
+    <span class="badge">EOS&amp;D</span>
+  </header>
+  <div class="wbar"><div class="wseg w-mid" style="flex:30" title="Mid-Semester: 30%">30</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-proj" style="flex:20" title="Project: 20%">20</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 30%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-proj"></i>Project 20%</span></div>
+  <p class="note">One combined course made of two halves taught separately.</p>
+  <div class="tracks"><div class="track"><div class="track-name">Economic and Official Statistics</div><div class="track-meta"><span class="teacher">Sandip Mitra</span><span class="unit">SOSU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div><div class="track"><div class="track-name">Demography</div><div class="track-meta"><span class="teacher">Kajori Banerjee</span><span class="unit">PSU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  <details class="sec proj"><summary><span class="ico">&#128203;</span>Project<span class="count">0</span></summary><p class="empty">no project files yet</p></details>
+</section>
+<section class="card" id="c-daa">
+  <header class="card-head">
+    <div>
+      <h3>Design and Analysis of Algorithms</h3>
+      <a class="folder" href="05%20Design%20and%20Analysis%20of%20Algorithms">05 Design and Analysis of Algorithms/</a>
+    </div>
+    <span class="badge">DAA</span>
+  </header>
+  <div class="wbar"><div class="wseg w-mid" style="flex:30" title="Mid-Semester: 30%">30</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-proj" style="flex:20" title="Project: 20%">20</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 30%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-proj"></i>Project 20%</span></div>
+  
+  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Sandip Das</span><span class="unit">ACMU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  <details class="sec proj"><summary><span class="ico">&#128203;</span>Project<span class="count">0</span></summary><p class="empty">no project files yet</p></details>
+</section></div>
+
+<h2 id="weekly">Weekly plan</h2>
+<div class="filters">
+  <button data-f="all" class="on">All</button>
+  <button data-f="current">This week</button>
+  <button data-f="past">Past</button>
+  <button data-f="future">Upcoming</button>
+</div>
+
+<details class="week current" open data-state="current">
+  <summary><span class="wn">Week 1</span><span class="wr">20 Jul &ndash; 26 Jul 2026</span>
+  <span class="flags"><span class="flag now">this week</span><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 2</span><span class="wr">27 Jul &ndash; 02 Aug 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 3</span><span class="wr">03 Aug &ndash; 09 Aug 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 4</span><span class="wr">10 Aug &ndash; 16 Aug 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 5</span><span class="wr">17 Aug &ndash; 23 Aug 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 6</span><span class="wr">24 Aug &ndash; 30 Aug 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 7</span><span class="wr">31 Aug &ndash; 06 Sep 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 8</span><span class="wr">07 Sep &ndash; 13 Sep 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 9</span><span class="wr">14 Sep &ndash; 20 Sep 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 10</span><span class="wr">21 Sep &ndash; 27 Sep 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 11</span><span class="wr">28 Sep &ndash; 04 Oct 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 12</span><span class="wr">05 Oct &ndash; 11 Oct 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 13</span><span class="wr">12 Oct &ndash; 18 Oct 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 14</span><span class="wr">19 Oct &ndash; 25 Oct 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 15</span><span class="wr">26 Oct &ndash; 01 Nov 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+<details class="week future" data-state="future">
+  <summary><span class="wn">Week 16</span><span class="wr">02 Nov &ndash; 08 Nov 2026</span>
+  <span class="flags"><span class="flag empty-f">not logged</span></span></summary>
+  
+  <div class="wgrid"><div class="wcol"><div class="wcol-h"><span class="badge sm">LSM</span>Linear Statistical Models</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">PI</span>Parametric Inference</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">SS</span>Sample Surveys</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Economic and Official Statistics</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">EOS&amp;D</span>Demography</div><p class="empty">not logged yet</p></div><div class="wcol"><div class="wcol-h"><span class="badge sm">DAA</span>Design and Analysis of Algorithms</div><p class="empty">not logged yet</p></div></div>
+</details>
+
+<h2 id="syllabus">Syllabus &amp; reference texts</h2>
+<p style="font-size:12.5px;color:var(--dim);margin:-6px 0 14px">
+  Official syllabus and reference texts as printed in the B.Stat (2016) brochure.
+  A topic ticks off when its index is listed under a week&rsquo;s
+  <code>syllabus</code> field in <code>_dashboard/plan.json</code>.</p>
+
+<details class="syl">
+  <summary>
+    <span class="syl-name">Linear Statistical Models</span>
+    <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
+    <span class="pct">0/5</span>
+  </summary>
+  <div class="syl-body">
+    <p class="src">B.Stat (2016) brochure — official syllabus</p>
+    <ol class="syl-list"><li class="">Introduction to stochastic models; formulation and illustrations. Linear statistical models; illustrations.</li><li class="">Least square estimation, estimable linear functions, normal equations, Best Linear Unbiased Estimates (BLUEs). Gauss–Markov Theorem.</li><li class="">Degrees of freedom. Fundamental Theorems of Least Squares. Testing of linear hypotheses. One-way and two-way classification models, ANOVA and ANCOVA. Nested models. Multiple comparisons.</li><li class="">Introduction to random effect models.</li><li class="">Illustration with specific examples and numerical exercises using statistical packages, preferably R.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>S. R. Searle — Linear Models</li><li>F. A. Graybill — An Introduction to Linear Statistical Models, Vol. I</li><li>J. H. Stapleton — Linear Statistical Models</li><li>R. R. Hocking — Methods and Applications of Linear Models</li><li>R. Christensen — Plane Answers to Complex Questions: The Theory of Linear Models</li><li>C. R. Rao — Linear Statistical Inference and its Applications</li><li>D. Sengupta and S. R. Jammalamadaka — Linear Models: An Integrated Approach</li></ul></div>
+  </div>
+</details>
+<details class="syl">
+  <summary>
+    <span class="syl-name">Parametric Inference</span>
+    <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
+    <span class="pct">0/5</span>
+  </summary>
+  <div class="syl-body">
+    <p class="src">B.Stat (2016) brochure — official syllabus</p>
+    <ol class="syl-list"><li class="">Basic inference problems. Sufficiency, factorization theorem, minimal sufficiency. Completeness, Lehmann–Scheffé Theorem. Ancillarity, Basu&#x27;s Theorem. Exponential families of distributions, canonical parameters and canonical sufficient statistics.</li><li class="">Point estimation: criteria for goodness — mean square error, unbiasedness, relative efficiency, Cramér–Rao inequality, Bhattacharya bounds, UMVUE, Rao–Blackwell theorem. Consistency.</li><li class="">Bayesian techniques: priors, posteriors, Bayes&#x27; estimators and Bayesian credible regions.</li><li class="">Tests of hypotheses: statistical hypothesis, simple and composite hypotheses, critical regions. Neyman–Pearson Lemma and MP test; randomization; UMP, UMPU and LMP tests; illustrations. Monotone likelihood ratio family of distributions.</li><li class="">Likelihood ratio tests. Test of multiple hypotheses, union–intersection principle.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>P. J. Bickel and K. A. Doksum — Mathematical Statistics</li><li>G. Casella and R. L. Berger — Statistical Inference</li><li>C. R. Rao — Linear Statistical Inference and its Applications</li><li>E. L. Lehmann — Theory of Point Estimation</li><li>E. L. Lehmann — Testing Statistical Hypotheses</li></ul></div>
+  </div>
+</details>
+<details class="syl">
+  <summary>
+    <span class="syl-name">Sample Surveys</span>
+    <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
+    <span class="pct">0/6</span>
+  </summary>
+  <div class="syl-body">
+    <p class="src">B.Stat (2016) brochure — official syllabus</p>
+    <ol class="syl-list"><li class="">Concepts of population, sample, survey and census. Sampling designs and schemes.</li><li class="">Properties of good estimators under different approaches: design, predictive, super-population-modelling and model-assisted. Sampling strategies.</li><li class="">Drawing simple random samples (SRS) with and without replacement using random numbers; estimation; sample size determination.</li><li class="">Narain–Horvitz–Thompson estimator. Sen–Yates–Grundy estimator. Stratified sampling, cluster sampling, multi-stage sampling. PPS sampling — WR and WOR. Systematic sampling — equal and unequal probabilities, linear and circular, unbiased variance estimation.</li><li class="">Ratio and regression estimation for equal and unequal probability sampling; Hartley–Ross estimator. Interpenetrating Network of Subsampling (IPNS) and half-sampling.</li><li class="">Double sampling — non-response and &#x27;not-at-homes&#x27;. Sampling on successive occasions. Acquaintance with National Sample Surveys and other large-scale surveys; controlling non-sampling errors.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>W. G. Cochran — Sampling Techniques</li><li>M. N. Murthy — Sampling Theory and Methods</li><li>A. Chaudhuri — Essentials of Survey Sampling</li><li>A. S. Hedayat and B. K. Sinha — Design and Inference in Finite Population Sampling</li><li>C. M. Cassel, C. E. Särndal and J. H. Wretman — Foundations of Inference in Survey Sampling</li></ul></div>
+  </div>
+</details>
+<details class="syl">
+  <summary>
+    <span class="syl-name">EOS&D &middot; Economic and Official Statistics</span>
+    <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
+    <span class="pct">0/7</span>
+  </summary>
+  <div class="syl-body">
+    <p class="src">B.Stat (2016) brochure — official syllabus</p>
+    <ol class="syl-list"><li class="">Index numbers: construction of index numbers, properties, well-known index number formulae, problems of construction, chain indices, cost of living indices, splicing of index numbers, different types of index numbers used in India.</li><li class="">Analysis of income and allied size distributions: Pareto and log-normal distributions — genesis, specification and estimation. Lorenz curve, Gini coefficient.</li><li class="">Demand analysis: classification of commodities, Engel curve analysis using cross-section and time series data, Engel curves incorporating household characteristics, demand projection, specific concentration curves.</li><li class="">Production analysis: profit maximization, cost minimization, returns to scale, Cobb–Douglas and ACMS production functions.</li><li class="">Indian Statistical System: official organisations collecting, compiling and publishing national and state level data — CSO, NSSO, RBI, Planning Commission, State Statistical Bureaus, Labour Bureau, Population Census; role of Centre and State.</li><li class="">Selected topics on Indian statistics: agriculture and allied areas including meteorology and environment; industry, trade and finance including money supply and banking; national accounts and infrastructure; population, health, education, prices, level of living, labour and employment.</li><li class="">International Statistical System: comparison of major macro variables — National Income / GDP. Purchasing power parity; indicators relating to energy, environment, gender, industry, national accounts, social statistics and trade.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><div class="bk-group">Economic Statistics</div><ul class="bk-list"><li>P. H. Karmel and M. Polasek — Applied Statistics for Economists</li><li>R. G. D. Allen — Price Index Numbers</li><li>N. Kakwani — Income Inequality and Poverty</li><li>L. R. Klein — An Introduction to Econometrics</li><li>J. S. Cramer — Empirical Econometrics</li><li>M. D. Intrilligator — Econometric Models, Techniques and Applications</li></ul><div class="bk-group">Official Statistics</div><ul class="bk-list"><li>M. R. Saluja — Indian Official Statistical Systems</li><li>CSO (MoSPI) — Statistical System in India</li><li>United Nations publications</li><li>RBI — Handbook of Statistics for the Indian Economy (various years)</li><li>Economic Survey, Govt. of India, Ministry of Finance (various years)</li></ul></div>
+  </div>
+</details>
+<details class="syl">
+  <summary>
+    <span class="syl-name">EOS&D &middot; Demography</span>
+    <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
+    <span class="pct">0/5</span>
+  </summary>
+  <div class="syl-body">
+    <p class="src">B.Stat (2016) brochure — official syllabus</p>
+    <ol class="syl-list"><li class="">Sources of demographic data — census, registration of vital events. Rates and ratios. Measures of mortality.</li><li class="">Life table — construction and applications.</li><li class="">Stable and stationary population. Measures of fertility and reproduction. Standardization of vital rates.</li><li class="">Population growth curves, population estimates and projections.</li><li class="">Measures of migration. Use of demographic data for policy formulation.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>R. Ramkumar — Technical Demography</li><li>K. Srinivasan — Demographic Techniques and Applications</li><li>B. D. Mishra — An Introduction to the Study of Population</li><li>H. S. Shryock — The Methods and Materials in Demography</li></ul></div>
+  </div>
+</details>
+<details class="syl">
+  <summary>
+    <span class="syl-name">Design and Analysis of Algorithms</span>
+    <span class="prog"><span class="prog-fill" style="width:0%"></span></span>
+    <span class="pct">0/7</span>
+  </summary>
+  <div class="syl-body">
+    <p class="src">B.Stat (2016) brochure — official syllabus</p>
+    <ol class="syl-list"><li class="">Introduction and basic concepts: complexity measures and asymptotic notation, notions of worst-case and average-case complexity, use of recurrences in algorithms. Searching algorithms: binary search, balanced binary search tree, hashing.</li><li class="">Selection and sorting: finding maximum and minimum, k-th largest elements. Different sorting algorithms — quicksort, mergesort, heapsort. Lower bound for sorting. Other sorting algorithms — radix sort, bucket sort.</li><li class="">Graph algorithms: basic definitions, connectivity and traversals (Breadth First Search and Depth First Search), directed acyclic graphs and topological ordering.</li><li class="">Computational geometry: convex hull, diameter of a point set.</li><li class="">Greedy algorithms: shortest paths in a graph, minimum spanning trees, clustering.</li><li class="">Divide and conquer: closest pair of points, integer multiplication, matrix multiplication, Fast Fourier Transform.</li><li class="">Dynamic programming: subset sum, knapsack, all pair shortest paths in a graph.</li></ol>
+    <div class="books"><div class="lbl">Reference texts</div><ul class="bk-list"><li>T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein — Introduction to Algorithms</li><li>J. Kleinberg and E. Tardos — Algorithm Design</li><li>S. Dasgupta, C. Papadimitriou, U. Vazirani — Algorithms</li><li>A. V. Aho, J. E. Hopcroft and J. D. Ullman — The Design and Analysis of Computer Algorithms</li><li>E. Horowitz, S. Sahni and S. Rajasekaran — Computer Algorithms</li><li>D. E. Knuth — The Art of Computer Programming: Fundamental Algorithms</li><li>A. V. Aho, J. E. Hopcroft and J. D. Ullman — Data Structures and Algorithms</li></ul></div>
+  </div>
+</details>
+
+<footer>
+  Generated 24 Jul 2026, 22:13 from
+  <code>_dashboard/plan.json</code>. Edit that file, then run
+  <code>python _dashboard/build.py</code> to refresh this page.
+</footer>
+</div>
+
+<script>
+document.querySelectorAll('.filters button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.filters button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    var f = b.dataset.f;
+    document.querySelectorAll('details.week').forEach(function (w) {
+      w.style.display = (f === 'all' || w.dataset.state === f) ? '' : 'none';
+    });
+  });
+});
+</script>
+</body></html>

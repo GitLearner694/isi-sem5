@@ -1,0 +1,998 @@
+{
+  "semester": {
+    "name": "Semester 5",
+    "program": "B.Stat 3rd Year",
+    "institute": "Indian Statistical Institute",
+    "start": "2026-07-20",
+    "num_weeks": 16,
+    "info_folder": "00 Course Information"
+  },
+  "milestones": [
+    {
+      "date": null,
+      "label": "Mid-Semester Examinations",
+      "note": "date TBD — fill in when announced"
+    },
+    {
+      "date": null,
+      "label": "Project submissions (SS / EOS&D / DAA)",
+      "note": "date TBD"
+    },
+    {
+      "date": null,
+      "label": "Semester Examinations",
+      "note": "date TBD"
+    }
+  ],
+  "courses": [
+    {
+      "id": "lsm",
+      "short": "LSM",
+      "name": "Linear Statistical Models",
+      "folder": "01 Linear Statistical Models",
+      "weights": {
+        "Mid-Semester": 40,
+        "Semester": 50,
+        "Project": 0,
+        "Assignments": 10
+      },
+      "tracks": [
+        {
+          "id": "lsm",
+          "name": null,
+          "teacher": "Debashis Paul",
+          "unit": "ASU",
+          "subfolder": "",
+          "syllabus": [
+            "Introduction to stochastic models; formulation and illustrations. Linear statistical models; illustrations.",
+            "Least square estimation, estimable linear functions, normal equations, Best Linear Unbiased Estimates (BLUEs). Gauss–Markov Theorem.",
+            "Degrees of freedom. Fundamental Theorems of Least Squares. Testing of linear hypotheses. One-way and two-way classification models, ANOVA and ANCOVA. Nested models. Multiple comparisons.",
+            "Introduction to random effect models.",
+            "Illustration with specific examples and numerical exercises using statistical packages, preferably R."
+          ],
+          "books": [
+            {
+              "group": "",
+              "items": [
+                "S. R. Searle — Linear Models",
+                "F. A. Graybill — An Introduction to Linear Statistical Models, Vol. I",
+                "J. H. Stapleton — Linear Statistical Models",
+                "R. R. Hocking — Methods and Applications of Linear Models",
+                "R. Christensen — Plane Answers to Complex Questions: The Theory of Linear Models",
+                "C. R. Rao — Linear Statistical Inference and its Applications",
+                "D. Sengupta and S. R. Jammalamadaka — Linear Models: An Integrated Approach"
+              ]
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        }
+      ]
+    },
+    {
+      "id": "pi",
+      "short": "PI",
+      "name": "Parametric Inference",
+      "folder": "02 Parametric Inference",
+      "weights": {
+        "Mid-Semester": null,
+        "Semester": null,
+        "Project": null,
+        "Assignments": null
+      },
+      "weights_note": "Not specified on the course sheet — confirm with the instructor.",
+      "tracks": [
+        {
+          "id": "pi",
+          "name": null,
+          "teacher": "Probal Chaudhuri",
+          "unit": "SMU",
+          "subfolder": "",
+          "syllabus": [
+            "Basic inference problems. Sufficiency, factorization theorem, minimal sufficiency. Completeness, Lehmann–Scheffé Theorem. Ancillarity, Basu's Theorem. Exponential families of distributions, canonical parameters and canonical sufficient statistics.",
+            "Point estimation: criteria for goodness — mean square error, unbiasedness, relative efficiency, Cramér–Rao inequality, Bhattacharya bounds, UMVUE, Rao–Blackwell theorem. Consistency.",
+            "Bayesian techniques: priors, posteriors, Bayes' estimators and Bayesian credible regions.",
+            "Tests of hypotheses: statistical hypothesis, simple and composite hypotheses, critical regions. Neyman–Pearson Lemma and MP test; randomization; UMP, UMPU and LMP tests; illustrations. Monotone likelihood ratio family of distributions.",
+            "Likelihood ratio tests. Test of multiple hypotheses, union–intersection principle."
+          ],
+          "books": [
+            {
+              "group": "",
+              "items": [
+                "P. J. Bickel and K. A. Doksum — Mathematical Statistics",
+                "G. Casella and R. L. Berger — Statistical Inference",
+                "C. R. Rao — Linear Statistical Inference and its Applications",
+                "E. L. Lehmann — Theory of Point Estimation",
+                "E. L. Lehmann — Testing Statistical Hypotheses"
+              ]
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        }
+      ]
+    },
+    {
+      "id": "ss",
+      "short": "SS",
+      "name": "Sample Surveys",
+      "folder": "03 Sample Surveys",
+      "weights": {
+        "Mid-Semester": 30,
+        "Semester": 50,
+        "Project": 20,
+        "Assignments": 0
+      },
+      "tracks": [
+        {
+          "id": "ss",
+          "name": null,
+          "teacher": "Ambarish Chattopadhyay",
+          "unit": "ASU",
+          "subfolder": "",
+          "syllabus": [
+            "Concepts of population, sample, survey and census. Sampling designs and schemes.",
+            "Properties of good estimators under different approaches: design, predictive, super-population-modelling and model-assisted. Sampling strategies.",
+            "Drawing simple random samples (SRS) with and without replacement using random numbers; estimation; sample size determination.",
+            "Narain–Horvitz–Thompson estimator. Sen–Yates–Grundy estimator. Stratified sampling, cluster sampling, multi-stage sampling. PPS sampling — WR and WOR. Systematic sampling — equal and unequal probabilities, linear and circular, unbiased variance estimation.",
+            "Ratio and regression estimation for equal and unequal probability sampling; Hartley–Ross estimator. Interpenetrating Network of Subsampling (IPNS) and half-sampling.",
+            "Double sampling — non-response and 'not-at-homes'. Sampling on successive occasions. Acquaintance with National Sample Surveys and other large-scale surveys; controlling non-sampling errors."
+          ],
+          "books": [
+            {
+              "group": "",
+              "items": [
+                "W. G. Cochran — Sampling Techniques",
+                "M. N. Murthy — Sampling Theory and Methods",
+                "A. Chaudhuri — Essentials of Survey Sampling",
+                "A. S. Hedayat and B. K. Sinha — Design and Inference in Finite Population Sampling",
+                "C. M. Cassel, C. E. Särndal and J. H. Wretman — Foundations of Inference in Survey Sampling"
+              ]
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        }
+      ]
+    },
+    {
+      "id": "eosd",
+      "short": "EOS&D",
+      "name": "Economic and Official Statistics and Demography",
+      "folder": "04 Economic and Official Statistics and Demography",
+      "weights": {
+        "Mid-Semester": 30,
+        "Semester": 50,
+        "Project": 20,
+        "Assignments": 0
+      },
+      "weights_note": "One combined course made of two halves taught separately.",
+      "tracks": [
+        {
+          "id": "eos",
+          "name": "Economic and Official Statistics",
+          "teacher": "Sandip Mitra",
+          "unit": "SOSU",
+          "subfolder": "A Economic and Official Statistics",
+          "syllabus": [
+            "Index numbers: construction of index numbers, properties, well-known index number formulae, problems of construction, chain indices, cost of living indices, splicing of index numbers, different types of index numbers used in India.",
+            "Analysis of income and allied size distributions: Pareto and log-normal distributions — genesis, specification and estimation. Lorenz curve, Gini coefficient.",
+            "Demand analysis: classification of commodities, Engel curve analysis using cross-section and time series data, Engel curves incorporating household characteristics, demand projection, specific concentration curves.",
+            "Production analysis: profit maximization, cost minimization, returns to scale, Cobb–Douglas and ACMS production functions.",
+            "Indian Statistical System: official organisations collecting, compiling and publishing national and state level data — CSO, NSSO, RBI, Planning Commission, State Statistical Bureaus, Labour Bureau, Population Census; role of Centre and State.",
+            "Selected topics on Indian statistics: agriculture and allied areas including meteorology and environment; industry, trade and finance including money supply and banking; national accounts and infrastructure; population, health, education, prices, level of living, labour and employment.",
+            "International Statistical System: comparison of major macro variables — National Income / GDP. Purchasing power parity; indicators relating to energy, environment, gender, industry, national accounts, social statistics and trade."
+          ],
+          "books": [
+            {
+              "group": "Economic Statistics",
+              "items": [
+                "P. H. Karmel and M. Polasek — Applied Statistics for Economists",
+                "R. G. D. Allen — Price Index Numbers",
+                "N. Kakwani — Income Inequality and Poverty",
+                "L. R. Klein — An Introduction to Econometrics",
+                "J. S. Cramer — Empirical Econometrics",
+                "M. D. Intrilligator — Econometric Models, Techniques and Applications"
+              ]
+            },
+            {
+              "group": "Official Statistics",
+              "items": [
+                "M. R. Saluja — Indian Official Statistical Systems",
+                "CSO (MoSPI) — Statistical System in India",
+                "United Nations publications",
+                "RBI — Handbook of Statistics for the Indian Economy (various years)",
+                "Economic Survey, Govt. of India, Ministry of Finance (various years)"
+              ]
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        },
+        {
+          "id": "dem",
+          "name": "Demography",
+          "teacher": "Kajori Banerjee",
+          "unit": "PSU",
+          "subfolder": "B Demography",
+          "syllabus": [
+            "Sources of demographic data — census, registration of vital events. Rates and ratios. Measures of mortality.",
+            "Life table — construction and applications.",
+            "Stable and stationary population. Measures of fertility and reproduction. Standardization of vital rates.",
+            "Population growth curves, population estimates and projections.",
+            "Measures of migration. Use of demographic data for policy formulation."
+          ],
+          "books": [
+            {
+              "group": "",
+              "items": [
+                "R. Ramkumar — Technical Demography",
+                "K. Srinivasan — Demographic Techniques and Applications",
+                "B. D. Mishra — An Introduction to the Study of Population",
+                "H. S. Shryock — The Methods and Materials in Demography"
+              ]
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        }
+      ]
+    },
+    {
+      "id": "daa",
+      "short": "DAA",
+      "name": "Design and Analysis of Algorithms",
+      "folder": "05 Design and Analysis of Algorithms",
+      "weights": {
+        "Mid-Semester": 30,
+        "Semester": 50,
+        "Project": 20,
+        "Assignments": 0
+      },
+      "tracks": [
+        {
+          "id": "daa",
+          "name": null,
+          "teacher": "Sandip Das",
+          "unit": "ACMU",
+          "subfolder": "",
+          "syllabus": [
+            "Introduction and basic concepts: complexity measures and asymptotic notation, notions of worst-case and average-case complexity, use of recurrences in algorithms. Searching algorithms: binary search, balanced binary search tree, hashing.",
+            "Selection and sorting: finding maximum and minimum, k-th largest elements. Different sorting algorithms — quicksort, mergesort, heapsort. Lower bound for sorting. Other sorting algorithms — radix sort, bucket sort.",
+            "Graph algorithms: basic definitions, connectivity and traversals (Breadth First Search and Depth First Search), directed acyclic graphs and topological ordering.",
+            "Computational geometry: convex hull, diameter of a point set.",
+            "Greedy algorithms: shortest paths in a graph, minimum spanning trees, clustering.",
+            "Divide and conquer: closest pair of points, integer multiplication, matrix multiplication, Fast Fourier Transform.",
+            "Dynamic programming: subset sum, knapsack, all pair shortest paths in a graph."
+          ],
+          "books": [
+            {
+              "group": "",
+              "items": [
+                "T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein — Introduction to Algorithms",
+                "J. Kleinberg and E. Tardos — Algorithm Design",
+                "S. Dasgupta, C. Papadimitriou, U. Vazirani — Algorithms",
+                "A. V. Aho, J. E. Hopcroft and J. D. Ullman — The Design and Analysis of Computer Algorithms",
+                "E. Horowitz, S. Sahni and S. Rajasekaran — Computer Algorithms",
+                "D. E. Knuth — The Art of Computer Programming: Fundamental Algorithms",
+                "A. V. Aho, J. E. Hopcroft and J. D. Ullman — Data Structures and Algorithms"
+              ]
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        }
+      ]
+    }
+  ],
+  "weeks": [
+    {
+      "n": 1,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-07-20",
+      "end": "2026-07-26"
+    },
+    {
+      "n": 2,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-07-27",
+      "end": "2026-08-02"
+    },
+    {
+      "n": 3,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-08-03",
+      "end": "2026-08-09"
+    },
+    {
+      "n": 4,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-08-10",
+      "end": "2026-08-16"
+    },
+    {
+      "n": 5,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-08-17",
+      "end": "2026-08-23"
+    },
+    {
+      "n": 6,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-08-24",
+      "end": "2026-08-30"
+    },
+    {
+      "n": 7,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-08-31",
+      "end": "2026-09-06"
+    },
+    {
+      "n": 8,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-09-07",
+      "end": "2026-09-13"
+    },
+    {
+      "n": 9,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-09-14",
+      "end": "2026-09-20"
+    },
+    {
+      "n": 10,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-09-21",
+      "end": "2026-09-27"
+    },
+    {
+      "n": 11,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-09-28",
+      "end": "2026-10-04"
+    },
+    {
+      "n": 12,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-10-05",
+      "end": "2026-10-11"
+    },
+    {
+      "n": 13,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-10-12",
+      "end": "2026-10-18"
+    },
+    {
+      "n": 14,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-10-19",
+      "end": "2026-10-25"
+    },
+    {
+      "n": 15,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-10-26",
+      "end": "2026-11-01"
+    },
+    {
+      "n": 16,
+      "note": "",
+      "tracks": {
+        "lsm": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "pi": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "ss": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "eos": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "dem": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        }
+      },
+      "start": "2026-11-02",
+      "end": "2026-11-08"
+    }
+  ],
+  "schedule": {
+    "note": "Class schedule not yet filed — add the slots here and rebuild.",
+    "days": {
+      "Monday": [],
+      "Tuesday": [],
+      "Wednesday": [],
+      "Thursday": [],
+      "Friday": []
+    }
+  }
+}
