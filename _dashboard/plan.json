@@ -328,12 +328,18 @@
   "weeks": [
     {
       "n": 1,
-      "note": "",
+      "note": "Semester opens. LSM: course logistics and revision of prerequisites.",
       "tracks": {
         "lsm": {
-          "topics": [],
+          "topics": [
+            "Course work discussion: syllabus, grading (40/50/10), reading list, expectations.",
+            "Revision of ordinary least squares and related prerequisites — projections, normal equations, residual properties. Treated as background, not yet the course proper."
+          ],
           "syllabus": [],
-          "study": [],
+          "study": [
+            "Study material prepared: Study Material/01 OLS Revision and the Gauss-Markov Framework.html — §§1–4 cover this week's revision.",
+            "Christensen, Plane Answers — Appendix B (projections) and Ch. 1 (random vectors)."
+          ],
           "tasks": []
         },
         "pi": {
@@ -372,12 +378,15 @@
     },
     {
       "n": 2,
-      "note": "",
+      "note": "LSM begins the Gauss–Markov framework.",
       "tracks": {
         "lsm": {
           "topics": [],
           "syllabus": [],
-          "study": [],
+          "study": [
+            "Study Material/01 OLS Revision and the Gauss-Markov Framework.html — §§5–9 cover the Gauss–Markov framework, estimability and the GM theorem.",
+            "Christensen, Plane Answers — §§2.1, 2.3, 2.5."
+          ],
           "tasks": []
         },
         "pi": {
