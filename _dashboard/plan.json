@@ -212,23 +212,20 @@
       "weights_note": "One combined course made of two halves taught separately.",
       "tracks": [
         {
-          "id": "eos",
-          "name": "Economic and Official Statistics",
-          "teacher": "Sandip Mitra",
-          "unit": "SOSU",
-          "subfolder": "A Economic and Official Statistics",
+          "id": "econ",
+          "name": "Economic Statistics",
+          "teacher": "Kajori Banerjee",
+          "unit": "PSU",
+          "subfolder": "A Economic Statistics",
           "syllabus": [
             "Index numbers: construction of index numbers, properties, well-known index number formulae, problems of construction, chain indices, cost of living indices, splicing of index numbers, different types of index numbers used in India.",
             "Analysis of income and allied size distributions: Pareto and log-normal distributions — genesis, specification and estimation. Lorenz curve, Gini coefficient.",
             "Demand analysis: classification of commodities, Engel curve analysis using cross-section and time series data, Engel curves incorporating household characteristics, demand projection, specific concentration curves.",
-            "Production analysis: profit maximization, cost minimization, returns to scale, Cobb–Douglas and ACMS production functions.",
-            "Indian Statistical System: official organisations collecting, compiling and publishing national and state level data — CSO, NSSO, RBI, Planning Commission, State Statistical Bureaus, Labour Bureau, Population Census; role of Centre and State.",
-            "Selected topics on Indian statistics: agriculture and allied areas including meteorology and environment; industry, trade and finance including money supply and banking; national accounts and infrastructure; population, health, education, prices, level of living, labour and employment.",
-            "International Statistical System: comparison of major macro variables — National Income / GDP. Purchasing power parity; indicators relating to energy, environment, gender, industry, national accounts, social statistics and trade."
+            "Production analysis: profit maximization, cost minimization, returns to scale, Cobb–Douglas and ACMS production functions."
           ],
           "books": [
             {
-              "group": "Economic Statistics",
+              "group": "",
               "items": [
                 "P. H. Karmel and M. Polasek — Applied Statistics for Economists",
                 "R. G. D. Allen — Price Index Numbers",
@@ -237,9 +234,24 @@
                 "J. S. Cramer — Empirical Econometrics",
                 "M. D. Intrilligator — Econometric Models, Techniques and Applications"
               ]
-            },
+            }
+          ],
+          "syllabus_source": "B.Stat (2016) brochure — official syllabus"
+        },
+        {
+          "id": "off",
+          "name": "Official Statistics",
+          "teacher": "Sandip Mitra",
+          "unit": "SOSU",
+          "subfolder": "B Official Statistics",
+          "syllabus": [
+            "Indian Statistical System: official organisations collecting, compiling and publishing national and state level data — CSO, NSSO, RBI, Planning Commission, State Statistical Bureaus, Labour Bureau, Population Census; role of Centre and State.",
+            "Selected topics on Indian statistics: agriculture and allied areas including meteorology and environment; industry, trade and finance including money supply and banking; national accounts and infrastructure; population, health, education, prices, level of living, labour and employment.",
+            "International Statistical System: comparison of major macro variables — National Income / GDP. Purchasing power parity; indicators relating to energy, environment, gender, industry, national accounts, social statistics and trade."
+          ],
+          "books": [
             {
-              "group": "Official Statistics",
+              "group": "",
               "items": [
                 "M. R. Saluja — Indian Official Statistical Systems",
                 "CSO (MoSPI) — Statistical System in India",
@@ -256,7 +268,7 @@
           "name": "Demography",
           "teacher": "Kajori Banerjee",
           "unit": "PSU",
-          "subfolder": "B Demography",
+          "subfolder": "C Demography",
           "syllabus": [
             "Sources of demographic data — census, registration of vital events. Rates and ratios. Measures of mortality.",
             "Life table — construction and applications.",
@@ -354,12 +366,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -367,6 +373,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -401,12 +419,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -414,6 +426,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -445,12 +469,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -458,6 +476,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -489,12 +519,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -502,6 +526,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -533,12 +569,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -546,6 +576,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -577,12 +619,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -590,6 +626,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -621,12 +669,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -634,6 +676,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -665,12 +719,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -678,6 +726,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -709,12 +769,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -722,6 +776,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -753,12 +819,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -766,6 +826,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -797,12 +869,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -810,6 +876,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -841,12 +919,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -854,6 +926,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -885,12 +969,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -898,6 +976,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -929,12 +1019,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -942,6 +1026,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -973,12 +1069,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -986,6 +1076,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -1017,12 +1119,6 @@
           "study": [],
           "tasks": []
         },
-        "eos": {
-          "topics": [],
-          "syllabus": [],
-          "study": [],
-          "tasks": []
-        },
         "dem": {
           "topics": [],
           "syllabus": [],
@@ -1030,6 +1126,18 @@
           "tasks": []
         },
         "daa": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "econ": {
+          "topics": [],
+          "syllabus": [],
+          "study": [],
+          "tasks": []
+        },
+        "off": {
           "topics": [],
           "syllabus": [],
           "study": [],
@@ -1042,7 +1150,7 @@
   ],
   "schedule": {
     "note": "",
-    "source": "Semester timetable; slot initials resolved against the LSM handout.",
+    "source": "Semester timetable; EOS&D slots carry the initials KB (Kajori Banerjee — Economic Statistics & Demography) and SM (Sandip Mitra — Official Statistics).",
     "days": {
       "Monday": [
         {
@@ -1054,7 +1162,7 @@
         {
           "time": "14:15 – 15:05",
           "short": "EOS&D",
-          "course": "Demography",
+          "course": "Economic Statistics / Demography",
           "room": ""
         },
         {
@@ -1074,7 +1182,7 @@
         {
           "time": "14:15 – 16:00",
           "short": "EOS&D",
-          "course": "Economic and Official Statistics",
+          "course": "Official Statistics",
           "room": ""
         }
       ],
@@ -1082,7 +1190,7 @@
         {
           "time": "11:10 – 12:00",
           "short": "EOS&D",
-          "course": "Demography",
+          "course": "Economic Statistics / Demography",
           "room": ""
         },
         {

@@ -21,13 +21,16 @@ Sem 5/
 ├── 02 Parametric Inference/             Probal Chaudhuri · SMU
 ├── 03 Sample Surveys/                   Ambarish Chattopadhyay · ASU
 ├── 04 Economic and Official Statistics and Demography/
-│   ├── A Economic and Official Statistics/   Sandip Mitra · SOSU
-│   ├── B Demography/                         Kajori Banerjee · PSU
+│   ├── A Economic Statistics/                Kajori Banerjee · PSU
+│   ├── B Official Statistics/                Sandip Mitra · SOSU
+│   ├── C Demography/                         Kajori Banerjee · PSU
 │   └── Project/
 └── 05 Design and Analysis of Algorithms/  Sandip Das · ACMU
 ```
 
-Every course (and each half of course 04) has the same four sections:
+Course 04 is one combined course taught in three parts: Kajori Banerjee takes
+Economic Statistics and Demography, Sandip Mitra takes Official Statistics.
+Every course (and each part of course 04) has the same four sections:
 
 | Section | What goes in it |
 | --- | --- |
