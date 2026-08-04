@@ -116,7 +116,28 @@
       ],
       "weights_note": "Per the instructor's handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing.",
       "attendance": {
-        "sessions": []
+        "sessions": [
+          {
+            "date": "2026-07-20",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-22",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-29",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-03",
+            "status": "present"
+          }
+        ]
       }
     },
     {
@@ -166,6 +187,22 @@
             "date": "2026-07-21",
             "status": "cancelled",
             "note": "first class of the semester cancelled"
+          },
+          {
+            "date": "2026-07-24",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-28",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-31",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-04",
+            "status": "absent"
           }
         ]
       }
@@ -217,6 +254,18 @@
             "date": "2026-07-22",
             "status": "cancelled",
             "note": "first class of the semester cancelled"
+          },
+          {
+            "date": "2026-07-24",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-29",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-31",
+            "status": "present"
           }
         ]
       }
@@ -314,7 +363,40 @@
         }
       ],
       "attendance": {
-        "sessions": []
+        "sessions": [
+          {
+            "date": "2026-07-20",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-21",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-22",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-28",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-29",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-03",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-04",
+            "status": "absent"
+          }
+        ]
       }
     },
     {
@@ -362,7 +444,28 @@
         }
       ],
       "attendance": {
-        "sessions": []
+        "sessions": [
+          {
+            "date": "2026-07-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-23",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-30",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-03",
+            "status": "present"
+          }
+        ]
       }
     }
   ],
