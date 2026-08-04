@@ -9,7 +9,9 @@
     "academic_year": "2026–27",
     "also_known_as": "Semester 1, 2026–27",
     "classes_end": "2026-11-06",
-    "calendar_source": "ISI First Semester (2026–2027) Academic Calendar, dated 19/06/2026"
+    "calendar_source": "ISI First Semester (2026–2027) Academic Calendar, dated 19/06/2026",
+    "attendance_threshold": 75,
+    "attendance_source": "ISI expects at least 75% attendance per course for good academic standing (stated in the LSM handout). Counts are entered by hand — keep them current."
   },
   "milestones": [
     {
@@ -112,7 +114,11 @@
           ]
         }
       ],
-      "weights_note": "Per the instructor's handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing."
+      "weights_note": "Per the instructor's handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing.",
+      "attendance": {
+        "held": 0,
+        "attended": 0
+      }
     },
     {
       "id": "pi",
@@ -154,7 +160,11 @@
           ],
           "syllabus_source": "B.Stat (2016) brochure — official syllabus"
         }
-      ]
+      ],
+      "attendance": {
+        "held": 0,
+        "attended": 0
+      }
     },
     {
       "id": "ss",
@@ -196,7 +206,11 @@
           ],
           "syllabus_source": "B.Stat (2016) brochure — official syllabus"
         }
-      ]
+      ],
+      "attendance": {
+        "held": 0,
+        "attended": 0
+      }
     },
     {
       "id": "eosd",
@@ -289,7 +303,11 @@
           ],
           "syllabus_source": "B.Stat (2016) brochure — official syllabus"
         }
-      ]
+      ],
+      "attendance": {
+        "held": 0,
+        "attended": 0
+      }
     },
     {
       "id": "daa",
@@ -334,7 +352,11 @@
           ],
           "syllabus_source": "B.Stat (2016) brochure — official syllabus"
         }
-      ]
+      ],
+      "attendance": {
+        "held": 0,
+        "attended": 0
+      }
     }
   ],
   "weeks": [

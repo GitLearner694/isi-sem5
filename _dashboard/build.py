@@ -17,6 +17,7 @@ editing it, or after dropping new notes into the folders.
 import json
 import os
 import html
+import math
 import datetime as dt
 from pathlib import Path
 from urllib.parse import quote
@@ -194,6 +195,57 @@ def file_list(files, empty_msg):
     return f'<ul class="files">{"".join(rows)}</ul>'
 
 
+def attendance_stat(course, default_threshold):
+    """Present/held -> percentage, threshold state, and a concrete next-step hint."""
+    a = course.get("attendance") or {}
+    held = int(a.get("held", 0) or 0)
+    att = int(a.get("attended", 0) or 0)
+    thr = a.get("threshold", default_threshold)
+    if held <= 0:
+        return {"held": 0, "attended": att, "pct": None, "thr": thr,
+                "state": "none", "hint": "no classes recorded yet"}
+    pct = 100.0 * att / held
+    t = thr / 100.0
+    if pct + 1e-9 >= thr:
+        buf = int(att / t - held + 1e-9) if t > 0 else 0     # classes still missable
+        hint = f"can miss {buf} more and stay &ge;&thinsp;{thr:g}%" if buf > 0 else "right at the line"
+        state = "ok" if pct >= thr + 7 else "warn"
+    else:
+        need = max(0, math.ceil((t * held - att) / (1 - t) - 1e-9)) if t < 1 else 0
+        hint = f"attend the next {need} to reach {thr:g}%"
+        state = "below"
+    return {"held": held, "attended": att, "pct": pct, "thr": thr,
+            "state": state, "hint": hint}
+
+
+def attendance_meter(short, s):
+    """Full meter used in the overview section."""
+    if s["state"] == "none":
+        return (f'<div class="amtr none"><div class="amtr-h">'
+                f'<span class="badge sm">{esc(short)}</span><b>&mdash;</b></div>'
+                f'<div class="ameter"><i class="athr" style="left:{s["thr"]}%"></i></div>'
+                f'<div class="amtr-f"><span class="ahint">{esc(s["hint"])}</span></div></div>')
+    return (f'<div class="amtr {s["state"]}"><div class="amtr-h">'
+            f'<span class="badge sm">{esc(short)}</span><b>{s["pct"]:.0f}%</b></div>'
+            f'<div class="ameter"><span class="afill" style="width:{min(s["pct"],100):.1f}%"></span>'
+            f'<i class="athr" style="left:{s["thr"]}%" title="{s["thr"]:g}% required"></i></div>'
+            f'<div class="amtr-f"><span>{s["attended"]}/{s["held"]} classes</span>'
+            f'<span class="ahint">{s["hint"]}</span></div></div>')
+
+
+def render_attendance(plan):
+    thr = plan["semester"].get("attendance_threshold", 75)
+    any_data = any((c.get("attendance") or {}).get("held") for c in plan["courses"])
+    meters = "".join(attendance_meter(c["short"], attendance_stat(c, thr))
+                     for c in plan["courses"])
+    src = plan["semester"].get("attendance_source")
+    note = f'<p class="src">{esc(src)}</p>' if src else ""
+    if not any_data:
+        note += ('<p class="src">Record classes in <code>_dashboard/plan.json</code>: give each '
+                 'course an <code>"attendance": {"held": N, "attended": M}</code> entry, then rebuild.</p>')
+    return f'{note}<div class="attgrid">{meters}</div>'
+
+
 def render_course_card(plan, course, scans):
     tracks_html = []
     for t in course["tracks"]:
@@ -242,6 +294,14 @@ def render_course_card(plan, course, scans):
     if course.get("weights_note"):
         note = f'<p class="note">{esc(course["weights_note"])}</p>'
 
+    a = attendance_stat(course, plan["semester"].get("attendance_threshold", 75))
+    if a["state"] == "none":
+        att_line = ""
+    else:
+        att_line = (f'<div class="att-line {a["state"]}">Attendance '
+                    f'<b>{a["pct"]:.0f}%</b> <span>({a["attended"]}/{a["held"]})</span>'
+                    f'<span class="ahint">{a["hint"]}</span></div>')
+
     return f"""
 <section class="card" id="c-{esc(course['id'])}">
   <header class="card-head">
@@ -253,6 +313,7 @@ def render_course_card(plan, course, scans):
   </header>
   {weight_bar(course.get('weights') or {})}
   {note}
+  {att_line}
   <div class="tracks">{''.join(tracks_html)}</div>
   {proj}
 </section>"""
@@ -508,6 +569,7 @@ def render(plan, cur_week, scans):
     syl_html = render_syllabus(plan, covered)
     sched_html = render_schedule(plan)
     term_html = render_term(plan)
+    att_html = render_attendance(plan)
 
     info_folder = plan["semester"].get("info_folder")
     info_files = scan(ROOT / info_folder) if info_folder else []
@@ -722,6 +784,35 @@ details.week:not(.current) .flag.now {{ display:none }}
 .away {{ flex:0 0 auto; font-size:11px; color:var(--dim); white-space:nowrap }}
 .away.soon {{ color:var(--warn) }}
 .away.now {{ color:var(--accent) }}
+
+/* attendance: --ac is the state colour, set per meter */
+.attgrid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:12px }}
+.amtr {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:13px 15px 12px }}
+.amtr.ok {{ --ac:var(--ok) }} .amtr.warn {{ --ac:var(--warn) }}
+.amtr.below {{ --ac:#c0392b }} .amtr.none {{ --ac:var(--line) }}
+.amtr-h {{ display:flex; align-items:center; gap:8px; margin-bottom:9px }}
+.amtr-h b {{ margin-left:auto; font-size:22px; font-weight:600;
+  letter-spacing:-.02em; color:var(--ac) }}
+.amtr.none .amtr-h b {{ color:var(--dim) }}
+.ameter {{ position:relative; height:8px; background:var(--bg);
+  border-radius:99px; overflow:hidden }}
+.afill {{ display:block; height:100%; background:var(--ac); border-radius:99px }}
+.athr {{ position:absolute; top:-3px; width:2px; height:14px; background:var(--ink);
+  opacity:.55; transform:translateX(-1px) }}
+.amtr-f {{ display:flex; gap:10px; margin-top:8px; font-size:11.5px;
+  color:var(--dim) }}
+.amtr-f .ahint {{ margin-left:auto; text-align:right; color:var(--ac) }}
+.amtr.warn .amtr-f .ahint, .amtr.ok .amtr-f .ahint {{ color:var(--dim) }}
+.amtr.none .ahint {{ margin-left:0 }}
+
+.att-line {{ display:flex; align-items:baseline; gap:7px; margin:9px 0 0;
+  font-size:12.5px; color:var(--dim); --ac:var(--ok) }}
+.att-line.warn {{ --ac:var(--warn) }} .att-line.below {{ --ac:#c0392b }}
+.att-line b {{ font-size:14px; color:var(--ac) }}
+.att-line .ahint {{ margin-left:auto; color:var(--ac) }}
+.att-line.ok .ahint, .att-line.warn .ahint {{ color:var(--dim) }}
 .wnote {{ padding:0 15px 10px; font-size:13px; color:var(--dim) }}
 .wgrid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
   gap:1px; background:var(--line); border-top:1px solid var(--line) }}
@@ -753,7 +844,7 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 <header class="top"><div class="wrap">
   <h1>{esc(sem['program'])} &middot; {esc(sem['name'])}</h1>
   <span class="sub">{esc(sem['also_known_as']) + ' &middot; ' if sem.get('also_known_as') else ''}<span id="sub-week">Week {cur_week} of {sem['num_weeks']}</span> &middot; <span id="sub-date">{today.strftime('%A, %d %B %Y')}</span></span>
-  <nav>{nav}<a href="#term">Term</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
+  <nav>{nav}<a href="#attendance">Attendance</a><a href="#term">Term</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
 </div></header>
 
 <div class="wrap">
@@ -770,6 +861,9 @@ code {{ font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   <div class="panel"><h4>Next up</h4><ul>{up_html}</ul></div>
   <div class="panel"><h4>Milestones</h4><ul>{ms_html}</ul></div>
 </div>
+
+<h2 id="attendance">Attendance</h2>
+{att_html}
 
 <div style="margin-top:14px">{info_html}</div>
 

@@ -203,6 +203,35 @@ details.week:not(.current) .flag.now { display:none }
 .away { flex:0 0 auto; font-size:11px; color:var(--dim); white-space:nowrap }
 .away.soon { color:var(--warn) }
 .away.now { color:var(--accent) }
+
+/* attendance: --ac is the state colour, set per meter */
+.attgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:12px }
+.amtr { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:13px 15px 12px }
+.amtr.ok { --ac:var(--ok) } .amtr.warn { --ac:var(--warn) }
+.amtr.below { --ac:#c0392b } .amtr.none { --ac:var(--line) }
+.amtr-h { display:flex; align-items:center; gap:8px; margin-bottom:9px }
+.amtr-h b { margin-left:auto; font-size:22px; font-weight:600;
+  letter-spacing:-.02em; color:var(--ac) }
+.amtr.none .amtr-h b { color:var(--dim) }
+.ameter { position:relative; height:8px; background:var(--bg);
+  border-radius:99px; overflow:hidden }
+.afill { display:block; height:100%; background:var(--ac); border-radius:99px }
+.athr { position:absolute; top:-3px; width:2px; height:14px; background:var(--ink);
+  opacity:.55; transform:translateX(-1px) }
+.amtr-f { display:flex; gap:10px; margin-top:8px; font-size:11.5px;
+  color:var(--dim) }
+.amtr-f .ahint { margin-left:auto; text-align:right; color:var(--ac) }
+.amtr.warn .amtr-f .ahint, .amtr.ok .amtr-f .ahint { color:var(--dim) }
+.amtr.none .ahint { margin-left:0 }
+
+.att-line { display:flex; align-items:baseline; gap:7px; margin:9px 0 0;
+  font-size:12.5px; color:var(--dim); --ac:var(--ok) }
+.att-line.warn { --ac:var(--warn) } .att-line.below { --ac:#c0392b }
+.att-line b { font-size:14px; color:var(--ac) }
+.att-line .ahint { margin-left:auto; color:var(--ac) }
+.att-line.ok .ahint, .att-line.warn .ahint { color:var(--dim) }
 .wnote { padding:0 15px 10px; font-size:13px; color:var(--dim) }
 .wgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
   gap:1px; background:var(--line); border-top:1px solid var(--line) }
@@ -234,7 +263,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 <header class="top"><div class="wrap">
   <h1>B.Stat 3rd Year &middot; Semester 5</h1>
   <span class="sub">Semester 1, 2026–27 &middot; <span id="sub-week">Week 3 of 16</span> &middot; <span id="sub-date">Tuesday, 04 August 2026</span></span>
-  <nav><a href="#c-lsm">LSM</a><a href="#c-pi">PI</a><a href="#c-ss">SS</a><a href="#c-eosd">EOS&amp;D</a><a href="#c-daa">DAA</a><a href="#term">Term</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
+  <nav><a href="#c-lsm">LSM</a><a href="#c-pi">PI</a><a href="#c-ss">SS</a><a href="#c-eosd">EOS&amp;D</a><a href="#c-daa">DAA</a><a href="#attendance">Attendance</a><a href="#term">Term</a><a href="#schedule">Schedule</a><a href="#weekly">Weekly</a><a href="#syllabus">Syllabus</a></nav>
 </div></header>
 
 <div class="wrap">
@@ -242,7 +271,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 <h2>At a glance</h2>
 <div class="stats">
   <div class="stat"><b>5</b><span>courses &middot; 7 taught units</span></div>
-  <div class="stat"><b>5</b><span>files filed</span></div>
+  <div class="stat"><b>7</b><span>files filed</span></div>
   <div class="stat"><b>2</b><span>weeks logged</span></div>
   <div class="stat"><b>0</b><span>open tasks</span></div>
 </div>
@@ -251,6 +280,9 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   <div class="panel"><h4>Next up</h4><ul><li class="empty">nothing with a due date yet</li></ul></div>
   <div class="panel"><h4>Milestones</h4><ul><li class="stack" data-start="2026-08-03" data-end="2026-08-03"><span class="due-d">03 Aug 2026</span><span class="lab">Confirmation of credit / non-credit courses<em class="sub-note">on or before this date</em></span><span class="away"></span></li><li class="stack" data-start="2026-09-07" data-end="2026-09-11"><span class="due-d">07 &ndash; 11 Sep 2026</span><span class="lab">Mid-Semester Examinations<em class="sub-note">held in the least number of consecutive working days required</em></span><span class="away"></span></li><li class="stack" data-start="2026-11-06" data-end="2026-11-06"><span class="due-d">06 Nov 2026</span><span class="lab">Last day of classes</span><span class="away"></span></li><li class="stack" data-start="2026-11-09" data-end="2026-11-13"><span class="due-d">09 &ndash; 13 Nov 2026</span><span class="lab">Study Leave<em class="sub-note">shortened if the mid-semester exams spill over</em></span><span class="away"></span></li><li class="stack" data-start="2026-11-16" data-end="2026-11-27"><span class="due-d">16 &ndash; 27 Nov 2026</span><span class="lab">End-Semester Examinations</span><span class="away"></span></li><li class="stack"><span class="due-d">TBD</span><span class="lab">Project submissions (SS / EOS&amp;D / DAA)<em class="sub-note">date TBD — not on the institute calendar</em></span><span class="away"></span></li><li class="stack" data-start="2026-12-16" data-end="2026-12-22"><span class="due-d">16 &ndash; 22 Dec 2026</span><span class="lab">Backpaper Examinations</span><span class="away"></span></li><li class="stack" data-start="2027-01-04" data-end="2027-01-04"><span class="due-d">04 Jan 2027</span><span class="lab">Next semester begins<em class="sub-note">tentative</em></span><span class="away"></span></li></ul></div>
 </div>
+
+<h2 id="attendance">Attendance</h2>
+<p class="src">ISI expects at least 75% attendance per course for good academic standing (stated in the LSM handout). Counts are entered by hand — keep them current.</p><p class="src">Record classes in <code>_dashboard/plan.json</code>: give each course an <code>"attendance": {"held": N, "attended": M}</code> entry, then rebuild.</p><div class="attgrid"><div class="amtr none"><div class="amtr-h"><span class="badge sm">LSM</span><b>&mdash;</b></div><div class="ameter"><i class="athr" style="left:75%"></i></div><div class="amtr-f"><span class="ahint">no classes recorded yet</span></div></div><div class="amtr none"><div class="amtr-h"><span class="badge sm">PI</span><b>&mdash;</b></div><div class="ameter"><i class="athr" style="left:75%"></i></div><div class="amtr-f"><span class="ahint">no classes recorded yet</span></div></div><div class="amtr none"><div class="amtr-h"><span class="badge sm">SS</span><b>&mdash;</b></div><div class="ameter"><i class="athr" style="left:75%"></i></div><div class="amtr-f"><span class="ahint">no classes recorded yet</span></div></div><div class="amtr none"><div class="amtr-h"><span class="badge sm">EOS&amp;D</span><b>&mdash;</b></div><div class="ameter"><i class="athr" style="left:75%"></i></div><div class="amtr-f"><span class="ahint">no classes recorded yet</span></div></div><div class="amtr none"><div class="amtr-h"><span class="badge sm">DAA</span><b>&mdash;</b></div><div class="ameter"><i class="athr" style="left:75%"></i></div><div class="amtr-f"><span class="ahint">no classes recorded yet</span></div></div></div>
 
 <div style="margin-top:14px"><div class="panel"><h4>Course information</h4><ul class="files"><li><a href="00%20Course%20Information/1st%20Semester%20Academic%20Calendar.pdf">1st Semester Academic Calendar.pdf</a><span class="meta">81.9 KB &middot; 24 Jul</span></li><li><a href="00%20Course%20Information/Revised-Brochure-BStat%282016%29.pdf">Revised-Brochure-BStat(2016).pdf</a><span class="meta">304.7 KB &middot; 24 Jul</span></li></ul></div></div>
 
@@ -272,6 +304,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   </header>
   <div class="wbar"><div class="wseg w-mid" style="flex:40" title="Mid-Semester: 40%">40</div><div class="wseg w-sem" style="flex:50" title="Final Exam: 50%">50</div><div class="wseg w-asg" style="flex:10" title="Assignments: 10%">10</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 40%</span><span class="wkey"><i class="dot w-sem"></i>Final Exam 50%</span><span class="wkey"><i class="dot w-asg"></i>Assignments 10%</span></div>
   <p class="note">Per the instructor&#x27;s handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing.</p>
+  
   <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Debashis Paul</span><span class="unit">ASU</span><span class="fcount">2 files</span></div><div class="track-extra"><span class="ct">Mon 3:10 – 4:55 pm &middot; Wed 2:15 – 4:00 pm</span><span class="rm">508, S. N. Bose Bhavan</span><a class="em" href="mailto:debpaul.isi@gmail.com">debpaul.isi@gmail.com</a></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec" open><summary><span class="ico">&#128218;</span>Study Material<span class="count">2</span></summary><ul class="files"><li><a href="01%20Linear%20Statistical%20Models/Study%20Material/overview_simple_linear_regression.pdf">overview_simple_linear_regression.pdf</a><span class="meta">670.3 KB &middot; 04 Aug</span></li><li><a href="01%20Linear%20Statistical%20Models/Study%20Material/01%20OLS%20Revision%20and%20the%20Gauss-Markov%20Framework.html">01 OLS Revision and the Gauss-Markov Framework.html</a><span class="meta">36.3 KB &middot; 24 Jul</span></li></ul></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
   
 </section>
@@ -285,6 +318,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   </header>
   <div class="wbar unknown"><span>weighting not specified</span></div>
   <p class="note">Not specified on the course sheet — confirm with the instructor.</p>
+  
   <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Probal Chaudhuri</span><span class="unit">SMU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
   
 </section>
@@ -298,7 +332,8 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   </header>
   <div class="wbar"><div class="wseg w-mid" style="flex:30" title="Mid-Semester: 30%">30</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-proj" style="flex:20" title="Project: 20%">20</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 30%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-proj"></i>Project 20%</span></div>
   
-  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Ambarish Chattopadhyay</span><span class="unit">ASU</span><span class="fcount">1 file</span></div><div class="secs"><details class="sec" open><summary><span class="ico">&#9998;</span>Notes<span class="count">1</span></summary><ul class="files"><li><a href="03%20Sample%20Surveys/Notes/class_1_upload.pdf">class_1_upload.pdf</a><span class="meta">17.2 MB &middot; 29 Jul</span></li></ul></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
+  
+  <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Ambarish Chattopadhyay</span><span class="unit">ASU</span><span class="fcount">3 files</span></div><div class="secs"><details class="sec" open><summary><span class="ico">&#9998;</span>Notes<span class="count">3</span></summary><ul class="files"><li><a href="03%20Sample%20Surveys/Notes/class_3_upload.pdf">class_3_upload.pdf</a><span class="meta">217.5 KB &middot; 04 Aug</span></li><li><a href="03%20Sample%20Surveys/Notes/class_2_upload.pdf">class_2_upload.pdf</a><span class="meta">495.1 KB &middot; 04 Aug</span></li><li><a href="03%20Sample%20Surveys/Notes/class_1_upload.pdf">class_1_upload.pdf</a><span class="meta">17.2 MB &middot; 29 Jul</span></li></ul></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
   <details class="sec proj"><summary><span class="ico">&#128203;</span>Project<span class="count">0</span></summary><p class="empty">no project files yet</p></details>
 </section>
 <section class="card" id="c-eosd">
@@ -311,6 +346,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
   </header>
   <div class="wbar"><div class="wseg w-mid" style="flex:30" title="Mid-Semester: 30%">30</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-proj" style="flex:20" title="Project: 20%">20</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 30%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-proj"></i>Project 20%</span></div>
   <p class="note">One combined course made of two halves taught separately.</p>
+  
   <div class="tracks"><div class="track"><div class="track-name">Economic Statistics</div><div class="track-meta"><span class="teacher">Kajori Banerjee</span><span class="unit">PSU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div><div class="track"><div class="track-name">Official Statistics</div><div class="track-meta"><span class="teacher">Sandip Mitra</span><span class="unit">SOSU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div><div class="track"><div class="track-name">Demography</div><div class="track-meta"><span class="teacher">Kajori Banerjee</span><span class="unit">PSU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
   <details class="sec proj"><summary><span class="ico">&#128203;</span>Project<span class="count">0</span></summary><p class="empty">no project files yet</p></details>
 </section>
@@ -323,6 +359,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
     <span class="badge">DAA</span>
   </header>
   <div class="wbar"><div class="wseg w-mid" style="flex:30" title="Mid-Semester: 30%">30</div><div class="wseg w-sem" style="flex:50" title="Semester: 50%">50</div><div class="wseg w-proj" style="flex:20" title="Project: 20%">20</div></div><div class="wkeys"><span class="wkey"><i class="dot w-mid"></i>Mid-Semester 30%</span><span class="wkey"><i class="dot w-sem"></i>Semester 50%</span><span class="wkey"><i class="dot w-proj"></i>Project 20%</span></div>
+  
   
   <div class="tracks"><div class="track"><div class="track-meta"><span class="teacher">Sandip Das</span><span class="unit">ACMU</span><span class="fcount">0 files</span></div><div class="secs"><details class="sec"><summary><span class="ico">&#9998;</span>Notes<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128218;</span>Study Material<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#9745;</span>Assignments<span class="count">0</span></summary><p class="empty">nothing here yet</p></details><details class="sec"><summary><span class="ico">&#128260;</span>Weekly Review<span class="count">0</span></summary><p class="empty">nothing here yet</p></details></div></div></div>
   <details class="sec proj"><summary><span class="ico">&#128203;</span>Project<span class="count">0</span></summary><p class="empty">no project files yet</p></details>
@@ -542,7 +579,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
 </details>
 
 <footer>
-  Generated 04 Aug 2026, 19:27 from
+  Generated 04 Aug 2026, 19:38 from
   <code>_dashboard/plan.json</code>. Edit that file, then run
   <code>python _dashboard/build.py</code> to refresh this page.
 </footer>
