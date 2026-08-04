@@ -86,6 +86,12 @@ usual `git add/commit/push`. Add a reason with a trailing `-- note`:
 python _dashboard/attend.py lsm absent -- travelling
 ```
 
+**Class length matters.** A 2-hour class counts as 2, a 1-hour class as 1. The
+weight is read automatically from the timetable by the day you mark, so you just
+record present / absent / cancelled and the maths follows. (Only EOS&D mixes
+lengths — Kajori Banerjee's Mon/Wed hours are single, Sandip Mitra's Tuesday is
+a double.)
+
 **Cancelled classes** are logged but never count toward the percentage — the
 denominator only includes classes that actually met. Under the hood each class
 is one entry in `attendance.sessions` in `plan.json`, so you can also edit that

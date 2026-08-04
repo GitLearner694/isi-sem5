@@ -27,6 +27,7 @@ convenience wrapper that appends an entry and re-runs build.py.
 """
 
 import datetime as dt
+import importlib.util
 import json
 import subprocess
 import sys
@@ -35,6 +36,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 PLAN = HERE / "plan.json"
 BUILD = HERE / "build.py"
+
+# reuse the dashboard's weighted attendance logic so tallies always agree
+_spec = importlib.util.spec_from_file_location("build", BUILD)
+build = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(build)
 
 STATUS = {
     "present": "present", "p": "present", "yes": "present", "y": "present",
@@ -92,29 +98,26 @@ def sessions_of(course):
     return att.setdefault("sessions", [])
 
 
-def tally(course, thr):
-    ss = (course.get("attendance") or {}).get("sessions") or []
-    held = sum(1 for s in ss if s.get("status") in ("present", "absent"))
-    att = sum(1 for s in ss if s.get("status") == "present")
-    canc = sum(1 for s in ss if s.get("status") == "cancelled")
-    pct = f"{100 * att / held:.0f}%" if held else "-"
-    flag = ""
-    if held:
-        flag = "  OK" if 100 * att / held >= thr else "  BELOW"
-    extra = f", {canc} cancelled" if canc else ""
-    return f'{course["short"]:6} {att}/{held} held{extra:16} {pct:>5}{flag}'
+def tally(plan, course):
+    """One-line weighted summary (a 2-hour class counts as 2), via build.py."""
+    s = build.attendance_stat(plan, course)
+    pct = f'{s["pct"]:.0f}%' if s["pct"] is not None else "-"
+    flag = {"ok": "  OK", "warn": "  OK", "below": "  BELOW"}.get(s["state"], "")
+    extra = f', {s["cancelled"]} cancelled' if s["cancelled"] else ""
+    return f'{course["short"]:6} {s["attended"]}/{s["held"]} classes{extra:16} {pct:>5}{flag}'
 
 
 def show(plan, course=None):
-    thr = plan["semester"].get("attendance_threshold", 75)
     courses = [course] if course else plan["courses"]
     for c in courses:
-        print(tally(c, thr))
+        print(tally(plan, c))
         if course:                       # detail for a single course
             for s in (c.get("attendance") or {}).get("sessions", []):
                 m = MARK.get(s.get("status"), "?")
+                w = build.session_weight(plan, c["short"], s.get("date", ""))
+                wt = f' (x{w})' if s.get("status") != "cancelled" and w != 1 else ""
                 note = f'  {s["note"]}' if s.get("note") else ""
-                print(f'   {s.get("date","?")}  {m} {s.get("status","?")}{note}')
+                print(f'   {s.get("date","?")}  {m} {s.get("status","?")}{wt}{note}')
 
 
 def rebuild():
@@ -190,7 +193,7 @@ def main(argv):
     rebuild()
 
     print(f'{c["short"]}: {date} -> {MARK[status]} {status}')
-    print(tally(c, plan["semester"].get("attendance_threshold", 75)))
+    print(tally(plan, c))
     if push:
         git_push(f'Attendance: {c["short"]} {date} {status}')
     else:

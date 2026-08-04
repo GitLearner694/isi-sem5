@@ -16,6 +16,7 @@ editing it, or after dropping new notes into the folders.
 
 import json
 import os
+import re
 import html
 import math
 import datetime as dt
@@ -200,21 +201,59 @@ ABSENT = {"absent", "a", "no", "n"}
 CANCELLED = {"cancelled", "canceled", "c", "off"}
 
 
-def attendance_stat(course, default_threshold):
+def slot_hours(time_str):
+    """Length of a timetable slot in whole hours (min 1). '11:10 – 12:55' -> 2."""
+    ms = re.findall(r'(\d{1,2}):(\d{2})', time_str or "")
+    if len(ms) < 2:
+        return 1
+    (h1, m1), (h2, m2) = ms[0], ms[1]
+    mins = (int(h2) * 60 + int(m2)) - (int(h1) * 60 + int(m1))
+    return max(1, round(mins / 60))
+
+
+def session_weight(plan, short, date_iso):
+    """How many 'classes' one meeting counts for, per the rule that a 2-hour
+    class counts as 2 and a 1-hour class as 1. Read from the timetable by the
+    weekday of the session's date."""
+    try:
+        wd = dt.date.fromisoformat(date_iso).strftime("%A")
+    except ValueError:
+        return 1
+    slots = ((plan.get("schedule") or {}).get("days") or {}).get(wd, [])
+    hrs = sum(slot_hours(s.get("time", "")) for s in slots if s.get("short") == short)
+    return hrs or 1
+
+
+def attendance_stat(plan, course):
     """Percentage, threshold state and a concrete next-step hint for one course.
 
     Reads a session log — attendance.sessions = [{date, status}, ...] — where
-    status is present / absent / cancelled. Cancelled sessions are excluded from
-    the denominator entirely. Falls back to plain held/attended counters if no
-    session list is present.
+    status is present / absent / cancelled. Each session is weighted by the
+    class length in hours (a 2-hour class counts as 2), taken from the timetable;
+    a session may override with an explicit "weight". Cancelled sessions are
+    excluded from the denominator entirely. Falls back to plain held/attended
+    counters if no session list is present.
     """
+    default_threshold = plan["semester"].get("attendance_threshold", 75)
     a = course.get("attendance") or {}
     thr = a.get("threshold", default_threshold)
+    short = course.get("short", "")
     sessions = a.get("sessions")
     if sessions is not None:
-        held = sum(1 for s in sessions if s.get("status") in PRESENT | ABSENT)
-        att = sum(1 for s in sessions if s.get("status") in PRESENT)
-        cancelled = sum(1 for s in sessions if s.get("status") in CANCELLED)
+        held = att = 0
+        cancelled = 0
+        for s in sessions:
+            st = s.get("status")
+            if st in CANCELLED:
+                cancelled += 1
+                continue
+            w = s.get("weight")
+            if w is None:
+                w = session_weight(plan, short, s.get("date", ""))
+            if st in PRESENT | ABSENT:
+                held += w
+            if st in PRESENT:
+                att += w
     else:
         held = int(a.get("held", 0) or 0)
         att = int(a.get("attended", 0) or 0)
@@ -259,8 +298,7 @@ def attendance_meter(short, s):
 
 
 def render_attendance(plan):
-    thr = plan["semester"].get("attendance_threshold", 75)
-    stats = [attendance_stat(c, thr) for c in plan["courses"]]
+    stats = [attendance_stat(plan, c) for c in plan["courses"]]
     any_held = any(s["held"] for s in stats)
     meters = "".join(attendance_meter(c["short"], s)
                      for c, s in zip(plan["courses"], stats))
@@ -321,7 +359,7 @@ def render_course_card(plan, course, scans):
     if course.get("weights_note"):
         note = f'<p class="note">{esc(course["weights_note"])}</p>'
 
-    a = attendance_stat(course, plan["semester"].get("attendance_threshold", 75))
+    a = attendance_stat(plan, course)
     if a["state"] == "none":
         att_line = ""
     else:
