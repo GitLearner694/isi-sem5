@@ -55,6 +55,42 @@ Every course (and each part of course 04) has the same four sections:
 Parametric Inference has no weighting on the course sheet — worth confirming with
 the instructor and filling into `plan.json`.
 
+## Marking attendance
+
+Attendance shows on the dashboard as a meter per course, measured against ISI's
+75% requirement. Mark a class with one command from the `Sem 5` folder:
+
+```bash
+python _dashboard/attend.py lsm present
+```
+
+- **course** — `lsm`, `pi`, `ss`, `eosd`, or `daa` (any case)
+- **status** — `present`, `absent`, or `cancelled` (short forms `p` / `a` / `c`)
+- **date** — optional; defaults to today. Also accepts `YYYY-MM-DD`, a weekday
+  this week (`mon`…`fri`), or `yesterday`.
+
+```bash
+python _dashboard/attend.py pi cancelled 2026-07-21     # a specific date
+python _dashboard/attend.py ss absent mon               # this Monday
+python _dashboard/attend.py daa present --push          # mark AND publish
+python _dashboard/attend.py                             # show every course
+python _dashboard/attend.py lsm                         # show one course's log
+python _dashboard/attend.py undo lsm                    # remove the last entry
+```
+
+The command rebuilds `index.html` for you. It does **not** push by default —
+add `--push` to commit and publish in the same step, or push later with the
+usual `git add/commit/push`. Add a reason with a trailing `-- note`:
+
+```bash
+python _dashboard/attend.py lsm absent -- travelling
+```
+
+**Cancelled classes** are logged but never count toward the percentage — the
+denominator only includes classes that actually met. Under the hood each class
+is one entry in `attendance.sessions` in `plan.json`, so you can also edit that
+by hand if you prefer.
+
 ## Weekly routine
 
 1. Drop the week's files into the right subject folders. Subfolders inside a

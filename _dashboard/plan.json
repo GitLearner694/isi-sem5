@@ -11,7 +11,7 @@
     "classes_end": "2026-11-06",
     "calendar_source": "ISI First Semester (2026–2027) Academic Calendar, dated 19/06/2026",
     "attendance_threshold": 75,
-    "attendance_source": "ISI expects at least 75% attendance per course for good academic standing (stated in the LSM handout). Counts are entered by hand — keep them current."
+    "attendance_source": "ISI expects at least 75% attendance per course for good academic standing (stated in the LSM handout). Cancelled classes are excluded. Mark classes with _dashboard/attend.py."
   },
   "milestones": [
     {
@@ -116,8 +116,7 @@
       ],
       "weights_note": "Per the instructor's handout. Homework assignments carry 10%. At least 75% attendance is expected for good academic standing.",
       "attendance": {
-        "held": 0,
-        "attended": 0
+        "sessions": []
       }
     },
     {
@@ -162,8 +161,13 @@
         }
       ],
       "attendance": {
-        "held": 0,
-        "attended": 0
+        "sessions": [
+          {
+            "date": "2026-07-21",
+            "status": "cancelled",
+            "note": "first class of the semester cancelled"
+          }
+        ]
       }
     },
     {
@@ -208,8 +212,13 @@
         }
       ],
       "attendance": {
-        "held": 0,
-        "attended": 0
+        "sessions": [
+          {
+            "date": "2026-07-22",
+            "status": "cancelled",
+            "note": "first class of the semester cancelled"
+          }
+        ]
       }
     },
     {
@@ -305,8 +314,7 @@
         }
       ],
       "attendance": {
-        "held": 0,
-        "attended": 0
+        "sessions": []
       }
     },
     {
@@ -354,8 +362,7 @@
         }
       ],
       "attendance": {
-        "held": 0,
-        "attended": 0
+        "sessions": []
       }
     }
   ],

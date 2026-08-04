@@ -195,15 +195,39 @@ def file_list(files, empty_msg):
     return f'<ul class="files">{"".join(rows)}</ul>'
 
 
+PRESENT = {"present", "p", "yes", "y"}
+ABSENT = {"absent", "a", "no", "n"}
+CANCELLED = {"cancelled", "canceled", "c", "off"}
+
+
 def attendance_stat(course, default_threshold):
-    """Present/held -> percentage, threshold state, and a concrete next-step hint."""
+    """Percentage, threshold state and a concrete next-step hint for one course.
+
+    Reads a session log — attendance.sessions = [{date, status}, ...] — where
+    status is present / absent / cancelled. Cancelled sessions are excluded from
+    the denominator entirely. Falls back to plain held/attended counters if no
+    session list is present.
+    """
     a = course.get("attendance") or {}
-    held = int(a.get("held", 0) or 0)
-    att = int(a.get("attended", 0) or 0)
     thr = a.get("threshold", default_threshold)
+    sessions = a.get("sessions")
+    if sessions is not None:
+        held = sum(1 for s in sessions if s.get("status") in PRESENT | ABSENT)
+        att = sum(1 for s in sessions if s.get("status") in PRESENT)
+        cancelled = sum(1 for s in sessions if s.get("status") in CANCELLED)
+    else:
+        held = int(a.get("held", 0) or 0)
+        att = int(a.get("attended", 0) or 0)
+        cancelled = 0
+
     if held <= 0:
-        return {"held": 0, "attended": att, "pct": None, "thr": thr,
-                "state": "none", "hint": "no classes recorded yet"}
+        if cancelled:
+            hint = f"{cancelled} cancelled &middot; none counted yet"
+        else:
+            hint = "no classes recorded yet"
+        return {"held": 0, "attended": att, "cancelled": cancelled, "pct": None,
+                "thr": thr, "state": "none", "hint": hint}
+
     pct = 100.0 * att / held
     t = thr / 100.0
     if pct + 1e-9 >= thr:
@@ -214,8 +238,8 @@ def attendance_stat(course, default_threshold):
         need = max(0, math.ceil((t * held - att) / (1 - t) - 1e-9)) if t < 1 else 0
         hint = f"attend the next {need} to reach {thr:g}%"
         state = "below"
-    return {"held": held, "attended": att, "pct": pct, "thr": thr,
-            "state": state, "hint": hint}
+    return {"held": held, "attended": att, "cancelled": cancelled, "pct": pct,
+            "thr": thr, "state": state, "hint": hint}
 
 
 def attendance_meter(short, s):
@@ -224,25 +248,28 @@ def attendance_meter(short, s):
         return (f'<div class="amtr none"><div class="amtr-h">'
                 f'<span class="badge sm">{esc(short)}</span><b>&mdash;</b></div>'
                 f'<div class="ameter"><i class="athr" style="left:{s["thr"]}%"></i></div>'
-                f'<div class="amtr-f"><span class="ahint">{esc(s["hint"])}</span></div></div>')
+                f'<div class="amtr-f"><span class="ahint">{s["hint"]}</span></div></div>')
+    canc = f' &middot; {s["cancelled"]} cancelled' if s.get("cancelled") else ""
     return (f'<div class="amtr {s["state"]}"><div class="amtr-h">'
             f'<span class="badge sm">{esc(short)}</span><b>{s["pct"]:.0f}%</b></div>'
             f'<div class="ameter"><span class="afill" style="width:{min(s["pct"],100):.1f}%"></span>'
             f'<i class="athr" style="left:{s["thr"]}%" title="{s["thr"]:g}% required"></i></div>'
-            f'<div class="amtr-f"><span>{s["attended"]}/{s["held"]} classes</span>'
+            f'<div class="amtr-f"><span>{s["attended"]}/{s["held"]} classes{canc}</span>'
             f'<span class="ahint">{s["hint"]}</span></div></div>')
 
 
 def render_attendance(plan):
     thr = plan["semester"].get("attendance_threshold", 75)
-    any_data = any((c.get("attendance") or {}).get("held") for c in plan["courses"])
-    meters = "".join(attendance_meter(c["short"], attendance_stat(c, thr))
-                     for c in plan["courses"])
+    stats = [attendance_stat(c, thr) for c in plan["courses"]]
+    any_held = any(s["held"] for s in stats)
+    meters = "".join(attendance_meter(c["short"], s)
+                     for c, s in zip(plan["courses"], stats))
     src = plan["semester"].get("attendance_source")
     note = f'<p class="src">{esc(src)}</p>' if src else ""
-    if not any_data:
-        note += ('<p class="src">Record classes in <code>_dashboard/plan.json</code>: give each '
-                 'course an <code>"attendance": {"held": N, "attended": M}</code> entry, then rebuild.</p>')
+    if not any_held:
+        note += ('<p class="src">Mark a class from the course folder with, e.g., '
+                 '<code>python _dashboard/attend.py lsm present</code> '
+                 '(status: present / absent / cancelled). See the README.</p>')
     return f'{note}<div class="attgrid">{meters}</div>'
 
 
@@ -298,8 +325,9 @@ def render_course_card(plan, course, scans):
     if a["state"] == "none":
         att_line = ""
     else:
+        canc = f' &middot; {a["cancelled"]} canc.' if a.get("cancelled") else ""
         att_line = (f'<div class="att-line {a["state"]}">Attendance '
-                    f'<b>{a["pct"]:.0f}%</b> <span>({a["attended"]}/{a["held"]})</span>'
+                    f'<b>{a["pct"]:.0f}%</b> <span>({a["attended"]}/{a["held"]}{canc})</span>'
                     f'<span class="ahint">{a["hint"]}</span></div>')
 
     return f"""
