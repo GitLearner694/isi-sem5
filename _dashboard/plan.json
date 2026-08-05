@@ -136,6 +136,10 @@
           {
             "date": "2026-08-03",
             "status": "present"
+          },
+          {
+            "date": "2026-08-05",
+            "status": "absent"
           }
         ]
       }
@@ -266,6 +270,10 @@
           {
             "date": "2026-07-31",
             "status": "present"
+          },
+          {
+            "date": "2026-08-05",
+            "status": "absent"
           }
         ]
       }
@@ -395,6 +403,11 @@
           {
             "date": "2026-08-04",
             "status": "absent"
+          },
+          {
+            "date": "2026-08-05",
+            "status": "cancelled",
+            "note": "class did not happen"
           }
         ]
       }
