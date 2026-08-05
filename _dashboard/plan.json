@@ -536,6 +536,7 @@
           "topics": [],
           "syllabus": [],
           "study": [
+            "Study Material/02 Simple Linear Regression Overview with proofs.html — covers lectures 1–4 (lectures 3–4 fall in this week); worked companion with full proofs.",
             "Study Material/01 OLS Revision and the Gauss-Markov Framework.html — §§5–9 cover the Gauss–Markov framework, estimability and the GM theorem.",
             "Christensen, Plane Answers — §§2.1, 2.3, 2.5."
           ],
