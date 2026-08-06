@@ -477,6 +477,10 @@
           {
             "date": "2026-08-03",
             "status": "present"
+          },
+          {
+            "date": "2026-08-06",
+            "status": "present"
           }
         ]
       }
@@ -624,10 +628,17 @@
           "tasks": []
         },
         "daa": {
-          "topics": [],
+          "topics": [
+            "The 3-SUM problem."
+          ],
           "syllabus": [],
           "study": [],
-          "tasks": []
+          "tasks": [
+            {
+              "t": "Upload DAA notes — 3-SUM problem (Thu 6 Aug)",
+              "done": false
+            }
+          ]
         },
         "econ": {
           "topics": [],
