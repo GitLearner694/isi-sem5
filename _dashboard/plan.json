@@ -140,6 +140,10 @@
           {
             "date": "2026-08-05",
             "status": "absent"
+          },
+          {
+            "date": "2026-08-10",
+            "status": "present"
           }
         ]
       }
@@ -207,6 +211,10 @@
           {
             "date": "2026-08-04",
             "status": "present"
+          },
+          {
+            "date": "2026-08-07",
+            "status": "absent"
           }
         ]
       }
@@ -274,6 +282,10 @@
           {
             "date": "2026-08-05",
             "status": "absent"
+          },
+          {
+            "date": "2026-08-07",
+            "status": "present"
           }
         ]
       }
@@ -408,6 +420,10 @@
             "date": "2026-08-05",
             "status": "cancelled",
             "note": "class did not happen"
+          },
+          {
+            "date": "2026-08-10",
+            "status": "present"
           }
         ]
       }
@@ -480,6 +496,10 @@
           },
           {
             "date": "2026-08-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-10",
             "status": "present"
           }
         ]
