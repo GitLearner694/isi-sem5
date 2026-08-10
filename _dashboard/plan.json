@@ -626,7 +626,9 @@
         "lsm": {
           "topics": [],
           "syllabus": [],
-          "study": [],
+          "study": [
+            "Instructor's study material shared (week 3): Study Material/Gauss-Markov_framework.pdf and Study Material/projection_matrix_inverse.pdf."
+          ],
           "tasks": []
         },
         "pi": {
@@ -638,7 +640,9 @@
         "ss": {
           "topics": [],
           "syllabus": [],
-          "study": [],
+          "study": [
+            "Class notes for the first five Sample Surveys classes filed under Notes (class_1–class_5)."
+          ],
           "tasks": []
         },
         "dem": {
