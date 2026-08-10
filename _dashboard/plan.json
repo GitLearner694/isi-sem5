@@ -534,7 +534,9 @@
         "ss": {
           "topics": [],
           "syllabus": [],
-          "study": [],
+          "study": [
+            "Class 1 notes filed under Notes (class_1_upload.pdf)."
+          ],
           "tasks": []
         },
         "dem": {
@@ -588,7 +590,9 @@
         "ss": {
           "topics": [],
           "syllabus": [],
-          "study": [],
+          "study": [
+            "Classes 2–3 notes filed under Notes (class_2_upload.pdf, class_3_upload.pdf)."
+          ],
           "tasks": []
         },
         "dem": {
@@ -641,7 +645,7 @@
           "topics": [],
           "syllabus": [],
           "study": [
-            "Class notes for the first five Sample Surveys classes filed under Notes (class_1–class_5)."
+            "Classes 4–5 notes filed under Notes (class_4_upload.pdf, class_5_upload.pdf)."
           ],
           "tasks": []
         },
