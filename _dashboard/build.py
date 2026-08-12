@@ -227,6 +227,21 @@ def session_weight(plan, short, date_iso):
     return hrs or 1
 
 
+def _parse_sheet_date(s):
+    """Accept the date formats Google Sheets is likely to emit and normalise to
+    ISO (YYYY-MM-DD). Day-first is preferred for the ambiguous dash/slash cases,
+    matching the DD-MM-YYYY that Sheets produces in this locale."""
+    s = (s or "").strip()
+    if not s:
+        return None
+    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d", "%d.%m.%Y", "%m/%d/%Y"):
+        try:
+            return dt.datetime.strptime(s, fmt).date().isoformat()
+        except ValueError:
+            continue
+    return None
+
+
 def _status_norm(s):
     s = (s or "").strip().lower()
     if s in PRESENT:
@@ -284,18 +299,13 @@ def load_attendance_sheet(plan):
 
     grouped, skipped = {}, 0
     for row in rows:
-        date = col(row, "date")
+        date = _parse_sheet_date(col(row, "date"))
         who = col(row, "course", "subject").lower()
         status = _status_norm(col(row, "status"))
         note = col(row, "note", "notes")
         if not date or who not in lookup or status is None:
             if any(v.strip() for v in row.values() if v):  # non-blank but unusable
                 skipped += 1
-            continue
-        try:
-            dt.date.fromisoformat(date)
-        except ValueError:
-            skipped += 1
             continue
         cid = lookup[who]["id"]
         entry = {"date": date, "status": status}
