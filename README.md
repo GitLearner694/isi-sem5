@@ -119,14 +119,22 @@ display).
 
 **Then, to update attendance:** just edit the Sheet — one row per class:
 
-| date | course | status | note |
-| --- | --- | --- | --- |
-| 2026-08-12 | LSM | present | |
-| 2026-08-12 | SS | absent | overslept |
+| date | course | status | hours | note |
+| --- | --- | --- | --- | --- |
+| 2026-08-12 | LSM | present | 2 | |
+| 2026-08-12 | SS | absent | 2 | overslept |
+| 2026-08-12 | EOS&D | present | 1 | |
 
 `course` is the short code (`LSM`, `PI`, `SS`, `EOS&D`, `DAA`); `status` is
-`present`, `absent`, or `cancelled`. Class-length weighting and the 75% maths
-are still applied automatically. Edits show on the live site after the next
+`present`, `absent`, or `cancelled`.
+
+**One row = one class meeting.** The `hours` column is how many "classes" that
+meeting counts for — 2 for a 2-hour class, 1 for a 1-hour class. It comes
+pre-filled in the seed file (so you can see it), and you can **leave it blank on
+new rows**: the dashboard then reads the length from the timetable by the day of
+the class. Only fill it in to override an odd case — e.g. a rescheduled/makeup
+class on a day the course doesn't normally meet, which would otherwise default
+to 1. The 75% maths uses these weights. Edits show on the live site after the next
 rebuild — the site rebuilds **daily**, or hit **Actions → Build and deploy →
 Run workflow** for an instant refresh. If the Sheet is ever unreachable, the
 dashboard quietly falls back to the `plan.json` log, so it never breaks.

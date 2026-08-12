@@ -301,6 +301,13 @@ def load_attendance_sheet(plan):
         entry = {"date": date, "status": status}
         if note:
             entry["note"] = note
+        hrs = col(row, "hours", "weight", "classes")   # optional explicit weight
+        if hrs:
+            try:
+                hv = float(hrs)
+                entry["weight"] = int(hv) if hv == int(hv) else hv
+            except ValueError:
+                pass
         grouped.setdefault(cid, []).append(entry)
 
     # overlay: replace sessions only for courses that appear in the sheet
