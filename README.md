@@ -97,6 +97,40 @@ denominator only includes classes that actually met. Under the hood each class
 is one entry in `attendance.sessions` in `plan.json`, so you can also edit that
 by hand if you prefer.
 
+### Tracking attendance in a Google Sheet (optional)
+
+Instead of `attend.py` you can drive attendance from a Google Sheet you edit
+directly. Once it's wired up, the dashboard reads the Sheet on every rebuild and
+the Sheet becomes the single source of truth (the `plan.json` log is ignored for
+display).
+
+**One-time setup:**
+
+1. Create a new Google Sheet.
+2. Open `_dashboard/attendance.csv` (already seeded with your current
+   attendance) and paste its contents into the Sheet — or in the Sheet use
+   **File → Import → Upload** and pick that file. Keep the header row
+   `date, course, status, note`.
+3. **File → Share → Publish to web → Entire document → Comma-separated values
+   (.csv) → Publish.** Copy the URL it gives you (it ends in `output=csv`).
+4. Paste that URL into `_dashboard/plan.json` as
+   `"attendance_sheet_csv": "https://…output=csv"` (inside `semester`), then
+   commit and push. Leave it `""` to keep using `plan.json`/`attend.py` instead.
+
+**Then, to update attendance:** just edit the Sheet — one row per class:
+
+| date | course | status | note |
+| --- | --- | --- | --- |
+| 2026-08-12 | LSM | present | |
+| 2026-08-12 | SS | absent | overslept |
+
+`course` is the short code (`LSM`, `PI`, `SS`, `EOS&D`, `DAA`); `status` is
+`present`, `absent`, or `cancelled`. Class-length weighting and the 75% maths
+are still applied automatically. Edits show on the live site after the next
+rebuild — the site rebuilds **daily**, or hit **Actions → Build and deploy →
+Run workflow** for an instant refresh. If the Sheet is ever unreachable, the
+dashboard quietly falls back to the `plan.json` log, so it never breaks.
+
 ## Weekly routine
 
 1. Drop the week's files into the right subject folders. Subfolders inside a

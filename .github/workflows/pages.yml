@@ -5,10 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Rebuild once a week so the "current week" highlight stays accurate
-# even in weeks with no pushes. 03:00 UTC Monday = 08:30 IST.
+# Rebuild daily so the "current week" highlight stays accurate and any edits
+# to the attendance Google Sheet propagate without a push. 03:00 UTC = 08:30 IST.
+# (Use the Actions tab -> Run workflow for an instant refresh.)
   schedule:
-    - cron: "0 3 * * 1"
+    - cron: "0 3 * * *"
 
 permissions:
   contents: read

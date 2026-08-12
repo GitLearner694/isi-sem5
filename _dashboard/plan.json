@@ -11,7 +11,8 @@
     "classes_end": "2026-11-06",
     "calendar_source": "ISI First Semester (2026–2027) Academic Calendar, dated 19/06/2026",
     "attendance_threshold": 75,
-    "attendance_source": "ISI expects at least 75% attendance per course for good academic standing (stated in the LSM handout). A 2-hour class counts as 2, a 1-hour class as 1; cancelled classes are excluded. Mark classes with _dashboard/attend.py."
+    "attendance_source": "ISI expects at least 75% attendance per course for good academic standing (stated in the LSM handout). A 2-hour class counts as 2, a 1-hour class as 1; cancelled classes are excluded. Mark classes with _dashboard/attend.py.",
+    "attendance_sheet_csv": ""
   },
   "milestones": [
     {

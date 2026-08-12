@@ -17,9 +17,12 @@ editing it, or after dropping new notes into the folders.
 import json
 import os
 import re
+import csv
+import io
 import html
 import math
 import datetime as dt
+import urllib.request
 from pathlib import Path
 from urllib.parse import quote
 
@@ -222,6 +225,94 @@ def session_weight(plan, short, date_iso):
     slots = ((plan.get("schedule") or {}).get("days") or {}).get(wd, [])
     hrs = sum(slot_hours(s.get("time", "")) for s in slots if s.get("short") == short)
     return hrs or 1
+
+
+def _status_norm(s):
+    s = (s or "").strip().lower()
+    if s in PRESENT:
+        return "present"
+    if s in ABSENT:
+        return "absent"
+    if s in CANCELLED:
+        return "cancelled"
+    return None
+
+
+def load_attendance_sheet(plan):
+    """If semester.attendance_sheet_csv is set, pull attendance from it (a
+    published Google-Sheet CSV URL, or a local .csv path) and overlay it onto
+    each course's sessions FOR RENDERING ONLY — plan.json is not modified, so a
+    transient fetch failure never wipes the saved log.
+
+    CSV columns (header row, case-insensitive): date, course, status[, note].
+    'course' matches a course id or short name; 'status' is present/absent/
+    cancelled (short forms p/a/c accepted). Returns a status string for logging.
+    """
+    src = (plan["semester"].get("attendance_sheet_csv") or "").strip()
+    if not src:
+        return "not configured (using plan.json)"
+    try:
+        if src.lower().startswith(("http://", "https://")):
+            req = urllib.request.Request(src, headers={"User-Agent": "sem5-dashboard"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                text = r.read().decode("utf-8-sig")
+        else:
+            p = Path(src)
+            if not p.is_absolute():
+                p = ROOT / src
+            text = p.read_text(encoding="utf-8-sig")
+    except Exception as e:
+        print(f"  attendance sheet: FETCH FAILED ({e}); keeping plan.json log")
+        return f"fetch failed: {e}"
+
+    # index courses by id and short, case-insensitive
+    lookup = {}
+    for c in plan["courses"]:
+        lookup[c["id"].lower()] = c
+        lookup[c["short"].lower()] = c
+
+    rows = list(csv.DictReader(io.StringIO(text)))
+    if not rows:
+        print("  attendance sheet: empty; keeping plan.json log")
+        return "sheet empty; kept plan.json"
+
+    def col(row, *names):
+        for k in row:
+            if k and k.strip().lower() in names:
+                return (row[k] or "").strip()
+        return ""
+
+    grouped, skipped = {}, 0
+    for row in rows:
+        date = col(row, "date")
+        who = col(row, "course", "subject").lower()
+        status = _status_norm(col(row, "status"))
+        note = col(row, "note", "notes")
+        if not date or who not in lookup or status is None:
+            if any(v.strip() for v in row.values() if v):  # non-blank but unusable
+                skipped += 1
+            continue
+        try:
+            dt.date.fromisoformat(date)
+        except ValueError:
+            skipped += 1
+            continue
+        cid = lookup[who]["id"]
+        entry = {"date": date, "status": status}
+        if note:
+            entry["note"] = note
+        grouped.setdefault(cid, []).append(entry)
+
+    # overlay: replace sessions only for courses that appear in the sheet
+    for c in plan["courses"]:
+        if c["id"] in grouped:
+            sess = sorted(grouped[c["id"]], key=lambda s: s["date"])
+            c.setdefault("attendance", {})["sessions"] = sess
+
+    n = sum(len(v) for v in grouped.values())
+    msg = f"loaded {n} rows for {len(grouped)} courses" + (f" ({skipped} skipped)" if skipped else "")
+    print(f"  attendance sheet: {msg}")
+    return msg
 
 
 def attendance_stat(plan, course):
@@ -1034,6 +1125,12 @@ def main():
     created = ensure_dirs(plan)
     ensure_weeks(plan)
     save_plan(plan)
+
+    # Overlay attendance from the Google Sheet (if configured). Done AFTER
+    # save_plan so the fetched data is used for rendering but never written back
+    # to plan.json — the sheet stays the single source of truth, and a failed
+    # fetch just falls back to whatever is in plan.json.
+    load_attendance_sheet(plan)
 
     start = dt.date.fromisoformat(plan["semester"]["start"])
     cur_week = max(1, min(plan["semester"]["num_weeks"],
