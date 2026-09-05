@@ -1,0 +1,918 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=2pt,topsep=3pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Parametric Inference --- Homework Solutions}
+\rhead{\small B.Stat.\ 3rd yr, Sem 1, 2026--27}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\Ybar}{\overline{Y}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\ind}{\perp\!\!\!\perp}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newtcolorbox{ideabox}{colback=ForestGreen!5,colframe=ForestGreen!55,
+  title=\textbf{Key idea},fonttitle=\bfseries,breakable}
+\newtcolorbox{notebox}{colback=BrickRed!5,colframe=BrickRed!55,
+  title=\textbf{Watch out},fonttitle=\bfseries,breakable}
+
+\newenvironment{prob}[1]{\medskip\noindent\textbf{\large #1}\quad}{\par}
+\newcommand{\soln}{\medskip\noindent\textbf{Solution.}\ }
+
+\lstset{basicstyle=\ttfamily\footnotesize,frame=single,breaklines=true,
+  backgroundcolor=\color{black!3},columns=fullflexible}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Parametric Inference}\\[3pt]
+{\large Worked Solutions to Homeworks 1--3}\\[4pt]
+{\small Companion to \texttt{PI\_Exam\_Revision.pdf}}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\noindent\emph{Read these only after a cold attempt.} Each solution states the key idea first,
+so you can take the hint and go back to the problem before reading the algebra.
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Homework 1 --- Unbiased estimation and UMVUE}
+
+\begin{prob}{Q1.}
+$X$ has pmf $f(x\mid\theta)=\dfrac{\Gamma(\alpha+x)}{\Gamma(\alpha)\,\Gamma(x+1)}\,
+\theta^{\alpha}(1-\theta)^{x}$, $x=0,1,2,\dots$, with $0<\theta<1$ unknown and $\alpha>0$
+known. For any given $\alpha$, does a UMVUE of $\theta$ exist? Find it when it does.
+\end{prob}
+
+\begin{ideabox}
+Substitute $p=1-\theta$ and use the negative binomial series
+$(1-p)^{-\alpha}=\sum_{k\ge0}c_k p^k$ with $c_k=\Gamma(\alpha+k)/(\Gamma(\alpha)k!)$.
+Matching power-series coefficients gives the unique unbiased estimator, and uniqueness
+makes it the UMVUE.
+\end{ideabox}
+
+\soln
+Write $c_x=\dfrac{\Gamma(\alpha+x)}{\Gamma(\alpha)\,x!}$, so $f(x\mid\theta)=c_x\theta^\alpha(1-\theta)^x$.
+Note first that this is a one-parameter exponential family:
+$f(x\mid\theta)=\theta^{\alpha}c_x\exp\{x\log(1-\theta)\}$ with $T(x)=x$ and natural parameter
+$\eta=\log(1-\theta)$ ranging over $(-\infty,0)$, an open interval. Hence \textbf{$X$ is
+complete and sufficient}, and by Lehmann--Scheff\'e any unbiased estimator (necessarily a
+function of $X$) is \emph{the} UMVUE.
+
+It remains to find one. Put $p=1-\theta$. Unbiasedness of $T$ reads
+\[
+\sum_{x\ge0}T(x)\,c_x\,(1-p)^{\alpha}p^{x}=1-p
+\quad\Longleftrightarrow\quad
+\sum_{x\ge0}T(x)c_x p^x=(1-p)^{1-\alpha}
+\qquad \forall\,p\in(0,1).
+\]
+Now use the negative binomial series $\displaystyle(1-p)^{-\alpha}=\sum_{k\ge0}c_kp^k$, so
+\[
+(1-p)^{1-\alpha}=(1-p)\sum_{k\ge0}c_kp^k=\sum_{k\ge0}c_kp^k-\sum_{k\ge0}c_kp^{k+1}
+=\sum_{x\ge0}\big(c_x-c_{x-1}\big)p^x,\qquad c_{-1}:=0 .
+\]
+Two power series agree on an interval iff their coefficients agree, so
+$T(x)c_x=c_x-c_{x-1}$, i.e.
+\[
+T(x)=1-\frac{c_{x-1}}{c_x}
+=1-\frac{\Gamma(\alpha+x-1)}{\Gamma(\alpha)(x-1)!}\cdot\frac{\Gamma(\alpha)\,x!}{\Gamma(\alpha+x)}
+=1-\frac{x}{\alpha+x-1},
+\]
+using $\Gamma(\alpha+x)=(\alpha+x-1)\Gamma(\alpha+x-1)$ and $x!=x\,(x-1)!$. Therefore
+\[
+\boxed{\ T(X)=\frac{\alpha-1}{\alpha+X-1}\ \ (X\ge1),\qquad T(0)=1.\ }
+\]
+For $\alpha\ne1$ the single formula $(\alpha-1)/(\alpha+X-1)$ covers $X=0$ as well. For
+$\alpha=1$ (the geometric case) all $c_x=1$ and the estimator is $T(X)=\mathbb{I}\{X=0\}$.
+
+\emph{Existence.} The coefficient matching determines $T$ uniquely, so an unbiased estimator
+exists for \textbf{every} $\alpha>0$. Its variance is finite because $T$ is bounded:
+$|T(x)|\le\max\{1,\,|\alpha-1|/\alpha\}$. Hence the UMVUE exists for every $\alpha>0$ and is
+the estimator boxed above.
+
+\emph{Check ($\alpha=2$).} Then $c_x=x+1$ and $T(x)=1/(x+1)$, so
+$\E_\theta T=\sum_{x\ge0}\frac{1}{x+1}(x+1)\theta^2(1-\theta)^x=\theta^2\cdot\frac{1}{\theta}=\theta$. \checkmark
+
+\bigskip
+\begin{prob}{Q2.}
+$X\sim\mathrm{Poisson}(\lambda)$, $\lambda>0$. Find the UMVUE of $e^{c\lambda}$ for a given
+$-\infty<c<\infty$.
+\end{prob}
+
+\begin{ideabox}
+Poisson is a complete-sufficient exponential family, so \emph{any} unbiased estimator is the
+UMVUE. Write unbiasedness as a power-series identity and match coefficients of $\lambda^x$.
+\end{ideabox}
+
+\soln
+$X$ is complete sufficient ($T(x)=x$, $c(\lambda)=\log\lambda$, natural space $\R$). Let $T$
+be unbiased:
+\[
+\sum_{x\ge0}T(x)\,\frac{e^{-\lambda}\lambda^{x}}{x!}=e^{c\lambda}
+\iff
+\sum_{x\ge0}\frac{T(x)}{x!}\lambda^{x}=e^{(c+1)\lambda}
+=\sum_{x\ge0}\frac{(c+1)^{x}}{x!}\lambda^{x}\qquad\forall\lambda>0.
+\]
+Both sides are power series in $\lambda$ converging on $(0,\infty)$, so the coefficients match:
+$T(x)=(1+c)^{x}$. Hence
+\[
+\boxed{\ T(X)=(1+c)^{X}\ }
+\]
+is the unique unbiased estimator, and therefore the UMVUE by Lehmann--Scheff\'e.
+
+The variance is finite:
+$\E_\lambda T^2=\sum_x (1+c)^{2x}e^{-\lambda}\lambda^x/x!=\exp\{\lambda[(1+c)^2-1]\}<\infty$,
+so $\Var_\lambda T=e^{\lambda[(1+c)^2-1]}-e^{2c\lambda}$.
+
+\begin{notebox}
+With $n$ iid observations, $S=\sum X_i\sim\mathrm{Poi}(n\lambda)$ is complete sufficient and
+the same argument gives $T=(1+c/n)^{S}$ as the UMVUE of $e^{c\lambda}$. Note the estimator can
+be negative when $c<-1$, or oscillate in sign when $c<-2$ --- a standard illustration that a
+UMVUE need not be sensible.
+\end{notebox}
+
+\bigskip
+\begin{prob}{Q3.}
+$X_1,\dots,X_n\iid N(\theta,1)$, $\theta\in\R$. Find the UMVUE of $\Prob\{X_1>0\}$.
+\end{prob}
+
+\begin{ideabox}
+Route B: Rao--Blackwellise the crude unbiased estimator $\mathbb{I}\{X_1>0\}$ over the
+complete sufficient statistic $\Xbar$. The only work is the conditional law of $X_1$ given
+$\Xbar$.
+\end{ideabox}
+
+\soln
+Here $\psi(\theta)=\Prob_\theta(X_1>0)=\Phi(\theta)$, where $\Phi$ is the standard normal cdf.
+$\Xbar$ is complete sufficient ($N(\theta,1)$ is an exponential family with natural parameter
+$\theta$ over $\R$). Start from the unbiased estimator $T_0=\mathbb{I}\{X_1>0\}$, which
+satisfies $\E_\theta T_0=\Phi(\theta)$, and Rao--Blackwellise:
+\[
+T^*=\E\big[\mathbb{I}\{X_1>0\}\ \big|\ \Xbar=t\big]=\Prob\big(X_1>0\mid \Xbar=t\big).
+\]
+\emph{Conditional law.} $(X_1,\Xbar)$ is jointly normal with
+$\Cov(X_1,\Xbar)=\tfrac1n\Var(X_1)=\tfrac1n=\Var(\Xbar)$. Hence
+\[
+\E[X_1\mid\Xbar=t]=\theta+\frac{\Cov(X_1,\Xbar)}{\Var(\Xbar)}(t-\theta)=t,\qquad
+\Var(X_1\mid\Xbar)=\Var(X_1)-\frac{\Cov^2}{\Var(\Xbar)}=1-\frac1n=\frac{n-1}{n}.
+\]
+(Equivalently: $X_1-\Xbar\ind\Xbar$, and $\Var(X_1-\Xbar)=1-1/n$.) So
+$X_1\mid\Xbar=t\ \sim\ N\!\big(t,\tfrac{n-1}{n}\big)$ and
+\[
+T^*=\Prob\Big(N\big(t,\tfrac{n-1}{n}\big)>0\Big)
+=\Phi\!\left(\frac{t}{\sqrt{(n-1)/n}}\right).
+\]
+Since $T^*$ is unbiased and a function of the complete sufficient statistic,
+Lehmann--Scheff\'e gives
+\[
+\boxed{\ \text{UMVUE of }\Prob\{X_1>0\}\ =\ \Phi\!\left(\sqrt{\tfrac{n}{n-1}}\ \Xbar\right).\ }
+\]
+Sanity check: as $n\to\infty$ the factor $\to1$ and $T^*\to\Phi(\theta)$ by the LLN and
+continuity. \checkmark
+
+\bigskip
+\begin{prob}{Q4.}
+For a sequence $\{a_x\}$ of positive constants let $A(\theta)=\sum_{x\ge0}a_x\theta^x<\infty$
+for $0<\theta<b$, and let $X$ have pmf $a_x\theta^x/A(\theta)$. Does the UMVUE of $\E(X)$
+attain the Cram\'er--Rao lower bound? Verify.
+\end{prob}
+
+\begin{ideabox}
+Yes. In a power-series family the score is exactly $\frac{1}{\theta}\{X-\E X\}$, which is the
+equality condition in the CRLB. The verification also gives the identity
+$\Var_\theta X=\theta\,\psi'(\theta)$.
+\end{ideabox}
+
+\soln
+Write $\psi(\theta)=\E_\theta X$. This is a one-parameter exponential family
+($T(x)=x$, $c(\theta)=\log\theta$, natural space $(-\infty,\log b)$, an open interval), so $X$
+is complete sufficient; $X$ is unbiased for $\psi(\theta)$; hence \textbf{$X$ is the UMVUE of
+$\E(X)$}.
+
+\emph{Step 1: the mean.} Using the operator $\theta\frac{d}{d\theta}$, which turns
+$\sum a_x\theta^x$ into $\sum x a_x\theta^x$,
+\[
+\psi(\theta)=\E_\theta X=\frac{1}{A(\theta)}\sum_x x\,a_x\theta^x
+=\frac{\theta A'(\theta)}{A(\theta)}=\theta\,L'(\theta),\qquad L:=\log A .
+\]
+
+\emph{Step 2: the variance.} Applying the operator twice,
+$\sum_x x^2a_x\theta^x=\theta\frac{d}{d\theta}\big(\theta A'\big)=\theta A'+\theta^2A''$, so
+\[
+\Var_\theta X=\frac{\theta A'+\theta^2A''}{A}-\Big(\frac{\theta A'}{A}\Big)^2
+=\theta L'+\theta^2\Big(\frac{A''}{A}-\frac{(A')^2}{A^2}\Big)
+=\theta L'+\theta^2L''.
+\]
+On the other hand $\psi'=(\theta L')'=L'+\theta L''$, so $\theta\psi'=\theta L'+\theta^2L''$.
+Hence
+\[
+\boxed{\ \Var_\theta X=\theta\,\psi'(\theta).\ }
+\]
+
+\emph{Step 3: Fisher information.}
+$\log f(x\mid\theta)=\log a_x+x\log\theta-\log A(\theta)$, so
+\[
+\frac{\partial}{\partial\theta}\log f=\frac{x}{\theta}-\frac{A'(\theta)}{A(\theta)}
+=\frac{1}{\theta}\Big(x-\frac{\theta A'}{A}\Big)
+=\frac{1}{\theta}\big[x-\psi(\theta)\big].
+\]
+Therefore
+$I(\theta)=\Var_\theta\big(\tfrac{1}{\theta}(X-\psi)\big)=\dfrac{\Var_\theta X}{\theta^2}
+=\dfrac{\psi'(\theta)}{\theta}$.
+
+\emph{Step 4: compare.} The CRLB for estimating $\psi(\theta)$ from one observation is
+\[
+\frac{[\psi'(\theta)]^2}{I(\theta)}=\frac{[\psi'(\theta)]^2\,\theta}{\psi'(\theta)}
+=\theta\,\psi'(\theta)=\Var_\theta(X).
+\]
+So the UMVUE $X$ \textbf{attains the CRLB exactly, for every $\theta\in(0,b)$}. \qed
+
+Two remarks worth a line in an exam script. (i) The structural reason is visible in Step 3:
+the score has the form $k(\theta)[T(x)-\psi(\theta)]$ with $k(\theta)=1/\theta$, which is
+precisely the equality condition in the Cauchy--Schwarz proof of the CRLB. (ii) With $n$ iid
+observations, $\Xbar$ is the UMVUE, $\Var(\Xbar)=\theta\psi'(\theta)/n$, and the bound
+$[\psi']^2/(nI)$ matches again.
+
+\bigskip
+\begin{prob}{Q5.}
+$Y_i\sim N(\beta x_i,\sigma^2)$ independent, $i=1,\dots,n$, with $\beta\in\R$ and
+$\sigma^2\in(0,\infty)$ unknown and $x_1,\dots,x_n$ known non-zero constants. Show the least
+squares estimate of $\beta$ and the associated residual variance are UMVUEs. Are they
+independent?
+\end{prob}
+
+\begin{ideabox}
+Recognise a two-parameter exponential family with $S=(\sum Y_i^2,\ \sum x_iY_i)$, whose natural
+parameter space is the open half-plane $\R\times(-\infty,0)$ --- so $S$ is complete sufficient.
+Both estimators are functions of $S$ and unbiased. For independence, use orthogonality of the
+fitted and residual parts (or Basu).
+\end{ideabox}
+
+\soln
+\emph{Complete sufficiency.} The joint density is
+\[
+f(\mathbf{y})=(2\pi\sigma^2)^{-n/2}\exp\Big\{-\frac{1}{2\sigma^2}\sum_i(y_i-\beta x_i)^2\Big\}
+=\underbrace{(2\pi\sigma^2)^{-n/2}e^{-\beta^2\sum x_i^2/2\sigma^2}}_{p(\beta,\sigma^2)}
+\exp\Big\{-\frac{1}{2\sigma^2}\sum_iy_i^2+\frac{\beta}{\sigma^2}\sum_ix_iy_i\Big\}.
+\]
+This is a two-parameter exponential family with
+$S=\big(\sum_iY_i^2,\ \sum_ix_iY_i\big)$ and natural parameters
+$\big(\eta_1,\eta_2\big)=\big(-\tfrac{1}{2\sigma^2},\ \tfrac{\beta}{\sigma^2}\big)$,
+whose range is $(-\infty,0)\times\R$ --- an open rectangle. By the completeness criterion,
+$S$ is \textbf{complete sufficient}.
+
+\emph{The two estimators are functions of $S$.} Minimising $\sum_i(y_i-\beta x_i)^2$ gives
+\[
+\hat\beta=\frac{\sum_i x_iY_i}{\sum_i x_i^2},\qquad
+\sum_i(Y_i-\hat\beta x_i)^2=\sum_iY_i^2-\frac{(\sum_ix_iY_i)^2}{\sum_ix_i^2},\qquad
+\hat\sigma^2=\frac{1}{n-1}\sum_i(Y_i-\hat\beta x_i)^2 .
+\]
+Both are functions of $S$ alone.
+
+\emph{Unbiasedness.} $\E\hat\beta=\dfrac{\sum_ix_i\,\beta x_i}{\sum_ix_i^2}=\beta$. For the
+residual sum of squares, write $\mathbf{Y}=\beta\mathbf{x}+\boldsymbol\varepsilon$ and let
+$P=\mathbf{x}\mathbf{x}^{\!\top}\!/\|\mathbf{x}\|^2$ be the (rank-1) projection onto
+$\mathrm{span}(\mathbf{x})$. The residual vector is
+$\mathbf{e}=(I-P)\mathbf{Y}=(I-P)\boldsymbol\varepsilon$, so
+\[
+\E\|\mathbf{e}\|^2=\E\big[\boldsymbol\varepsilon^{\!\top}(I-P)\boldsymbol\varepsilon\big]
+=\sigma^2\operatorname{tr}(I-P)=\sigma^2(n-1),
+\]
+hence $\E\hat\sigma^2=\sigma^2$.
+
+By Lehmann--Scheff\'e, $\hat\beta$ is \textbf{the UMVUE of $\beta$} and $\hat\sigma^2$ is
+\textbf{the UMVUE of $\sigma^2$}. \qed
+
+\emph{Independence: yes.} $\hat\beta=\mathbf{a}^{\!\top}\mathbf{Y}$ with
+$\mathbf{a}=\mathbf{x}/\|\mathbf{x}\|^2$, and $\mathbf{e}=(I-P)\mathbf{Y}$. Since
+$(\hat\beta,\mathbf{e})$ is a linear image of the Gaussian vector $\mathbf{Y}$, it is jointly
+normal, and
+\[
+\Cov(\hat\beta,\mathbf{e})=\mathbf{a}^{\!\top}\Var(\mathbf{Y})(I-P)^{\!\top}
+=\frac{\sigma^2}{\|\mathbf{x}\|^2}\,\mathbf{x}^{\!\top}(I-P)=\mathbf{0},
+\]
+because $P\mathbf{x}=\mathbf{x}$. Zero covariance plus joint normality gives
+$\hat\beta\ind\mathbf{e}$, hence $\hat\beta\ind\|\mathbf{e}\|^2=(n-1)\hat\sigma^2$.
+Moreover $(n-1)\hat\sigma^2/\sigma^2\sim\chi^2_{n-1}$, since $I-P$ is a projection of rank
+$n-1$.
+
+\emph{Basu route (worth knowing).} Fix $\sigma^2$. Then $\hat\beta$ is complete sufficient for
+$\beta$, while $\hat\sigma^2$ has the $\beta$-free distribution $\sigma^2\chi^2_{n-1}/(n-1)$
+and is therefore ancillary. Basu's theorem gives independence for each fixed $\sigma^2$, hence
+for all $(\beta,\sigma^2)$.
+
+\bigskip
+\begin{prob}{Q6.}
+$X_1,\dots,X_n\iid f(x\mid\theta)=\tfrac1\theta e^{-x/\theta}$, $0<x,\theta<\infty$. Show that
+$\displaystyle\sum_{i=1}^n X_i$ and $\displaystyle\Big(\sum_{j=1}^p X_j\Big)\Big/\Big(\sum_{k=1}^q X_k\Big)$
+are independent for $1\le p\ne q\le n$.
+\end{prob}
+
+\begin{ideabox}
+Basu. $\sum X_i$ is complete sufficient; the ratio is scale-invariant and $\theta$ is a pure
+scale parameter, so the ratio is ancillary.
+\end{ideabox}
+
+\soln
+\emph{Step 1: $S=\sum_{i=1}^nX_i$ is complete sufficient.} The joint density is
+\[
+f(\mathbf{x}\mid\theta)=\theta^{-n}\exp\Big\{-\frac1\theta\sum_i x_i\Big\}
+\prod_i\mathbb{I}[x_i>0],
+\]
+a one-parameter exponential family with $T(x)=x$ and $c(\theta)=-1/\theta$, whose natural
+parameter space $(-\infty,0)$ contains an open interval. Hence $S$ is complete sufficient
+(and $S\sim\mathrm{Gamma}(n,\theta)$).
+
+\emph{Step 2: $R=\sum_{j\le p}X_j\big/\sum_{k\le q}X_k$ is ancillary.} $\theta$ is a scale
+parameter: if $Z_1,\dots,Z_n\iid\mathrm{Exp}(1)$ then $X_i\overset{d}{=}\theta Z_i$ jointly.
+Substituting,
+\[
+R=\frac{\sum_{j\le p}\theta Z_j}{\sum_{k\le q}\theta Z_k}
+=\frac{\sum_{j\le p}Z_j}{\sum_{k\le q}Z_k},
+\]
+and the $\theta$'s cancel. So the distribution of $R$ does not involve $\theta$: $R$ is
+ancillary.
+
+\emph{Step 3.} By Basu's theorem, a complete sufficient statistic is independent of every
+ancillary statistic. Hence $S\ind R$. \qed
+
+\begin{notebox}
+If $p=q$ the ratio is identically $1$ and the statement is vacuous, which is why the
+interesting case is $p\ne q$. Note also that the argument never needs the distribution of $R$
+--- that is exactly the economy Basu's theorem buys you. (For the record, when the two index
+sets are disjoint, $\sum_{j\le p}X_j/\sum_{k}X_k\sim\mathrm{Beta}(p,q)$-type quantities appear;
+you are not asked for this.)
+\end{notebox}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Homework 2 --- Minimax, Bayes, and a first MP test}
+
+\begin{prob}{Q1.}
+Prove that for $X\sim N(\theta,1)$, $X$ is a minimax estimate of $\theta$ for
+$-\infty<\theta<\infty$.
+\end{prob}
+
+\begin{ideabox}
+$X$ has constant risk 1, but it is not Bayes for any proper prior. So use the \emph{limit of
+Bayes rules}: take $\pi_k=N(0,k)$, compute the Bayes risk $k/(k+1)$, and let $k\to\infty$.
+\end{ideabox}
+
+\soln
+\emph{Risk of $X$.} $R(\theta,X)=\E_\theta(X-\theta)^2=1$ for every $\theta$, so
+$\sup_\theta R(\theta,X)=1$.
+
+\emph{Bayes problem with $\pi_k=N(0,k)$.} With $X\mid\theta\sim N(\theta,1)$ and
+$\theta\sim N(0,k)$, completing the square in the exponent of
+$\pi(\theta\mid x)\propto e^{-(x-\theta)^2/2}e^{-\theta^2/2k}$ gives
+\[
+\theta\mid X=x\ \sim\ N\!\left(\frac{k}{k+1}x,\ \frac{k}{k+1}\right).
+\]
+Hence the Bayes estimate is $T_k(X)=\dfrac{k}{k+1}X$ and, since the Bayes risk under squared
+error equals the expected posterior variance,
+\[
+r(\pi_k,T_k)=\E_m\big[\Var(\theta\mid X)\big]=\frac{k}{k+1}
+\qquad\text{(the posterior variance is constant here).}
+\]
+
+\emph{The minimax argument.} Let $T$ be \emph{any} estimator. For every $k$,
+\[
+\sup_{\theta\in\R}R(\theta,T)\ \ge\ \int R(\theta,T)\,\pi_k(\theta)\,d\theta=r(\pi_k,T)
+\ \ge\ r(\pi_k,T_k)=\frac{k}{k+1},
+\]
+the first inequality because a supremum dominates an average, the second because $T_k$ is
+Bayes for $\pi_k$. Letting $k\to\infty$,
+\[
+\sup_{\theta}R(\theta,T)\ \ge\ 1\ =\ \sup_\theta R(\theta,X).
+\]
+Since $T$ was arbitrary, $\inf_T\sup_\theta R(\theta,T)=1=\sup_\theta R(\theta,X)$, i.e.
+\textbf{$X$ is minimax}. \qed
+
+\begin{notebox}
+$X$ is minimax but \emph{not} admissible in dimension $\ge3$ (Stein). In dimension 1 it is
+admissible. Also note $\{\pi_k\}$ is called a \emph{least favourable sequence}: no single
+prior achieves the bound, which is why the sequence version of the theorem is needed here
+whereas the Binomial problem (Lec 8) can use a single Beta prior.
+\end{notebox}
+
+\bigskip
+\begin{prob}{Q2.}
+Show that for $X\sim\mathrm{Poisson}(\lambda)$, $0<\lambda<\infty$, any estimate has maximum
+risk $\infty$.
+\end{prob}
+
+\begin{ideabox}
+Same machinery, opposite conclusion: exhibit priors whose Bayes risk diverges. Gamma priors
+with growing scale do it.
+\end{ideabox}
+
+\soln
+Take the prior $\pi_{a,b}=\mathrm{Gamma}(a,b)$ (shape $a$, \emph{scale} $b$), i.e.\
+$\pi(\lambda)\propto\lambda^{a-1}e^{-\lambda/b}$.
+
+\emph{Posterior.} $\pi(\lambda\mid x)\propto e^{-\lambda}\lambda^{x}\cdot\lambda^{a-1}e^{-\lambda/b}
+=\lambda^{a+x-1}e^{-\lambda(1+1/b)}$, so
+\[
+\lambda\mid X=x\ \sim\ \mathrm{Gamma}\Big(a+x,\ \frac{b}{1+b}\Big),
+\]
+with mean $\frac{b(a+x)}{1+b}$ and variance $\frac{(a+x)b^2}{(1+b)^2}$.
+
+\emph{Bayes risk.} Since $\E[X]=\E\big[\E(X\mid\lambda)\big]=\E[\lambda]=ab$ under the joint
+law,
+\[
+r(\pi_{a,b})=\E_m\big[\Var(\lambda\mid X)\big]
+=\frac{b^2}{(1+b)^2}\,\E[a+X]=\frac{b^2(a+ab)}{(1+b)^2}
+=\frac{a\,b^2}{1+b}.
+\]
+
+\emph{Divergence.} Take $a=1$ and $b=k\to\infty$: $r(\pi_{1,k})=\dfrac{k^2}{1+k}\to\infty$.
+
+\emph{Conclusion.} For any estimator $T$ and every $k$,
+\[
+\sup_{\lambda>0}R(\lambda,T)\ \ge\ r(\pi_{1,k},T)\ \ge\ r(\pi_{1,k})=\frac{k^2}{1+k}
+\ \xrightarrow[k\to\infty]{}\ \infty .
+\]
+Hence $\sup_{\lambda>0}R(\lambda,T)=\infty$ for every estimator $T$: the minimax value of the
+problem is $+\infty$ and no estimator has finite maximum risk. \qed
+
+\begin{notebox}
+The intuition: $\Var_\lambda(X)=\lambda\to\infty$ as $\lambda\to\infty$, and the parameter
+space is unbounded, so no estimator can control the risk uniformly. Contrast with
+$\mathrm{Bin}(n,\theta)$, where $\theta$ lives in the bounded set $(0,1)$ and a genuine
+minimax estimator exists.
+\end{notebox}
+
+\bigskip
+\begin{prob}{Q3.}
+$X_1,\dots,X_n\iid \mathrm{Uniform}[\theta-\tfrac12,\ \theta+\tfrac12]$. Compute the
+generalized Bayes estimate under the improper prior $\pi(\theta)=1$, $\theta\in\R$.
+\end{prob}
+
+\begin{ideabox}
+The likelihood is an indicator. Multiply by the flat prior and read off a uniform posterior on
+an interval; its mean is the midpoint.
+\end{ideabox}
+
+\soln
+The likelihood is
+\[
+f(\mathbf{x}\mid\theta)=\prod_{i=1}^n\mathbb{I}\Big[\theta-\tfrac12\le x_i\le\theta+\tfrac12\Big]
+=\mathbb{I}\Big[\theta-\tfrac12\le x_{(1)}\Big]\cdot\mathbb{I}\Big[x_{(n)}\le\theta+\tfrac12\Big]
+=\mathbb{I}\Big[x_{(n)}-\tfrac12\ \le\ \theta\ \le\ x_{(1)}+\tfrac12\Big].
+\]
+(The interval is non-empty because the data satisfy $x_{(n)}-x_{(1)}\le1$ almost surely.)
+
+With $\pi(\theta)=1$,
+\[
+\pi(\theta\mid\mathbf{x})\ \propto\ f(\mathbf{x}\mid\theta)\cdot1
+=\mathbb{I}\Big[x_{(n)}-\tfrac12\le\theta\le x_{(1)}+\tfrac12\Big],
+\]
+which is a \emph{proper} density after normalising: the posterior is
+$\mathrm{Uniform}\big[x_{(n)}-\tfrac12,\ x_{(1)}+\tfrac12\big]$, an interval of length
+$1-(x_{(n)}-x_{(1)})$. The generalized Bayes estimate under squared error is the posterior
+mean, i.e.\ the midpoint of this interval:
+\[
+\hat\theta=\frac12\Big[\big(x_{(n)}-\tfrac12\big)+\big(x_{(1)}+\tfrac12\big)\Big]
+\quad\Longrightarrow\quad
+\boxed{\ \hat\theta=\frac{X_{(1)}+X_{(n)}}{2}\ \ \text{(the midrange).}\ }
+\]
+
+\begin{notebox}
+Consistent with the general fact from Lecture 7: generalized Bayes estimates are functions of
+the sufficient statistic, and here $(X_{(1)},X_{(n)})$ is sufficient. Note also that the
+midrange is \emph{not} the MLE-unique answer --- every $\theta$ in the interval maximises the
+likelihood, so the MLE is not unique, while the Bayes approach picks the midpoint canonically.
+\end{notebox}
+
+\bigskip
+\begin{prob}{Q4.}
+Generate $X_1,\dots,X_n\iid \dfrac{1}{\pi\{1+(x-\theta)^2\}}$ with $\theta=0$, for
+$n=10,15,20$. Pretending $\theta\in\R$ is unknown, compute the MLE of $\theta$ from your
+generated data.
+\end{prob}
+
+\begin{ideabox}
+The likelihood equation has no closed form and can have several roots. Start Newton--Raphson
+from the \emph{sample median} (which is consistent), and confirm the root is the global
+maximiser by evaluating the log-likelihood on a grid. Never start from $\Xbar$: for Cauchy
+data $\Xbar$ is itself Cauchy$(\theta)$ and does not concentrate.
+\end{ideabox}
+
+\soln
+\emph{The equation.} $\displaystyle\ell(\theta)=-\sum_{i=1}^n\log\{1+(x_i-\theta)^2\}+\text{const}$, so
+\[
+\ell'(\theta)=\sum_{i=1}^n\frac{2(x_i-\theta)}{1+(x_i-\theta)^2}=0 .
+\]
+Clearing denominators gives a polynomial equation of degree $2n-1$ in $\theta$: no closed form,
+and up to $n$ local maxima. Newton--Raphson uses
+\[
+\ell''(\theta)=\sum_{i=1}^n\frac{2\big[(x_i-\theta)^2-1\big]}{\big[1+(x_i-\theta)^2\big]^2},
+\qquad
+\theta^{(m+1)}=\theta^{(m)}-\frac{\ell'(\theta^{(m)})}{\ell''(\theta^{(m)})},
+\qquad \theta^{(0)}=\text{sample median}.
+\]
+
+\emph{Code (Python; an R version is given below).}
+\begin{lstlisting}[language=Python]
+import numpy as np
+rng = np.random.default_rng(2026)
+
+def score(t, x):  return np.sum(2*(x-t)/(1+(x-t)**2))
+def hess (t, x):  return np.sum(2*((x-t)**2 - 1)/(1+(x-t)**2)**2)
+
+for n in (10, 15, 20):
+    x = rng.standard_cauchy(n)          # theta = 0
+    t = np.median(x)                    # consistent starting value
+    for _ in range(100):
+        step = score(t, x)/hess(t, x)
+        t -= step
+        if abs(step) < 1e-12: break
+    print(n, np.median(x), t, x.mean())
+\end{lstlisting}
+
+\begin{lstlisting}[language=R]
+set.seed(2026)
+for (n in c(10,15,20)) {
+  x   <- rcauchy(n)                                  # theta = 0
+  nll <- function(t) sum(log(1 + (x-t)^2))
+  fit <- optimize(nll, interval = c(min(x), max(x))) # or optim(median(x), nll)
+  cat(n, median(x), fit$minimum, mean(x), "\n")
+}
+\end{lstlisting}
+
+\emph{Output from one run} (numpy generator, seed 2026 --- your numbers will differ, the
+\emph{pattern} is the point):
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$n$ & sample median & MLE $\hat\theta_n$ & sample mean $\Xbar$ & \# stationary points \\
+\midrule
+10 & $-0.4992$ & $-0.4417$ & $-0.544$ & 1 \\
+15 & $-0.3255$ & $\phantom{-}0.0316$ & $-0.535$ & 1 \\
+20 & $-0.4850$ & $-0.4267$ & $\phantom{-}0.188$ & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+In every case Newton--Raphson started at the median converged to the global maximiser (verified
+against a fine grid search over $[\min x_i-1,\ \max x_i+1]$).
+
+\emph{What to say about the output.}
+\begin{itemize}
+\item The MLE hovers near the true $\theta=0$ but converges slowly --- the Cauchy carries little
+information per observation ($I(\theta)=1/2$), so the standard error is
+$\sqrt{2/n}\approx0.45,\ 0.37,\ 0.32$ for $n=10,15,20$. The observed errors sit comfortably
+inside one standard error.
+\item $\Xbar$ is useless: in the $n=20$ sample, one observation equal to $20.4$ dragged the
+mean to $0.188$ while the bulk of the data sat near $-0.5$. Indeed $\Xbar\sim$
+Cauchy$(\theta)$ exactly, for every $n$ --- \emph{averaging does not help at all}.
+\item The sample median is a good, cheap, consistent starting value (Lecture 10); starting
+Newton--Raphson there avoids converging to a spurious local root.
+\end{itemize}
+
+\bigskip
+\begin{prob}{Q5.}
+Let $X\sim f$ where $H_0: f(x)=\tfrac12 e^{-|x|}$ (Laplace) and $H_A: f(x)=N(0,1)$. Derive the
+most powerful test of level $0<\alpha<1$.
+\end{prob}
+
+\begin{ideabox}
+Form the likelihood ratio and simplify: it is a function of $|x|$ that \emph{is not monotone}
+--- it rises to a peak at $|x|=1$ and falls away. So the rejection region is an \emph{annulus}
+$a<|X|<b$, not a tail. Use $\Prob_0(|X|>t)=e^{-t}$ to fix the constants.
+\end{ideabox}
+
+\soln
+\emph{Step 1: the likelihood ratio.}
+\[
+\Lambda(x)=\frac{f_1(x)}{f_0(x)}=\frac{(2\pi)^{-1/2}e^{-x^2/2}}{\tfrac12 e^{-|x|}}
+=\sqrt{\frac{2}{\pi}}\ \exp\Big\{|x|-\frac{x^2}{2}\Big\}.
+\]
+So $\Lambda$ is an increasing function of $g(u):=u-\tfrac{u^2}{2}$ evaluated at $u=|x|\ge0$.
+
+\emph{Step 2: shape of the rejection region.} $g'(u)=1-u$, so $g$ increases on $[0,1]$, peaks
+at $g(1)=\tfrac12$, and decreases thereafter, with $g(u)\to-\infty$. Hence
+$\{g(u)>c\}$ is an \emph{interval} in $u$:
+\[
+\{u\ge0:\ g(u)>c\}=\{u:\ 1-\sqrt{1-2c}<u<1+\sqrt{1-2c}\}\cap[0,\infty),\qquad c<\tfrac12 .
+\]
+Writing $a=1-\sqrt{1-2c}$ and $b=1+\sqrt{1-2c}$, note $a+b=2$, so the two cutoffs satisfy
+$b=2-a$. The MP test therefore rejects $H_0$ when
+\[
+a<|X|<b=2-a .
+\]
+Both distributions are continuous, so no randomisation is needed.
+
+\emph{Step 3: fix the size.} Under $H_0$, $\Prob_0(|X|>t)=e^{-t}$ for $t\ge0$. Hence for
+$0\le a<b$,
+\[
+\Prob_0\big(a<|X|<b\big)=e^{-a}-e^{-b}.
+\]
+Case (i): $a\ge0$, i.e.\ $c\ge0$. Set $h(a):=e^{-a}-e^{-(2-a)}=e^{-a}-e^{a-2}$ for
+$a\in[0,1]$. Then $h$ is strictly decreasing with $h(0)=1-e^{-2}\approx0.8647$ and $h(1)=0$.
+So for every $\alpha\in\big(0,\,1-e^{-2}\big)$ there is a unique $a=a(\alpha)\in(0,1)$ solving
+$e^{-a}-e^{a-2}=\alpha$, and the MP test is
+\[
+\boxed{\ \phi^*(x)=\mathbb{I}\big[a<|x|<2-a\big],\qquad e^{-a}-e^{a-2}=\alpha.\ }
+\]
+Case (ii): $\alpha\ge1-e^{-2}$. Then $c<0$, the constraint $|x|>a$ becomes vacuous, and the
+region is $\{|X|<b\}$ with $\Prob_0(|X|<b)=1-e^{-b}=\alpha$, i.e.\ $b=-\log(1-\alpha)>2$.
+
+\emph{Step 4: power.} Under $H_A$, $X\sim N(0,1)$, so in Case (i)
+\[
+\beta=\Prob_1\big(a<|X|<2-a\big)=2\big[\Phi(2-a)-\Phi(a)\big].
+\]
+
+\emph{Numerical illustration.} For $\alpha=0.05$, solving $e^{-a}-e^{a-2}=0.05$ gives
+$a\approx0.9321$, so the test rejects when $0.932<|X|<1.068$, with power
+$2[\Phi(1.068)-\Phi(0.932)]\approx0.0657$. The power barely exceeds the size --- a Laplace and
+a standard normal are genuinely hard to tell apart from one observation, which is exactly the
+lesson the problem is designed to deliver.
+
+\begin{notebox}
+The instinctive answer ``reject in the tails'' is \textbf{wrong here}. The normal has
+\emph{lighter} tails than the Laplace, so large $|x|$ is evidence \emph{for} $H_0$; the normal
+is relatively more likely at moderate $|x|$ near 1. Always sketch $\Lambda$ before declaring
+the shape of the region.
+\end{notebox}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Homework 3 --- MP and UMP tests}
+
+\begin{prob}{Q1.}
+$X_1,\dots,X_n\iid \tfrac1\theta e^{-x/\theta}$, $0<x,\theta<\infty$. Derive the form of the
+UMP test of $H_0:\theta\le1$ against $H_A:\theta>1$ with given size $0<\alpha<1$.
+\end{prob}
+
+\soln
+\emph{Step 1: MLR.} The joint density is
+$f(\mathbf{x}\mid\theta)=\theta^{-n}\exp\{-\tfrac1\theta\sum x_i\}$, a one-parameter
+exponential family with $T(\mathbf{x})=\sum_i x_i$ and $c(\theta)=-1/\theta$, which is
+\emph{strictly increasing} in $\theta$. Explicitly, for $\theta_1>\theta_0$,
+\[
+\frac{f(\mathbf{x}\mid\theta_1)}{f(\mathbf{x}\mid\theta_0)}
+=\Big(\frac{\theta_0}{\theta_1}\Big)^{n}
+\exp\Big\{\Big(\frac{1}{\theta_0}-\frac{1}{\theta_1}\Big)\sum_i x_i\Big\},
+\]
+which is increasing in $\sum_i x_i$ because $\tfrac{1}{\theta_0}-\tfrac{1}{\theta_1}>0$.
+So the family has \textbf{MLR in $T=\sum_iX_i$}.
+
+\emph{Step 2: Karlin--Rubin.} The UMP level-$\alpha$ test of $H_0:\theta\le1$ vs
+$H_A:\theta>1$ is
+\[
+\phi^*(\mathbf{x})=\begin{cases}1,& T(\mathbf{x})>c,\\ 0,& T(\mathbf{x})\le c,\end{cases}
+\qquad\text{with } \Prob_{\theta=1}(T>c)=\alpha .
+\]
+No randomisation is needed: $T$ is continuous.
+
+\emph{Step 3: the cutoff.} Under $\theta$, $T=\sum_iX_i\sim\mathrm{Gamma}(n,\theta)$ and
+$\dfrac{2T}{\theta}\sim\chi^2_{2n}$. At the boundary $\theta=1$ this gives $2T\sim\chi^2_{2n}$,
+so
+\[
+\Prob_{\theta=1}(T>c)=\Prob\big(\chi^2_{2n}>2c\big)=\alpha
+\quad\Longrightarrow\quad c=\tfrac12\chi^2_{2n,\alpha},
+\]
+where $\chi^2_{2n,\alpha}$ is the upper-$\alpha$ point. Hence
+\[
+\boxed{\ \text{Reject } H_0 \iff 2\sum_{i=1}^nX_i>\chi^2_{2n,\alpha}
+\quad\text{i.e.}\quad \sum_i X_i>\tfrac12\chi^2_{2n,\alpha}.\ }
+\]
+
+\emph{Step 4: size and power.} The power function is
+$\beta(\theta)=\Prob\big(\chi^2_{2n}>\chi^2_{2n,\alpha}/\theta\big)$, which is increasing in
+$\theta$. Hence $\sup_{\theta\le1}\beta(\theta)=\beta(1)=\alpha$: the test has size exactly
+$\alpha$ over the composite null, and $\beta(\theta)\to1$ as $\theta\to\infty$.
+
+\bigskip
+\begin{prob}{Q2.}
+$X_1,\dots,X_n\iid \dfrac{\lambda^x e^{-\lambda}}{x!}$, $\lambda>0$. Derive the form of the UMP
+test of $H_0:\lambda\le2$ against $H_A:\lambda>2$ with given size $0<\alpha<1$.
+\end{prob}
+
+\soln
+\emph{Step 1: MLR.} The joint pmf is
+\[
+f(\mathbf{x}\mid\lambda)=e^{-n\lambda}\ \frac{1}{\prod_i x_i!}\ \exp\Big\{\log\lambda\sum_i x_i\Big\},
+\]
+a one-parameter exponential family with $T=\sum_iX_i$ and $c(\lambda)=\log\lambda$, strictly
+increasing. So the family has \textbf{MLR in $T=\sum_iX_i$}, and $T\sim\mathrm{Poisson}(n\lambda)$.
+
+\emph{Step 2: Karlin--Rubin, with randomisation.} The UMP level-$\alpha$ test is
+\[
+\phi^*(\mathbf{x})=
+\begin{cases}
+1,&T>c,\\[2pt]
+\gamma,&T=c,\\[2pt]
+0,&T<c,
+\end{cases}
+\qquad\text{with}\quad
+\Prob_{\lambda=2}(T>c)+\gamma\,\Prob_{\lambda=2}(T=c)=\alpha .
+\]
+Under $\lambda=2$ we have $T\sim\mathrm{Poisson}(2n)$, so writing
+$P(t)=\Prob\big(\mathrm{Poi}(2n)>t\big)$ and $p(t)=\Prob\big(\mathrm{Poi}(2n)=t\big)$:
+\[
+\boxed{\ c=\min\{t\in\mathbb{Z}_{\ge0}:\ P(t)\le\alpha\},\qquad
+\gamma=\frac{\alpha-P(c)}{p(c)}\ \in[0,1).\ }
+\]
+
+\emph{Step 3: why randomisation is unavoidable.} $T$ is discrete, so
+$\Prob_{\lambda=2}(T>c)$ takes only countably many values and will not generally equal
+$\alpha$. Randomising on the boundary point $T=c$ restores exact size $\alpha$; without it the
+test is merely of level $\alpha$ and is no longer UMP among all level-$\alpha$ tests. (In
+practice one reports the non-randomised version, rejecting iff $T>c$, at the conservative
+level $P(c)\le\alpha$.)
+
+\emph{Step 4: size over the composite null.} The power function
+$\beta(\lambda)=\E_\lambda\phi^*$ is non-decreasing in $\lambda$ (MLR), so
+$\sup_{\lambda\le2}\beta(\lambda)=\beta(2)=\alpha$.
+
+\emph{Worked instance ($n=5$, $\alpha=0.05$).} Then $T\sim\mathrm{Poi}(10)$ under $H_0$;
+$\Prob(T>15)=0.0487$ and $\Prob(T>14)=0.0835$, so $c=15$,
+$p(15)=\Prob(T=15)=0.0347$, and
+$\gamma=(0.05-0.0487)/0.0347\approx0.036$. Reject if $T\ge16$; if $T=15$, reject with
+probability $0.036$.
+
+\bigskip
+\begin{prob}{Q3.}
+$H_0: X\sim p_0(x)=\big(\tfrac12\big)^{x+1}$, $x=0,1,2,\dots$ against
+$H_A: X\sim p_1(x)=\dfrac{e^{-1}}{x!}$, $x=0,1,2,\dots$. Derive the form of the MP test of
+given size $0<\alpha<1$.
+\end{prob}
+
+\begin{ideabox}
+Two simple hypotheses $\Rightarrow$ pure Neyman--Pearson. Compute $\Lambda(x)=p_1/p_0$, sort
+the sample space in \emph{decreasing} order of $\Lambda$, and fill the rejection region greedily
+until the null probability reaches $\alpha$. The ratio here is not monotone in $x$, and it has
+a \emph{tie}.
+\end{ideabox}
+
+\soln
+\emph{Step 1: the likelihood ratio.}
+\[
+\Lambda(x)=\frac{p_1(x)}{p_0(x)}=\frac{e^{-1}/x!}{2^{-(x+1)}}
+=\frac{2}{e}\cdot\frac{2^{x}}{x!} .
+\]
+So $\Lambda$ is an increasing function of $\lambda(x):=2^x/x!$. Tabulate:
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+$x$ & 0 & 1 & 2 & 3 & 4 & 5 & 6 & $\ge7$ \\
+\midrule
+$\lambda(x)=2^x/x!$ & $1$ & $2$ & $2$ & $1.333$ & $0.667$ & $0.267$ & $0.089$ & $\downarrow 0$ \\
+$p_0(x)=2^{-(x+1)}$ & $1/2$ & $1/4$ & $1/8$ & $1/16$ & $1/32$ & $1/64$ & $1/128$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+Ordering the sample space by \emph{decreasing} $\lambda$:
+\[
+\{1,2\}\ (\lambda=2)\ \succ\ \{3\}\ (1.333)\ \succ\ \{0\}\ (1)\ \succ\ \{4\}\ (0.667)\ \succ\ \{5\}\ \succ\ \{6\}\succ\cdots
+\]
+Note the \textbf{tie} at $x=1$ and $x=2$, and note that $x=0$ sits \emph{below} $x=3$ --- the
+region is not an upper tail.
+
+\emph{Step 2: cumulative null probabilities along this ordering.}
+\[
+\Prob_0\{1,2\}=\tfrac14+\tfrac18=\tfrac38,\quad
++\Prob_0\{3\}=\tfrac38+\tfrac1{16}=\tfrac7{16},\quad
++\Prob_0\{0\}=\tfrac7{16}+\tfrac12=\tfrac{15}{16},\quad
++\Prob_0\{4\}=\tfrac{31}{32},\ \dots
+\]
+
+\emph{Step 3: the test.} The MP test has the Neyman--Pearson form
+$\phi^*(x)=1,\gamma,0$ according as $\Lambda(x)>k,=k,<k$, with $k,\gamma$ chosen so that
+$\E_0\phi^*=\alpha$. Explicitly:
+\[
+\boxed{
+\begin{array}{ll}
+0<\alpha\le\tfrac38: & \phi^*=\tfrac{8\alpha}{3}\ \text{ on }\{1,2\},\quad 0\ \text{elsewhere}\\[3pt]
+\tfrac38<\alpha\le\tfrac7{16}: & \phi^*=1\ \text{on}\ \{1,2\},\ \ \phi^*=16\alpha-6\ \text{on}\ \{3\},\ 0\ \text{else}\\[3pt]
+\tfrac7{16}<\alpha\le\tfrac{15}{16}: & \phi^*=1\ \text{on}\ \{1,2,3\},\ \ \phi^*=2\alpha-\tfrac78\ \text{on}\ \{0\},\ 0\ \text{else}\\[3pt]
+\tfrac{15}{16}<\alpha\le\tfrac{31}{32}: & \phi^*=1\ \text{on}\ \{0,1,2,3\},\ \ \phi^*=32\alpha-30\ \text{on}\ \{4\},\ 0\ \text{else}
+\end{array}}
+\]
+and so on. (Each randomisation constant is $\big(\alpha-\Prob_0[\text{region so far}]\big)\big/
+p_0[\text{boundary point}]$.)
+
+\emph{Power.} For instance at $\alpha=0.05$: $\phi^*=8(0.05)/3=0.1333$ on $\{1,2\}$, so the
+power is $0.1333\times\big[p_1(1)+p_1(2)\big]=0.1333\times\big[e^{-1}+\tfrac{e^{-1}}{2}\big]
+=0.1333\times0.5518=0.0736$.
+
+\begin{notebox}
+Two things to notice.
+
+\textbf{(a) The region is not a tail.} $x=0$ is ranked \emph{below} $x=3$, so for
+$\alpha$ between $7/16$ and $15/16$ the rejection region is $\{0,1,2,3\}$ --- it includes both
+ends and excludes nothing in between only by accident. Never assume the NP region is one-sided
+in $x$; it is one-sided in $\Lambda$.
+
+\textbf{(b) The tie is where NP is indifferent.} Since $\Lambda(1)=\Lambda(2)=4/e$, we have
+$p_1(x)=\tfrac4e p_0(x)$ on the tie set, so \emph{any} allocation $(\gamma_1,\gamma_2)$ with
+$\gamma_1 p_0(1)+\gamma_2 p_0(2)=\alpha$ gives the same power
+$\tfrac4e\big[\gamma_1p_0(1)+\gamma_2p_0(2)\big]=\tfrac4e\alpha$. All such tests are MP; the
+uniform choice $\gamma_1=\gamma_2=8\alpha/3$ is just the tidy convention. (Check at
+$\alpha=0.05$: $\tfrac4e\times0.05=0.0736$, matching the power computed above.)
+\end{notebox}
+
+\bigskip
+\begin{prob}{Q4.}
+$X\sim\mathrm{Uniform}[0,\theta]$. Derive the form of the UMP test of $H_0:\theta=1$ against
+$H_A:\theta\ne1$ with given size $0<\alpha<1$.
+\end{prob}
+
+\begin{ideabox}
+The support moves with $\theta$. Rejecting on $\{X>1\}$ costs \emph{nothing} under $H_0$ and is
+forced by NP against every $\theta>1$; for $\theta<1$ the likelihood ratio is flat on $[0,\theta]$
+so the best test puts its $\alpha$ as far left as possible. The two requirements are compatible,
+and a two-sided UMP test exists --- the standard exception to the usual rule.
+\end{ideabox}
+
+\soln
+Write $f_\theta(x)=\tfrac1\theta\mathbb{I}[0\le x\le\theta]$, so $f_1(x)=\mathbb{I}[0\le x\le1]$.
+Consider the test
+\[
+\boxed{\ \phi^*(x)=\begin{cases}1,& x\le\alpha\ \ \text{or}\ \ x>1,\\ 0,&\alpha<x\le1.\end{cases}\ }
+\]
+Its size is $\Prob_{\theta=1}(X\le\alpha)+\Prob_{\theta=1}(X>1)=\alpha+0=\alpha$. \checkmark
+
+\emph{Optimality against $\theta_1>1$.} Here
+\[
+\frac{f_{\theta_1}(x)}{f_1(x)}=\begin{cases}1/\theta_1,&0\le x\le1,\\[2pt] +\infty,&1<x\le\theta_1.\end{cases}
+\]
+By Neyman--Pearson the MP test must reject wherever the ratio is $+\infty$, i.e.\ on
+$(1,\theta_1]$, and is otherwise \emph{indifferent} on $[0,1]$ because the ratio is the constant
+$1/\theta_1$ there. So \emph{any} test with $\phi=1$ on $\{x>1\}$ and
+$\int_0^1\phi(x)\,dx=\alpha$ is MP of size $\alpha$; $\phi^*$ is one such. Its power is
+\[
+\beta(\theta_1)=\frac{\theta_1-1}{\theta_1}+\frac{\alpha}{\theta_1}
+=1-\frac{1-\alpha}{\theta_1},
+\]
+which is the maximum achievable. This holds for every $\theta_1>1$ simultaneously.
+
+\emph{Optimality against $\theta_1<1$.} Here
+\[
+\frac{f_{\theta_1}(x)}{f_1(x)}=\begin{cases}1/\theta_1,&0\le x\le\theta_1,\\ 0,&\theta_1<x\le1,\end{cases}
+\]
+so the MP test rejects for small $x$: it must place all its rejection mass inside $[0,\theta_1]$
+as far as the size permits. For any level-$\alpha$ test $\phi$ (so $\int_0^1\phi=\alpha$) the
+power is
+\[
+\E_{\theta_1}\phi=\frac{1}{\theta_1}\int_0^{\theta_1}\phi(x)\,dx
+\ \le\ \frac{\min(\alpha,\theta_1)}{\theta_1},
+\]
+since $\int_0^{\theta_1}\phi\le\min\big(\int_0^1\phi,\ \theta_1\big)=\min(\alpha,\theta_1)$.
+Our $\phi^*$ achieves this bound: if $\theta_1\ge\alpha$ then
+$\int_0^{\theta_1}\phi^*=\alpha$ and the power is $\alpha/\theta_1$; if $\theta_1<\alpha$ then
+$\phi^*\equiv1$ on $[0,\theta_1]$ and the power is $1$. Again this holds for every
+$\theta_1<1$ simultaneously.
+
+\emph{Conclusion.} $\phi^*$ is MP against every $\theta\ne1$ at level $\alpha$, hence it is
+\textbf{UMP of size $\alpha$} for $H_0:\theta=1$ vs $H_A:\theta\ne1$. Its power function is
+\[
+\beta(\theta)=\begin{cases}
+1,&\theta\le\alpha,\\
+\alpha/\theta,&\alpha<\theta\le1,\\
+1-(1-\alpha)/\theta,&\theta>1,
+\end{cases}
+\]
+with $\beta(1)=\alpha$. \qed
+
+\begin{notebox}
+This is the standard example showing that ``no UMP test exists for two-sided alternatives'' is
+a statement about \emph{regular} (MLR) families, not a theorem of nature. The mechanism is
+that the support depends on $\theta$: the event $\{X>1\}$ is impossible under $H_0$, so
+including it in the rejection region is free, and it is precisely what the alternatives
+$\theta>1$ reward. The piece of the region inside $[0,1]$ is then free to be placed where the
+$\theta<1$ alternatives want it.
+
+Note $\phi^*$ is \emph{not} unique: on $[0,1]$ any allocation of $\alpha$ is MP against
+$\theta>1$, but only the left-most allocation $[0,\alpha]$ also works against $\theta<1$.
+That is what pins the test down.
+\end{notebox}
+
+\vfill
+\begin{center}
+\small\itshape Companion document: \texttt{PI\_Exam\_Revision.pdf} --- theory, proofs and cheat sheets.
+\end{center}
+
+\end{document}

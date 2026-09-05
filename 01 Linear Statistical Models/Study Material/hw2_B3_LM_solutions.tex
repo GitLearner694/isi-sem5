@@ -1,0 +1,465 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{microtype}
+
+% ---------- operators / macros ----------
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Corr}{Corr}
+\newcommand{\Cs}{\mathcal{C}}
+\newcommand{\Ns}{\mathcal{N}}
+\newcommand{\Rs}{\mathcal{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bQ}{\mathbf{Q}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bV}{\mathbf{V}}
+\newcommand{\bW}{\mathbf{W}}
+\newcommand{\bD}{\mathbf{D}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bw}{\mathbf{w}}
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bzero}{\mathbf{0}}
+\newcommand{\bone}{\mathbf{1}}
+\newcommand{\bbeta}{\bm{\beta}}
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\bmu}{\bm{\mu}}
+\newcommand{\beps}{\bm{\varepsilon}}
+\newcommand{\bnu}{\bm{\nu}}
+\newcommand{\Xt}{\widetilde{\bX}}
+\newcommand{\bbt}{\widetilde{\bm{\beta}}}
+\newcommand{\T}{^{\mathsf{T}}}
+\newcommand{\inv}{^{-1}}
+\newcommand{\bhat}[1]{\widehat{#1}}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{3em}
+
+% question / solution formatting
+\newcommand{\solution}{\smallskip\par\noindent\textbf{Solution.}\ }
+\newenvironment{question}%
+  {\smallskip\itshape\leftskip=1em\rightskip=1em\relax}%
+  {\par\smallskip\noindent\hrulefill\par}
+
+\begin{document}
+
+\begin{center}
+	{\large\bfseries Linear Statistical Models --- Homework 2}\\[3pt]
+	{\normalsize B.Stat.\ 3rd year, Semester 1, 2026--27}\\[6pt]
+	{\normalsize Sourath Biswas}\\[2pt]
+	{\small September 2, 2026}
+\end{center}
+
+\hrule
+\medskip
+
+\noindent\textbf{References to lecture notes.}\;
+\textbf{[GM]} \emph{Gauss--Markov Framework for Linear Models};\;
+\textbf{[SLR]} \emph{Overview of Simple Linear Regression};\;
+\textbf{[PMI]} \emph{Projection and Matrix Inversion}.\;
+Throughout, $\chi^2_k(\lambda)$ denotes the noncentral chi-square law with $k$ degrees of freedom and
+noncentrality $\lambda$: if $Z_i\sim N(a_i,1)$ are independent, then
+$\sum_{i=1}^k Z_i^2\sim\chi^2_k\big(\tfrac12\sum_i a_i^2\big)$; and $F_{m,d}(\lambda)$ is the law of
+$\frac{U/m}{V/d}$ with $U\sim\chi^2_m(\lambda)\perp V\sim\chi^2_d$.
+
+% =====================================================================
+\section*{Problem 1}
+
+\begin{question}
+Consider the linear model $\bY=\bX\bbeta+\beps$, $\beps\sim N(\bzero,\sigma^2\bI_n)$, where $\bX$ is
+$n\times p$ with $\rank(\bX)\le p$. Define $\bmu=\E(\bY)$ and $\btheta=\bX\T\bmu$.
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em,itemsep=1pt]
+\item Show that the least squares estimator of $\bmu$ is $\bhat{\bmu}=\bP_{\bX}\bY$, where $\bP_{\bX}$ is
+the orthogonal projection onto the column space of $\bX$.
+\item Show that $\btheta$ is estimable and its BLUE is $\bhat\btheta=\bX\T\bY$.
+\item Show that if $\ba\T\bbeta$ is estimable, then its BLUE is $\bw\T\bhat\btheta$ for some $\bw\in\R^p$.
+\end{enumerate}
+\end{question}
+
+Let $\bP_{\bX}=\bX(\bX\T\bX)^{-}\bX\T$ be the orthogonal projector onto $\Cs(\bX)$ (unique, independent of
+the g-inverse, [PMI]).
+
+\subsection*{(a) $\bhat{\bmu}=\bP_{\bX}\bY$}
+
+Since $\bmu=\bX\bbeta$ ranges over $\Cs(\bX)$ as $\bbeta$ varies, the least-squares estimate of $\bmu$
+minimises $\lVert\bY-\bv\rVert^2$ over $\bv\in\Cs(\bX)$. For any such $\bv$,
+$\bY-\bv=(\bI-\bP_{\bX})\bY+(\bP_{\bX}\bY-\bv)$, where $(\bI-\bP_{\bX})\bY\in\Cs(\bX)^{\perp}$ and
+$\bP_{\bX}\bY-\bv\in\Cs(\bX)$ are orthogonal, so by Pythagoras
+\[
+\lVert\bY-\bv\rVert^2=\lVert(\bI-\bP_{\bX})\bY\rVert^2+\lVert\bP_{\bX}\bY-\bv\rVert^2
+\ \ge\ \lVert(\bI-\bP_{\bX})\bY\rVert^2,
+\]
+with equality iff $\bv=\bP_{\bX}\bY$. As $\bP_{\bX}\bY\in\Cs(\bX)$, the minimiser is
+$\bhat{\bmu}=\bP_{\bX}\bY$. \hfill$\blacksquare$
+
+\subsection*{(b) $\btheta$ estimable, $\bhat\btheta=\bX\T\bY$}
+
+$\btheta=\bX\T\bmu=\bX\T\bX\bbeta$, so its $i$-th component is $\theta_i=\ba_i\T\bbeta$ with $\ba_i=$ ($i$-th
+column of $\bX\T\bX$) $\in\Cs(\bX\T\bX)=\Cs(\bX\T)=\Rs(\bX)$ (equal column spaces since
+$\rank(\bX\T\bX)=\rank(\bX)$, [PMI]). By the estimability criterion [GM, Lemma~1] each $\theta_i$, hence
+$\btheta$, is estimable. By the Gauss--Markov theorem [GM, Thm~1] the unique BLUE of $\theta_i=\ba_i\T\bbeta$
+is $\ba_i\T\bhat{\bbeta}$, i.e.\ $\bhat\btheta=\bX\T\bX\bhat{\bbeta}$ for any solution $\bhat{\bbeta}$ of the
+normal equations $\bX\T\bX\bhat{\bbeta}=\bX\T\bY$. Therefore
+\[
+\bhat\btheta=\bX\T\bX\bhat{\bbeta}=\bX\T\bY,
+\]
+a value unique even when $\bhat{\bbeta}$ is not. (Equivalently
+$\bhat\btheta=\bX\T\bhat{\bmu}=\bX\T\bP_{\bX}\bY=\bX\T\bY$, using $\bX\T\bP_{\bX}=\bX\T$.) \hfill$\blacksquare$
+
+\subsection*{(c) BLUE of $\ba\T\bbeta$ is $\bw\T\bhat\btheta$}
+
+Estimability gives $\ba\in\Rs(\bX)=\Cs(\bX\T)=\Cs(\bX\T\bX)$ [GM, Lemma~1; PMI], so $\ba=\bX\T\bX\bw$ for some
+$\bw\in\R^p$. Then $\ba\T\bbeta=\bw\T\bX\T\bX\bbeta=\bw\T\btheta$, and by the Gauss--Markov theorem the BLUE
+of $\ba\T\bbeta$ is
+\[
+\ba\T\bhat{\bbeta}=\bw\T\bX\T\bX\bhat{\bbeta}=\bw\T\bX\T\bY=\bw\T\bhat\btheta,
+\]
+with $\bw$ any solution of $\bX\T\bX\bw=\ba$. \hfill$\blacksquare$
+
+% =====================================================================
+\section*{Problem 2}
+
+\begin{question}
+Consider $\bY=\bX\bbeta+\beps$ with $\bbeta\in\R^p$, $\rank(\bX)=p$, $\beps\sim N_n(\bzero,\sigma^2\bI)$, and
+LSE $\bhat{\bbeta}$. Let $\bX_{\cdot j}$ be the $j$-th column of $\bX$ and $\bX_{-j}$ the $n\times(p-1)$
+submatrix with the $j$-th column removed.
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em,itemsep=1pt]
+\item Show that $\Var(\bhat\beta_j)=\sigma^2\big/\big(\bX_{\cdot j}\T(\bI-\bP_{-j})\bX_{\cdot j}\big)$, where
+$\bP_{-j}$ is the orthogonal projector onto $\Cs(\bX_{-j})$.
+\item For the one-variable submodel $\bY=\bX_{\cdot j}\beta_j+\beps$, find the distribution of the LSE
+$\widetilde\beta_j$ (i) if this submodel is true, and (ii) if instead the full model is true.
+\item Argue why the submodel is preferable for estimating $\beta_j$ when it is correct; and state a
+disadvantage of the submodel when it is incorrect.
+\item When do the distributions of $\bhat\beta_j$ (full model) and $\widetilde\beta_j$ (submodel) coincide?
+\end{enumerate}
+\end{question}
+
+Here $\Var(\bhat{\bbeta})=\sigma^2(\bX\T\bX)\inv$ and $\bhat{\bbeta}=(\bX\T\bX)\inv\bX\T\bY$.
+
+\subsection*{(a) $\Var(\bhat\beta_j)=\sigma^2/\big(\bX_{\cdot j}\T(\bI-\bP_{-j})\bX_{\cdot j}\big)$}
+
+Relabelling columns, take $j=p$ (a permutation of columns permutes the entries of $\bhat{\bbeta}$ and the
+rows/columns of $(\bX\T\bX)\inv$ identically, leaving $\Var(\bhat\beta_j)$ unchanged). Partition
+$\bX=[\,\bX_{-p}\ \vdots\ \bX_{\cdot p}\,]$, so
+\[
+\bX\T\bX=\begin{pmatrix} A & b\\ b\T & d\end{pmatrix},\quad
+A=\bX_{-p}\T\bX_{-p}\ (\text{nonsingular}),\ \ b=\bX_{-p}\T\bX_{\cdot p},\ \ d=\bX_{\cdot p}\T\bX_{\cdot p}.
+\]
+Let the last column of $(\bX\T\bX)\inv$ be $\begin{psmallmatrix}g\\ c\end{psmallmatrix}$; then
+$\bX\T\bX\begin{psmallmatrix}g\\ c\end{psmallmatrix}=\be_p=\begin{psmallmatrix}\bzero\\ 1\end{psmallmatrix}$
+gives $Ag+bc=\bzero$ and $b\T g+dc=1$, whence $g=-cA\inv b$ and $c(d-b\T A\inv b)=1$. Thus the $(p,p)$ entry
+of $(\bX\T\bX)\inv$ is $c=(d-b\T A\inv b)\inv$, and with
+$\bP_{-p}=\bX_{-p}(\bX_{-p}\T\bX_{-p})\inv\bX_{-p}\T$,
+\[
+d-b\T A\inv b=\bX_{\cdot p}\T\bX_{\cdot p}-\bX_{\cdot p}\T\bX_{-p}(\bX_{-p}\T\bX_{-p})\inv\bX_{-p}\T\bX_{\cdot p}
+=\bX_{\cdot p}\T(\bI-\bP_{-p})\bX_{\cdot p}.
+\]
+Hence $\Var(\bhat\beta_p)=\sigma^2\,\big[(\bX\T\bX)\inv\big]_{pp}
+=\sigma^2\big/\big(\bX_{\cdot p}\T(\bI-\bP_{-p})\bX_{\cdot p}\big)$. \hfill$\blacksquare$
+
+\subsection*{(b) Distribution of $\widetilde\beta_j$}
+
+$\widetilde\beta_j=\dfrac{\bX_{\cdot j}\T\bY}{\bX_{\cdot j}\T\bX_{\cdot j}}$ is a linear function of the
+normal vector $\bY$, hence normal; its variance is
+$\dfrac{\bX_{\cdot j}\T(\sigma^2\bI)\bX_{\cdot j}}{(\bX_{\cdot j}\T\bX_{\cdot j})^2}
+=\dfrac{\sigma^2}{\bX_{\cdot j}\T\bX_{\cdot j}}$ in either case.
+
+\emph{(i) Submodel true:} $\E(\bY)=\bX_{\cdot j}\beta_j\Rightarrow\E(\widetilde\beta_j)=\beta_j$, so
+$\widetilde\beta_j\sim N\!\big(\beta_j,\ \sigma^2/\bX_{\cdot j}\T\bX_{\cdot j}\big)$.
+
+\emph{(ii) Full model true:} $\E(\bY)=\bX_{\cdot j}\beta_j+\bX_{-j}\bbeta_{-j}$, so
+\[
+\widetilde\beta_j\ \sim\ N\!\Big(\beta_j+\tfrac{\bX_{\cdot j}\T\bX_{-j}\bbeta_{-j}}{\bX_{\cdot j}\T\bX_{\cdot j}},
+\ \tfrac{\sigma^2}{\bX_{\cdot j}\T\bX_{\cdot j}}\Big),
+\]
+same variance but biased by $\bX_{\cdot j}\T\bX_{-j}\bbeta_{-j}/\bX_{\cdot j}\T\bX_{\cdot j}$
+(omitted-variable bias).
+
+\subsection*{(c) Efficiency vs.\ bias}
+
+$\bP_{-j}\succeq0$, so $\bX_{\cdot j}\T\bP_{-j}\bX_{\cdot j}\ge0$ and hence
+$\bX_{\cdot j}\T(\bI-\bP_{-j})\bX_{\cdot j}\le\bX_{\cdot j}\T\bX_{\cdot j}$, giving
+\[
+\Var(\widetilde\beta_j)=\frac{\sigma^2}{\bX_{\cdot j}\T\bX_{\cdot j}}\ \le\
+\frac{\sigma^2}{\bX_{\cdot j}\T(\bI-\bP_{-j})\bX_{\cdot j}}=\Var(\bhat\beta_j).
+\]
+So if the submodel is correct, $\widetilde\beta_j$ is unbiased and at least as efficient as $\bhat\beta_j$
+(strictly, unless $\bP_{-j}\bX_{\cdot j}=\bzero$) --- hence preferable. If the submodel is incorrect (full
+model holds), $\widetilde\beta_j$ carries the nonvanishing, unknown bias of (b)(ii); tests and confidence
+intervals based on it are centred at the wrong value and are therefore invalid.
+
+\subsection*{(d) When the laws coincide}
+
+If $\bX_{\cdot j}\perp\Cs(\bX_{-j})$, i.e.\ $\bX_{\cdot j}\T\bX_{-j}=\bzero$, then
+$\bP_{-j}\bX_{\cdot j}=\bzero$, so $\bX_{\cdot j}\T(\bI-\bP_{-j})\bX_{\cdot j}=\bX_{\cdot j}\T\bX_{\cdot j}$
+and the bias vanishes. Both estimators are then $N\!\big(\beta_j,\sigma^2/\bX_{\cdot j}\T\bX_{\cdot j}\big)$,
+so $\bhat\beta_j\overset{d}{=}\widetilde\beta_j$ --- exactly when column $\bX_{\cdot j}$ is orthogonal to all
+other columns. \hfill$\blacksquare$
+
+% =====================================================================
+\section*{Problem 3}
+
+\begin{question}
+Consider $Y_i=\beta_0+\beta_1x_{i1}+\dots+\beta_{p-1}x_{i,p-1}+\varepsilon_i$,
+$\varepsilon_i\overset{\text{i.i.d.}}{\sim}N(0,\sigma^2)$.
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em,itemsep=1pt]
+\item Show that $R^2=\dfrac{\bbt\T\Xt\T\Xt\bbt}{\sum_{i=1}^n(Y_i-\bar Y)^2}$, where $\Xt$ is the
+$n\times(p-1)$ matrix with $(i,j)$-entry $x_{ij}-\bar x_{\cdot j}$, $\bar x_{\cdot j}=\tfrac1n\sum_i x_{ij}$,
+and $\bbt$ is the BLUE of $(\beta_1,\dots,\beta_{p-1})\T$.
+\item Find the distribution of $R^2/(1-R^2)$, assuming the model is true.
+\end{enumerate}
+\end{question}
+
+Write the model as $\bY=\bX\bbeta+\beps$, $\bX=[\bone\ \vdots\ \cdots]$ ($n\times p$, $\rank p$, first column
+$\bone$). Let $\bP_{\bX}=\bX(\bX\T\bX)\inv\bX\T$ and $\bP_{\bone}=\tfrac1n\bone\bone\T$ (projector onto
+$\Cs(\bone)$). Since $\bone\in\Cs(\bX)$, $\bP_{\bX}\bP_{\bone}=\bP_{\bone}$.
+
+\subsection*{(a) $R^2=\bbt\T\Xt\T\Xt\bbt\big/\sum_i(Y_i-\bar Y)^2$}
+
+With $\bhat{\bbeta}=(\hat\beta_0,\dots,\hat\beta_{p-1})\T$ the LSE and $\bhat\bY=\bP_{\bX}\bY$,
+\[
+\mathrm{SSTO}=\bY\T(\bI-\bP_{\bone})\bY,\quad \mathrm{SSE}=\bY\T(\bI-\bP_{\bX})\bY,\quad
+\mathrm{SSR}=\mathrm{SSTO}-\mathrm{SSE}=\bY\T(\bP_{\bX}-\bP_{\bone})\bY.
+\]
+As $\bone\in\Cs(\bX)$, $\bone\T(\bI-\bP_{\bX})\bY=\bzero$, i.e.\ $\bone\T\bY=\bone\T\bX\bhat{\bbeta}$, so
+$\bP_{\bone}\bY=\bP_{\bone}\bX\bhat{\bbeta}$. Using symmetry/idempotence of the projectors,
+\[
+\mathrm{SSR}=\lVert\bP_{\bX}\bY\rVert^2-\lVert\bP_{\bone}\bY\rVert^2
+=\lVert\bX\bhat{\bbeta}\rVert^2-\lVert\bP_{\bone}\bX\bhat{\bbeta}\rVert^2
+=\bhat{\bbeta}\T\bX\T(\bI-\bP_{\bone})\bX\bhat{\bbeta}
+=\big\lVert(\bI-\bP_{\bone})\bX\bhat{\bbeta}\big\rVert^2.
+\]
+Now $(\bI-\bP_{\bone})\bX$ centres each column: its first column is
+$(\bI-\bP_{\bone})\bone=\bzero$ and its $(j{+}1)$-th column has $i$-th entry $x_{ij}-\bar x_{\cdot j}$, i.e.\
+$(\bI-\bP_{\bone})\bX=[\,\bzero\ \vdots\ \Xt\,]$. Hence
+$(\bI-\bP_{\bone})\bX\bhat{\bbeta}=\Xt\bbt$ with $\bbt=(\hat\beta_1,\dots,\hat\beta_{p-1})\T$, and
+\[
+\mathrm{SSR}=\bbt\T\Xt\T\Xt\bbt,\qquad
+R^2=\frac{\mathrm{SSR}}{\mathrm{SSTO}}=\frac{\bbt\T\Xt\T\Xt\bbt}{\sum_{i=1}^n(Y_i-\bar Y)^2}.\qquad\blacksquare
+\]
+
+\subsection*{(b) Distribution of $R^2/(1-R^2)$}
+
+Since $R^2=\mathrm{SSR}/\mathrm{SSTO}$ and $1-R^2=\mathrm{SSE}/\mathrm{SSTO}$,
+$\dfrac{R^2}{1-R^2}=\dfrac{\mathrm{SSR}}{\mathrm{SSE}}
+=\dfrac{\bY\T(\bP_{\bX}-\bP_{\bone})\bY}{\bY\T(\bI-\bP_{\bX})\bY}$. Both
+$\bP_{\bX}-\bP_{\bone}$ and $\bI-\bP_{\bX}$ are orthogonal projectors (symmetric idempotent; e.g.\
+$(\bP_{\bX}-\bP_{\bone})^2=\bP_{\bX}-\bP_{\bone}$ using $\bP_{\bX}\bP_{\bone}=\bP_{\bone}\bP_{\bX}=\bP_{\bone}$)
+of ranks $p-1$ and $n-p$, with product
+$(\bP_{\bX}-\bP_{\bone})(\bI-\bP_{\bX})=\bzero$.
+
+Write a rank-$m$ orthogonal projector as $\bV\bV\T$ with $\bV$ ($n\times m$) having orthonormal columns
+spanning its range. So $\bP_{\bX}-\bP_{\bone}=\bV_1\bV_1\T$ and $\bI-\bP_{\bX}=\bV_2\bV_2\T$ with
+$\bV_1\T\bV_1=\bI_{p-1}$, $\bV_2\T\bV_2=\bI_{n-p}$; the product being $\bzero$ forces $\bV_1\T\bV_2=\bzero$.
+Then $\mathrm{SSR}=\lVert\bV_1\T\bY\rVert^2$, $\mathrm{SSE}=\lVert\bV_2\T\bY\rVert^2$, and with
+$\bY\sim N_n(\bX\bbeta,\sigma^2\bI)$ the vectors $\bV_1\T\bY,\bV_2\T\bY$ are jointly normal with
+$\Cov(\bV_1\T\bY,\bV_2\T\bY)=\sigma^2\bV_1\T\bV_2=\bzero$, hence independent; therefore
+$\mathrm{SSR}\perp\mathrm{SSE}$. Moreover $\tfrac1\sigma\bV_1\T\bY\sim N_{p-1}(\tfrac1\sigma\bV_1\T\bX\bbeta,\bI)$
+and $(\bI-\bP_{\bX})\bX\bbeta=\bzero$, so
+\[
+\frac{\mathrm{SSR}}{\sigma^2}\sim\chi^2_{p-1}(\lambda),\quad
+\lambda=\frac{(\bX\bbeta)\T(\bP_{\bX}-\bP_{\bone})(\bX\bbeta)}{2\sigma^2}
+=\frac{\bbeta_{(1)}\T\Xt\T\Xt\bbeta_{(1)}}{2\sigma^2},
+\qquad \frac{\mathrm{SSE}}{\sigma^2}\sim\chi^2_{n-p},
+\]
+where $\bbeta_{(1)}=(\beta_1,\dots,\beta_{p-1})\T$ (true values) and we used
+$(\bP_{\bX}-\bP_{\bone})\bX\bbeta=(\bI-\bP_{\bone})\bX\bbeta=\Xt\bbeta_{(1)}$ as in (a). Hence
+\[
+\frac{n-p}{p-1}\cdot\frac{R^2}{1-R^2}=\frac{\mathrm{SSR}/(p-1)}{\mathrm{SSE}/(n-p)}\ \sim\
+F_{p-1,\,n-p}(\lambda),\qquad\lambda=\frac{\bbeta_{(1)}\T\Xt\T\Xt\bbeta_{(1)}}{2\sigma^2}.
+\]
+Under $H_0:\beta_1=\dots=\beta_{p-1}=0$, $\lambda=0$ and the law is central $F_{p-1,\,n-p}$.
+\hfill$\blacksquare$
+
+% =====================================================================
+\section*{Problem 4}
+
+\begin{question}
+Let $\bA$ be $n\times n$ positive semidefinite with $\rank(\bA)=r$ and $\rank(\bI_n-\bA)=n-r$,
+$1\le r<n$. Prove that $\bA$ is an orthogonal projection matrix. Further, if $\bY\sim N(\bmu,\bI_n)$, show
+(without Fisher--Cochran) that $U_1:=\bY\T\bA\bY$ and $U_2:=\bY\T\bY-\bY\T\bA\bY$ are independent, with
+$U_1\sim\chi^2_r(\delta_1/2)$ and $U_2\sim\chi^2_{n-r}(\delta_2/2)$, where $\delta_1=\bmu\T\bA\bmu$ and
+$\delta_2=\bmu\T\bmu-\bmu\T\bA\bmu$.
+\end{question}
+
+\subsection*{$\bA$ is an orthogonal projector}
+
+Being symmetric positive semidefinite, $\bA$ has a spectral decomposition $\bA=\bU\bD\bU\T$ with $\bU$
+orthogonal and $\bD$ diagonal; its diagonal entries are the eigenvalues of $\bA$, of which exactly $r$ are
+positive (as $\rank\bA=r$). Ordering them,
+\[
+\bD=\operatorname{diag}(\lambda_1,\dots,\lambda_r,0,\dots,0),\ \ \lambda_i>0,
+\]
+\[
+\bI_n-\bD=\operatorname{diag}\big(1-\lambda_1,\dots,1-\lambda_r,\underbrace{1,\dots,1}_{n-r}\big).
+\]
+Then $\bI_n-\bA=\bU(\bI_n-\bD)\bU\T$; its last $n-r$ diagonal entries equal $1\neq0$, and since
+$\rank(\bI_n-\bA)=n-r$ the remaining $r$ vanish, i.e.\ $\lambda_i=1$ for all $i$. Hence $\bD^2=\bD$, so
+$\bA^2=\bU\bD^2\bU\T=\bA$; being symmetric and idempotent, $\bA$ is an orthogonal projector of rank $r$ (and
+$\bI_n-\bA$ one of rank $n-r$).
+\hfill$\blacksquare$
+
+\subsection*{Independence and distributions}
+
+With $\bD=\operatorname{diag}(1,\dots,1,0,\dots,0)$ ($r$ ones), set $\bZ=\bU\T\bY$. As $\bU$ is orthogonal
+and $\bY\sim N(\bmu,\bI_n)$, we have $\bZ\sim N(\bU\T\bmu,\bI_n)$, so $Z_1,\dots,Z_n$ are independent with
+$Z_i\sim N\big((\bU\T\bmu)_i,1\big)$. Then
+\[
+U_1=\bY\T\bA\bY=\bZ\T\bD\bZ=\sum_{i=1}^{r}Z_i^2,\qquad
+U_2=\bY\T(\bI_n-\bA)\bY=\sum_{i=r+1}^{n}Z_i^2.
+\]
+By the noncentral-$\chi^2$ convention,
+\[
+U_1\sim\chi^2_r(\delta_1/2),\qquad \delta_1=\sum_{i=1}^r(\bU\T\bmu)_i^2=\bmu\T\bA\bmu,
+\]
+\[
+U_2\sim\chi^2_{n-r}(\delta_2/2),\qquad \delta_2=\sum_{i=r+1}^n(\bU\T\bmu)_i^2=\bmu\T(\bI_n-\bA)\bmu=\bmu\T\bmu-\bmu\T\bA\bmu.
+\]
+Finally $U_1$ is a function of $(Z_1,\dots,Z_r)$ only and $U_2$ of $(Z_{r+1},\dots,Z_n)$ only; since
+$Z_1,\dots,Z_n$ are mutually independent, $U_1\perp U_2$. (No Fisher--Cochran theorem was used.)
+\hfill$\blacksquare$
+
+% =====================================================================
+\section*{Problem 5}
+
+\begin{question}
+Consider $Y_i=\beta_1x_{i1}+\beta_2x_{i2}+\varepsilon_i$, $i=1,\dots,8$, with $\varepsilon_i$ uncorrelated,
+mean $0$, variance $\sigma^2$. Estimate $\beta_1,\beta_2,\sigma^2$ from:
+\par\smallskip\centering\upshape
+\begin{tabular}{c|cccccccc}
+$i$ & 1&2&3&4&5&6&7&8\\\hline
+$Y_i$ & 82&79&74&83&80&81&84&81\\
+$x_{i1}$ & 10&9&9&11&11&10&10&12\\
+$x_{i2}$ & 15&14&13&15&14&14&16&13
+\end{tabular}
+\end{question}
+
+$\bX=[\bx_{\cdot1}\ \vdots\ \bx_{\cdot2}]$ is $8\times2$ of rank $2$, so
+$\bhat{\bbeta}=(\bX\T\bX)\inv\bX\T\bY$. From the data,
+\[
+\bX\T\bX=\begin{pmatrix}\sum_i x_{i1}^2 & \sum_i x_{i1}x_{i2}\\[2pt] \sum_i x_{i1}x_{i2}&\sum_i x_{i2}^2\end{pmatrix}
+=\begin{pmatrix}848&1168\\ 1168&1632\end{pmatrix},\qquad
+\bX\T\bY=\begin{pmatrix}\sum_i x_{i1}Y_i\\[2pt] \sum_i x_{i2}Y_i\end{pmatrix}=\begin{pmatrix}6612\\ 9194\end{pmatrix},
+\]
+and $\sum_i Y_i^2=51908$.
+$\det(\bX\T\bX)=848\cdot1632-1168^2=19712$, so
+$(\bX\T\bX)\inv=\tfrac{1}{19712}\begin{psmallmatrix}1632&-1168\\ -1168&848\end{psmallmatrix}$ and
+\[
+\hat\beta_1=\frac{1632\cdot6612-1168\cdot9194}{19712}=\frac{233}{88}\approx2.6477,\quad
+\hat\beta_2=\frac{848\cdot9194-1168\cdot6612}{19712}=\frac{329}{88}\approx3.7386.
+\]
+With residual degrees of freedom $n-\rank(\bX)=8-2=6$,
+\[
+\mathrm{SSE}=\bY\T\bY-\bhat{\bbeta}\T\bX\T\bY
+=51908-\Big(\tfrac{233}{88}\cdot6612+\tfrac{329}{88}\cdot9194\Big)=\frac{1241}{44}\approx28.205,
+\]
+\[
+\bhat\sigma^2=\frac{\mathrm{SSE}}{n-2}=\frac{1241}{264}\approx4.701.
+\]
+(For reference, $\widehat{\Var}(\bhat{\bbeta})=\mathrm{MSE}\,(\bX\T\bX)\inv$ gives
+$s(\hat\beta_1)\approx0.624$, $s(\hat\beta_2)\approx0.450$.) \hfill$\blacksquare$
+
+% =====================================================================
+\section*{Problem 6}
+
+\begin{question}
+Consider $Y_i=\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\beta_{11}x_{i1}^2+\beta_{22}x_{i2}^2
++\beta_{12}x_{i1}x_{i2}+\varepsilon_i$, $i=1,\dots,7$, with predictors:
+\par\smallskip\centering\upshape
+\begin{tabular}{c|ccccccc}
+$i$ & 1&2&3&4&5&6&7\\\hline
+$x_{i1}$ & 1&1&$-1$&$-1$&0&0&0\\
+$x_{i2}$ & 1&$-1$&1&$-1$&0&0&0
+\end{tabular}
+\par\smallskip\upshape\raggedright
+Show that $\beta_0,\beta_1,\beta_2,\beta_{11}+\beta_{22},\beta_{12}$ are estimable and find nonmatrix
+algebraic forms for their estimates. Find the MSE and the standard errors of the estimates.
+\end{question}
+
+The six columns of $\bX$ (order $\beta_0,\beta_1,\beta_2,\beta_{11},\beta_{22},\beta_{12}$) are
+\[
+\begin{array}{lll}
+\bc_0=(1,1,1,1,1,1,1)\T, & \bc_1=(1,1,-1,-1,0,0,0)\T, & \bc_2=(1,-1,1,-1,0,0,0)\T,\\[2pt]
+\bc_{11}=(1,1,1,1,0,0,0)\T, & \bc_{22}=(1,1,1,1,0,0,0)\T, & \bc_{12}=(1,-1,-1,1,0,0,0)\T.
+\end{array}
+\]
+
+\subsection*{Estimability}
+
+Since $x_{i1}^2=x_{i2}^2$ at every design point, $\bc_{11}=\bc_{22}$; thus $\bX\bv=\bzero$ for
+$\bv=(0,0,0,1,-1,0)\T$, and in fact $\Ns(\bX)=\operatorname{span}\{\bv\}$ (the other five columns
+$\bc_0,\bc_1,\bc_2,\bc_{11},\bc_{12}$ are independent: $\bc_0$ is the only one nonzero on rows $5,6,7$, and on
+rows $1$--$4$ the vectors $\bc_1,\bc_2,\bc_{11},\bc_{12}$ are mutually orthogonal $\pm1$ patterns). So
+$\rank(\bX)=5$. A function $\bm\lambda\T\bbeta$ is estimable iff $\bm\lambda\perp\Ns(\bX)$ [GM, Lemma~1],
+i.e.\ iff $\lambda_{11}=\lambda_{22}$. This holds for $\beta_0,\beta_1,\beta_2,\beta_{11}+\beta_{22},
+\beta_{12}$ (so these are estimable), but not for $\beta_{11}$ or $\beta_{22}$ alone. \hfill$\checkmark$
+
+\subsection*{Estimates}
+
+Fit the equivalent full-rank model whose design matrix $\bZ$ has columns
+$\bc_0,\bc_1,\bc_2,\bc_{11},\bc_{12}$ and coefficient vector
+$(\beta_0,\beta_1,\beta_2,\gamma,\beta_{12})$, where $\gamma:=\beta_{11}+\beta_{22}$ (valid since
+$\beta_{11}x_{i1}^2+\beta_{22}x_{i2}^2=\gamma\,\bc_{11,i}$). All off-diagonal inner products vanish except
+$\bc_0\T\bc_{11}=4$:
+\[
+\bZ\T\bZ=\begin{pmatrix}7&0&0&4&0\\0&4&0&0&0\\0&0&4&0&0\\4&0&0&4&0\\0&0&0&0&4\end{pmatrix},\qquad
+\bZ\T\bY=\begin{pmatrix}\sum_{i=1}^{7}Y_i\\ Y_1+Y_2-Y_3-Y_4\\ Y_1-Y_2+Y_3-Y_4\\
+Y_1+Y_2+Y_3+Y_4\\ Y_1-Y_2-Y_3+Y_4\end{pmatrix}.
+\]
+The orthogonal columns give $\hat\beta_1,\hat\beta_2,\hat\beta_{12}$ directly; $\hat\beta_0,\hat\gamma$ solve
+$\begin{psmallmatrix}7&4\\4&4\end{psmallmatrix}
+\begin{psmallmatrix}\hat\beta_0\\\hat\gamma\end{psmallmatrix}
+=\begin{psmallmatrix}\sum_1^7 Y_i\\ \sum_1^4 Y_i\end{psmallmatrix}$ (determinant $12$). Thus, with
+$\bar Y_c=\tfrac13(Y_5+Y_6+Y_7)$ and $\bar Y_f=\tfrac14(Y_1+Y_2+Y_3+Y_4)$,
+\[
+\boxed{\
+\begin{aligned}
+&\hat\beta_0=\tfrac13(Y_5+Y_6+Y_7)=\bar Y_c, &&\hat\beta_1=\tfrac14(Y_1+Y_2-Y_3-Y_4),\\
+&\hat\beta_2=\tfrac14(Y_1-Y_2+Y_3-Y_4), &&\hat\beta_{12}=\tfrac14(Y_1-Y_2-Y_3+Y_4),\\
+&\widehat{\beta_{11}+\beta_{22}}=\tfrac14(Y_1+Y_2+Y_3+Y_4)-\tfrac13(Y_5+Y_6+Y_7)=\bar Y_f-\bar Y_c.
+\end{aligned}\ }
+\]
+Each is unbiased for the stated function; being least-squares estimates of estimable functions, they are the
+BLUEs [GM, Thm~1]. (There is no BLUE of $\beta_{11}$ or $\beta_{22}$ separately, as neither is estimable.)
+
+\subsection*{MSE and standard errors}
+
+The four corner points are fitted exactly (the functions $1,x_1,x_2,x_1x_2$ interpolate any four values at
+the corners), so all residuals come from the three centre points:
+\[
+\mathrm{SSE}=\sum_{i=5}^{7}(Y_i-\bar Y_c)^2=\sum_{i=5}^7 Y_i^2-\tfrac13(Y_5+Y_6+Y_7)^2,
+\quad \mathrm{d.f.}=n-\rank(\bX)=2,
+\quad \mathrm{MSE}=\tfrac12\sum_{i=5}^{7}(Y_i-\bar Y_c)^2.
+\]
+Each estimate is a linear form $\ba\T\bY$ with variance $\sigma^2\lVert\ba\rVert^2$ (equivalently $\sigma^2$
+times a diagonal entry of $(\bZ\T\bZ)\inv$, namely $\tfrac13,\tfrac14,\tfrac14,\tfrac{7}{12},\tfrac14$ for
+$\beta_0,\beta_1,\beta_2,\gamma,\beta_{12}$). Estimating $\sigma^2$ by MSE,
+\[
+s(\hat\beta_0)=\sqrt{\tfrac{\mathrm{MSE}}{3}},\quad
+s(\hat\beta_1)=s(\hat\beta_2)=s(\hat\beta_{12})=\tfrac12\sqrt{\mathrm{MSE}},\quad
+s\big(\widehat{\beta_{11}{+}\beta_{22}}\big)=\sqrt{\tfrac{7\,\mathrm{MSE}}{12}}.
+\]
+\hfill$\blacksquare$
+
+\end{document}

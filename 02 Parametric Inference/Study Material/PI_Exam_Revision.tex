@@ -1,0 +1,822 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue,urlcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Parametric Inference --- Exam Revision}
+\rhead{\small B.Stat.\ 3rd yr, Sem 1, 2026--27}
+\cfoot{\small\thepage}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\pto}{\overset{p}{\longrightarrow}}
+\newcommand{\ind}{\perp\!\!\!\perp}
+\DeclareMathOperator{\MSE}{MSE}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newtcolorbox{keybox}[1]{colback=Blue!4,colframe=Blue!55,title={#1},fonttitle=\bfseries,breakable}
+\newtcolorbox{warnbox}[1]{colback=BrickRed!5,colframe=BrickRed!60,title={#1},fonttitle=\bfseries,breakable}
+\newtcolorbox{recipebox}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},fonttitle=\bfseries,breakable}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Parametric Inference}\\[2pt]
+{\large Two-Day Exam Revision Handout}\\[4pt]
+{\small Built from the 10 lecture notes (29 Jul -- 28 Aug 2026) and Homeworks 1--3}
+\end{center}
+
+\vspace{-4pt}
+\hrule
+\vspace{8pt}
+
+\section*{0. The two-day plan}
+
+Your position: Lectures 1--5 (estimation) were studied but are stale; Lectures 6--10
+(Bayes, minimax, testing, asymptotics) are the new material. The homeworks tell you the
+exam style: \emph{short, self-contained derivations on named distributions}. Nothing is
+asked that needs more than one page of honest algebra. So the plan is built around
+\textbf{deriving, not reading}.
+
+\begin{keybox}{What the homeworks tell you about the exam}
+Fifteen problems across three sheets. Every single one has the form ``here is a named
+family, derive the [UMVUE / Bayes estimate / minimax estimate / MP or UMP test].''
+There are \textbf{no} abstract measure-theoretic questions and \textbf{no} long asymptotic
+expansions. The families that recur: Binomial, Poisson, Exponential, Normal, Uniform,
+Cauchy, and power-series/negative-binomial. Master those seven and you have covered the
+observed question space.
+\end{keybox}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}p{2.1cm}p{4.6cm}p{8.6cm}@{}}
+\toprule
+\textbf{Slot} & \textbf{Topic} & \textbf{What you actually do} \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Tonight ($\approx$ 4 h) --- rebuild the estimation core}}\\
+\midrule
+1.5 h & \S1--\S4: risk, unbiasedness, sufficiency, completeness, Rao--Blackwell, Lehmann--Scheff\'e & Read \S1--\S4 with a pen. Reproduce the factorisation theorem statement and the Lehmann--Scheff\'e proof from memory once. \\
+1.0 h & \S5--\S7: exponential families, natural parameter space, ancillarity, Basu, Cram\'er--Rao & Write the exponential-family form for Bin, Poi, Exp, $N(\mu,\sigma^2)$, Gamma \emph{from scratch}. Identify $T$, $c(\theta)$, natural space each time. Then learn the CRLB \emph{attainment} condition in \S7. \\
+1.5 h & HW1 Q1--Q4, Q6 & Attempt cold, 12 min each, then check the solutions PDF. These five are the highest-yield problems in the course. \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Tomorrow morning ($\approx$ 4 h) --- Bayes and minimax (new)}}\\
+\midrule
+1.5 h & \S8: prior/posterior, conjugacy, Bayes estimate $=$ posterior mean, Bayes risk, improper priors & Derive all three conjugate pairs (Beta--Bin, Gamma--Poi, Normal--Normal) by hand. Do \emph{not} memorise the posteriors; memorise the kernel-matching trick. \\
+1.5 h & \S9: minimax, constant-risk theorem, limits of Bayes rules & Reproduce the two-line proof of ``Bayes $+$ constant risk $\Rightarrow$ minimax'' and the sequence version. \\
+1.0 h & HW2 Q1--Q3 & Cold attempt. Q1 and Q2 are the two canonical minimax arguments; expect one of them or a close cousin. \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Tomorrow afternoon/evening ($\approx$ 5 h) --- testing (new, heaviest)}}\\
+\midrule
+2.0 h & \S10: test functions, size/level/power, Neyman--Pearson with randomisation & Learn the NP statement exactly. Practise the loop: form $f_1/f_0$ $\to$ reduce to a statistic $\to$ invert to a region $\to$ set the size. \\
+1.5 h & \S11: MLR, Karlin--Rubin, UMP for one-sided hypotheses & Prove exponential family $\Rightarrow$ MLR. Know why two-sided UMP usually fails, and why $U[0,\theta]$ is the exception. \\
+1.5 h & HW3 (all four) $+$ HW2 Q5 & These five are \emph{exactly} the testing questions you will face. Do them under time. \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Exam morning ($\approx$ 2 h) --- consolidate}}\\
+\midrule
+0.5 h & \S12: consistency, $b_n$-consistency, MLE consistency & Light read; the cheapest section to score on. \\
+1.0 h & \S13--\S14: the cheat sheets & Re-derive every row of the distribution table from the exponential-family form. If you can rebuild the table, you are ready. \\
+0.5 h & Skim your own notes 1--10 & Only to catch anything idiosyncratic the professor stressed. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warnbox}{Triage --- if you run short of time}
+Drop, in this order: the Cauchy/ancillarity fine print (\S6), the simple-linear-regression
+consistency (\S12), and the multiparameter completeness detail (\S5).
+\textbf{Never} drop: Lehmann--Scheff\'e (\S4), exponential-family completeness (\S5),
+Neyman--Pearson (\S10), Karlin--Rubin (\S11). Those four carry the paper.
+\end{warnbox}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Decision-theoretic setup (Lec 1)}
+
+$X\sim P_\theta$, $\theta\in\Theta$. An \emph{estimator} $T=T(X)$ of $\psi(\theta)$ is judged by
+its \emph{risk} under squared error:
+\[
+R(\theta,T)=\E_\theta\big[(T-\psi(\theta))^2\big]=\MSE_\theta(T)
+=\underbrace{\big(\E_\theta T-\psi(\theta)\big)^2}_{\text{bias}^2}+\Var_\theta(T).
+\]
+
+\begin{itemize}
+\item $T$ is \textbf{unbiased} for $\psi$ if $\E_\theta T=\psi(\theta)$ for \emph{all} $\theta$.
+\item $T^*$ is \textbf{UMVUE} if it is unbiased and $\Var_\theta(T^*)\le\Var_\theta(T)$ for every
+unbiased $T$ and every $\theta$.
+\item $T$ is \textbf{inadmissible} if some $T'$ has $R(\theta,T')\le R(\theta,T)$ for all $\theta$,
+with strict inequality somewhere.
+\end{itemize}
+
+\begin{warnbox}{The pitfall Lecture 1 opens with}
+There is \emph{no} uniformly best estimator without restricting the class. For any fixed
+$\theta_0$, the silly estimator $T\equiv\theta_0$ has $R(\theta_0,T)=0$, so no $T^*$ can
+beat everything everywhere. That is exactly \emph{why} we impose unbiasedness (giving UMVUE),
+or average the risk (giving Bayes), or look at the worst case (giving minimax). Be able to
+say this in one sentence --- it is a standard opening bookwork part.
+\end{warnbox}
+
+\paragraph{Worked example (Lec 1, and a classic exam part).}
+$X_1,\dots,X_n\iid N(\mu,\sigma^2)$. Among estimators $T_c=c\sum_{i}(X_i-\Xbar)^2$ of
+$\sigma^2$, minimise the MSE. Write $W=\sum(X_i-\Xbar)^2$, so $W/\sigma^2\sim\chi^2_{n-1}$,
+$\E W=(n-1)\sigma^2$, $\Var W=2(n-1)\sigma^4$, hence
+$\E W^2=\Var W+(\E W)^2=\sigma^4(n^2-1)$. Then
+\[
+R(\sigma^2,T_c)=\E(cW-\sigma^2)^2=c^2\E W^2-2c\sigma^2\E W+\sigma^4
+=\sigma^4\big[c^2(n^2-1)-2c(n-1)+1\big].
+\]
+Minimising the quadratic in $c$ gives $c^*=\dfrac{n-1}{n^2-1}=\dfrac{1}{n+1}$.
+
+So $\dfrac{1}{n+1}\sum(X_i-\Xbar)^2$ beats the unbiased $S^2=\dfrac{1}{n-1}\sum(X_i-\Xbar)^2$
+in MSE at every $\sigma^2$: \textbf{the UMVUE is inadmissible}. Memorise the constant $1/(n+1)$.
+
+\section{Does an unbiased estimator even exist? (Lec 2)}
+
+Before hunting for a UMVUE, ask whether $\psi$ is \emph{estimable}. The method is always
+the same: write $\E_\theta T=\psi(\theta)$ as an identity in $\theta$, then use uniqueness of
+a series or transform expansion.
+
+\begin{keybox}{The three standard arguments}
+\begin{enumerate}[label=(\alph*)]
+\item \textbf{Polynomial argument (Binomial).} $X\sim \mathrm{Bin}(n,\theta)$,
+$\theta\in(0,1)$. Then $\E_\theta T=\sum_{i=0}^n T(i)\binom{n}{i}\theta^i(1-\theta)^{n-i}$ is a
+\emph{polynomial in $\theta$ of degree $\le n$}. Hence $\psi$ is unbiasedly estimable
+\textbf{iff} $\psi$ is a polynomial of degree $\le n$. In particular $\psi(\theta)=1/\theta$
+(or $(1-\theta)/\theta$) has \emph{no} unbiased estimator: a degree-$\le n$ polynomial
+cannot equal $1/\theta$ on an interval.
+\item \textbf{Power-series argument (Poisson).} $X\sim\mathrm{Poi}(\theta)$. Unbiasedness
+$\iff \sum_{i\ge0}\frac{T(i)}{i!}\theta^i=\psi(\theta)e^{\theta}$ for all $\theta>0$. So
+$\psi$ is estimable \textbf{iff} $\psi(\theta)e^\theta$ is analytic on $(0,\infty)$, i.e.\ iff
+$\psi$ is analytic; and then $T(i)=i!\times[\text{$i$-th Taylor coefficient of }\psi(\theta)e^{\theta}]$
+is \emph{unique}.
+\item \textbf{Laplace-transform argument (Exponential).} $X\sim\frac1\theta e^{-x/\theta}$,
+$x>0$. Then $\E_\theta T=\theta\iff\int_0^\infty T(x)e^{-x/\theta}\,dx=\theta^2$ for all
+$\theta>0$. By uniqueness of the Laplace transform the solution $T$ is unique (a.e.).
+\end{enumerate}
+\end{keybox}
+
+\begin{remark}
+Whenever the unbiased estimator is \emph{unique}, it is automatically the UMVUE --- there is
+nothing to compare it with. This ``uniqueness $\Rightarrow$ UMVUE'' shortcut appears
+repeatedly and is worth one sentence in any answer.
+\end{remark}
+
+\paragraph{Negative binomial (Lec 7).} ``Toss until 2 tails'':
+$f(x\mid\theta)=\binom{x-1}{1}\theta^{x-2}(1-\theta)^2$, $x\ge2$. No unbiased estimator of
+$\theta$ exists (same polynomial-type obstruction). Contrast HW1 Q1, where $\theta$ \emph{is}
+estimable for a differently parametrised negative binomial --- estimability depends on the
+parametrisation, not on the distribution.
+
+\paragraph{Cauchy (Lec 7).} For $X\sim\frac{1}{\pi\{1+(x-\theta)^2\}}$ with $n=1$ there is no
+unbiased estimator of $\theta$; $X$ itself has no mean.
+
+\section{Sufficiency (Lec 2--3)}
+
+\begin{definition}
+$T(X)$ is \textbf{sufficient} for $\theta$ if the conditional distribution of $X$ given $T=t$
+does not depend on $\theta$.
+\end{definition}
+
+\begin{theorem}[Neyman--Fisher factorisation]
+$T$ is sufficient $\iff$ the joint pdf/pmf factorises as
+\[
+f(\mathbf{x}\mid\theta)=g\big(\theta,T(\mathbf{x})\big)\cdot h(\mathbf{x}),
+\]
+with $h$ free of $\theta$ and the $\theta$-dependence entering only through $T$.
+\end{theorem}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Model ($n$ iid) & Sufficient statistic & Note \\
+\midrule
+$\mathrm{Bin}(m,\theta)$ & $\sum X_i$ & complete \\
+$\mathrm{Poi}(\theta)$ & $\sum X_i$ & complete; $\sum X_i\sim\mathrm{Poi}(n\theta)$ \\
+$\mathrm{Exp}(\text{mean }\theta)$ & $\sum X_i$ & complete; $\sum X_i\sim\mathrm{Gamma}(n,\theta)$ \\
+$N(\theta,1)$ & $\Xbar$ & complete \\
+$N(\mu,\sigma^2)$ & $\big(\sum X_i,\ \sum X_i^2\big)$ & complete (2-param.\ exp.\ family) \\
+$U[0,\theta]$ & $X_{(n)}$ & complete \\
+$U[\phi,\psi]$ & $\big(X_{(1)},X_{(n)}\big)$ & complete \\
+$U[\theta,\theta+1]$ & $\big(X_{(1)},X_{(n)}\big)$ & sufficient, \textbf{not} complete \\
+Cauchy$(\theta)$ & full order statistic & sufficient, \textbf{not} complete \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Indicator bookkeeping for the uniform families.} This is where marks are lost.
+For $U[\phi,\psi]$,
+\[
+f(\mathbf{x}\mid\phi,\psi)=(\psi-\phi)^{-n}\prod_i \mathbb{I}[\phi<x_i<\psi]
+=(\psi-\phi)^{-n}\,\mathbb{I}[\phi<x_{(1)}]\cdot\mathbb{I}[x_{(n)}<\psi],
+\]
+because ``all $x_i>\phi$'' $\iff$ ``$x_{(1)}>\phi$''. Always collapse the product of
+indicators into the two extreme order statistics before quoting the factorisation theorem.
+
+\paragraph{Two-point parameter space (Lec 5).} If $\Theta=\{\theta_0,\theta_1\}$, the
+likelihood ratio $T(x)=f_{\theta_1}(x)/f_{\theta_0}(x)$ is \emph{sufficient}: take
+$h(x)=f_{\theta_0}(x)$ and $g(\theta,T)=T$ if $\theta=\theta_1$, $=1$ if $\theta=\theta_0$.
+This is the bridge from estimation to testing --- it is exactly why the Neyman--Pearson test
+depends on the data only through the likelihood ratio.
+
+\section{Completeness, Rao--Blackwell, Lehmann--Scheff\'e (Lec 2--3)}
+
+\begin{definition}
+A sufficient statistic $T$ is \textbf{complete} if for every function $g$,
+\[
+\E_\theta\, g(T)=0\ \ \forall\theta\in\Theta \quad\Longrightarrow\quad g(T)=0\ \text{a.s.\ for all }\theta.
+\]
+\end{definition}
+
+\begin{keybox}{Why completeness is the right notion}
+If $T$ is complete sufficient and $h_1(T),h_2(T)$ are both unbiased for $\psi$, then
+$\E_\theta[h_2(T)-h_1(T)]=0$ for all $\theta$, so $h_1\equiv h_2$. \emph{There is at most one
+unbiased estimator that is a function of a complete sufficient statistic.} Uniqueness is the
+whole point.
+\end{keybox}
+
+\begin{theorem}[Rao--Blackwell]
+Let $T$ be any unbiased estimator of $\psi(\theta)$ and $S$ sufficient. Put
+$T^*=\E[T\mid S]$. Then $T^*$ is a statistic (sufficiency makes it free of $\theta$),
+$\E_\theta T^*=\psi(\theta)$, and $R(\theta,T^*)\le R(\theta,T)$ for all $\theta$.
+\end{theorem}
+
+\begin{proof}[Proof (memorise --- it is three lines)]
+$\E T^*=\E\,\E[T\mid S]=\E T=\psi(\theta)$, so the bias is unchanged. By the variance
+decomposition,
+\[
+\Var(T)=\E\big[\Var(T\mid S)\big]+\Var\big(\E[T\mid S]\big)\ \ge\ \Var(T^*),
+\]
+since the first term is $\ge0$. Equal bias plus smaller variance gives smaller MSE.
+Equality holds iff $\Var(T\mid S)=0$ a.s., i.e.\ $T$ is already a function of $S$.
+\end{proof}
+
+\begin{theorem}[Lehmann--Scheff\'e]
+If $S$ is \textbf{complete} and sufficient and $h(S)$ is unbiased for $\psi(\theta)$, then
+$h(S)$ is \emph{the} UMVUE of $\psi(\theta)$, and it is a.s.\ unique.
+\end{theorem}
+
+\begin{proof}
+Let $T$ be any unbiased estimator. Rao--Blackwellise: $T^*=\E[T\mid S]$ is unbiased, a
+function of $S$, and $\Var(T^*)\le\Var(T)$. By completeness $T^*=h(S)$ a.s. Hence
+$\Var(h(S))\le\Var(T)$ for every unbiased $T$.
+\end{proof}
+
+\begin{recipebox}{The UMVUE recipe --- two routes, use whichever is shorter}
+\textbf{Route A (guess-and-check).} Find a complete sufficient $S$; then find \emph{any}
+function $h$ with $\E_\theta h(S)=\psi(\theta)$, typically by expanding both sides in a series
+and matching coefficients. Done. (Used in HW1 Q1, Q2.)
+
+\smallskip
+\textbf{Route B (Rao--Blackwellise).} Find a crude unbiased estimator $T_0$ --- often an
+indicator like $\mathbb{I}[X_1>0]$ or $\mathbb{I}[X_1=0]$ --- and compute $\E[T_0\mid S]$.
+The conditional distribution of $X_1$ given $S$ is the only real work. (Used in HW1 Q3.)
+\end{recipebox}
+
+\paragraph{Standard UMVUEs to know cold.}
+\begin{itemize}
+\item $U[0,\theta]$: $X_{(n)}$ is complete sufficient with $\E X_{(n)}=\frac{n}{n+1}\theta$,
+so the UMVUE of $\theta$ is $\frac{n+1}{n}X_{(n)}$.
+\item $\mathrm{Poi}(\theta)$, one observation: UMVUE of $e^{c\theta}$ is $(1+c)^{X}$; with $n$
+observations, $(1+c/n)^{S}$ where $S=\sum X_i$.
+\item $N(\theta,1)$: UMVUE of $\Phi(\theta)=\Prob(X_1>0)$ is
+$\Phi\!\big(\Xbar\sqrt{n/(n-1)}\big)$.
+\item $\mathrm{Bin}(n,\theta)$: UMVUE of $\theta$ is $X/n$; UMVUE of $\theta(1-\theta)$ is
+$\frac{X(n-X)}{n(n-1)}$.
+\end{itemize}
+
+\section{Exponential families (Lec 4--5)}
+
+\begin{definition}[One-parameter]
+$f(x\mid\theta)=p(\theta)\,h(x)\,\exp\{c(\theta)\,T(x)\}$.
+For $X_1,\dots,X_n$ iid,
+\[
+f(\mathbf{x}\mid\theta)=p(\theta)^n\Big(\prod_i h(x_i)\Big)\exp\Big\{c(\theta)\sum_i T(x_i)\Big\},
+\]
+so by the factorisation theorem $S=\sum_i T(X_i)$ is sufficient. Call $\eta=c(\theta)$ the
+\textbf{natural parameter} and $\Gamma=\{c(\theta):\theta\in\Theta\}$ the \textbf{natural
+parameter space}.
+\end{definition}
+
+\begin{theorem}[Completeness criterion --- the most used result in the course]
+If the natural parameter space $\Gamma$ contains an open interval (an interval with
+non-empty interior), then $S=\sum_i T(X_i)$ is \textbf{complete} sufficient.
+\end{theorem}
+
+Multiparameter version (Lec 5): if
+$f(x\mid\theta)=p(\theta)h(x)\exp\{\sum_{j=1}^k c_j(\theta)T_j(x)\}$ with
+$\theta=(\theta_1,\dots,\theta_k)$, then $S=\big(\sum_i T_1(X_i),\dots,\sum_i T_k(X_i)\big)$
+is sufficient, and complete provided the natural parameter space
+$\{(c_1(\theta),\dots,c_k(\theta)):\theta\in\Theta\}$ contains a $k$-dimensional
+rectangle with non-empty interior.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}lcccl@{}}
+\toprule
+Family & $T(x)$ & $c(\theta)$ & natural space $\Gamma$ & complete? \\
+\midrule
+$\mathrm{Bin}(m,\theta),\ \theta\in(0,1)$ & $x$ & $\log\frac{\theta}{1-\theta}$ & $\R$ & yes \\
+$\mathrm{Poi}(\theta),\ \theta>0$ & $x$ & $\log\theta$ & $\R$ & yes \\
+$\mathrm{Exp}(\text{mean }\theta)$ & $x$ & $-1/\theta$ & $(-\infty,0)$ & yes \\
+$N(\theta,1)$ & $x$ & $\theta$ & $\R$ & yes \\
+$N(\mu,\sigma^2)$ & $(x,x^2)$ & $\big(\tfrac{\mu}{\sigma^2},-\tfrac{1}{2\sigma^2}\big)$ & $\R\times(-\infty,0)$ & yes \\
+$\mathrm{Gamma}(\alpha,\beta)$ & $(\log x,\ x)$ & $(\alpha-1,\ -1/\beta)$ & open rectangle & yes \\
+\midrule
+$U[0,\theta]$ & \multicolumn{3}{l}{\emph{not} an exponential family (support depends on $\theta$)} & yes, shown directly \\
+Cauchy$(\theta)$ & \multicolumn{3}{l}{\emph{not} an exponential family} & no \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warnbox}{Where the criterion bites}
+$N(\theta,\theta^2)$ has natural parameters $\big(\tfrac{1}{\theta},-\tfrac{1}{2\theta^2}\big)$,
+which trace a \emph{curve} in $\R^2$, not a rectangle. The criterion does not apply and
+completeness fails. Likewise $U[\theta,\theta+1]$ is not an exponential family at all, and its
+sufficient statistic $(X_{(1)},X_{(n)})$ is not complete because $X_{(n)}-X_{(1)}$ is ancillary.
+The phrase to write is: \emph{``the natural parameter space does not contain a rectangle with
+non-empty interior, so the criterion is unavailable.''}
+\end{warnbox}
+
+\paragraph{Power-series family (Lec 4).}
+\[
+f(x\mid\theta)=\frac{a_x\theta^x}{A(\theta)},\qquad x=0,1,2,\dots,\quad
+A(\theta)=\sum_{x\ge0}a_x\theta^x,\quad \theta\in(0,b),\ a_x\ge0.
+\]
+This is an exponential family with $T(x)=x$, $c(\theta)=\log\theta$, natural space
+$(-\infty,\log b)$ --- an open interval, so $X$ (and $\sum X_i$) is complete sufficient.
+Two identities worth memorising, with $\psi(\theta):=\E_\theta X$:
+\[
+\boxed{\ \E_\theta X=\frac{\theta A'(\theta)}{A(\theta)}=\psi(\theta),\qquad
+\Var_\theta X=\theta\,\psi'(\theta).\ }
+\]
+Bernoulli, Binomial, Poisson, Geometric and Negative Binomial are all power-series families.
+(HW1 Q4 is exactly this; see the solutions PDF.)
+
+\section{Ancillarity and Basu's theorem (Lec 4)}
+
+\begin{definition}
+$V(X)$ is \textbf{ancillary} if its distribution does not depend on $\theta$.
+\end{definition}
+
+\begin{theorem}[Basu]
+If $S$ is complete sufficient for $\theta$ and $V$ is ancillary, then $S\ind V$ under every
+$P_\theta$.
+\end{theorem}
+
+\begin{recipebox}{How to spot an ancillary statistic in one line}
+\textbf{Location family} $f(x-\theta)$: any \emph{difference} is ancillary ---
+$X_i-X_j$, $X_{(n)}-X_{(1)}$, $S^2$, the whole vector $(X_1-\Xbar,\dots,X_n-\Xbar)$.
+
+\textbf{Scale family} $\tfrac1\theta f(x/\theta)$: any \emph{ratio} is ancillary ---
+$X_i/X_j$, $X_{(n)}/X_{(1)}$, $\sum_{j\le p}X_j\big/\sum_{k\le q}X_k$, $\Xbar/S$.
+
+Proof template: write $X_i=\theta Z_i$ (scale) or $X_i=\theta+Z_i$ (location) with $Z_i$
+free of $\theta$; the statistic is unchanged, hence its law is free of $\theta$.
+\end{recipebox}
+
+\paragraph{Cauchy: sufficiency without completeness.} For $X_1,\dots,X_n\iid$
+Cauchy$(\theta)$ the full order statistic $S=(X_{(1)},\dots,X_{(n)})$ is sufficient (and
+minimal), but \emph{not} complete: for bounded $g$, the statistic $g(X_{(i)}-X_{(j)})$ has a
+$\theta$-free distribution, so with $c=\E g(X_{(i)}-X_{(j)})$ we get
+$\E_\theta[g(X_{(i)}-X_{(j)})-c]=0$ for all $\theta$ while $g-c\not\equiv0$. This is the
+standard counterexample; know it.
+
+\paragraph{The two textbook Basu applications.}
+\begin{enumerate}[label=(\roman*)]
+\item $N(\mu,\sigma^2)$ with $\sigma^2$ known: $\Xbar$ is complete sufficient for $\mu$, and
+$S^2$ is ancillary, hence $\Xbar\ind S^2$. (The slick proof of the classical independence.)
+\item $\mathrm{Exp}(\theta)$: $\sum X_i$ is complete sufficient, $\sum_{j\le p}X_j/\sum_{k\le q}X_k$
+is scale-invariant hence ancillary, so the two are independent. (HW1 Q6.)
+\end{enumerate}
+
+\section{Information inequality / Cram\'er--Rao (Lec 2, HW1 Q4)}
+
+Under regularity (support free of $\theta$, differentiation under the integral sign legal), the
+\textbf{Fisher information} in one observation is
+\[
+I(\theta)=\Var_\theta\!\Big(\frac{\partial}{\partial\theta}\log f(X\mid\theta)\Big)
+=\E_\theta\!\Big[\Big(\frac{\partial}{\partial\theta}\log f\Big)^{\!2}\Big]
+=-\E_\theta\Big[\frac{\partial^2}{\partial\theta^2}\log f\Big],
+\]
+and for $n$ iid observations $I_n(\theta)=nI(\theta)$.
+
+\begin{theorem}[CRLB]
+For any $T$ with $\E_\theta T=\psi(\theta)$,
+$\ \Var_\theta(T)\ \ge\ \dfrac{[\psi'(\theta)]^2}{n\,I(\theta)}$.
+\end{theorem}
+
+\begin{keybox}{Attainment --- the exam-relevant half}
+Equality holds at every $\theta$ \textbf{iff} the score factorises as
+\[
+\frac{\partial}{\partial\theta}\log f(\mathbf{x}\mid\theta)=k(\theta)\big[T(\mathbf{x})-\psi(\theta)\big]
+\]
+for some $k(\theta)$, i.e.\ \textbf{iff the model is a one-parameter exponential family and
+$\psi$ is the mean of its natural sufficient statistic}. Consequences:
+\begin{itemize}
+\item $\Xbar$ attains the CRLB for $\mu$ in $N(\mu,\sigma_0^2)$, for $\theta$ in
+$\mathrm{Poi}(\theta)$, for $\theta$ in $\mathrm{Exp}(\theta)$, and for $\E X$ in any
+power-series family. (The equality condition in Cauchy--Schwarz is the source.)
+\item The CRLB is \emph{not} attained for e.g.\ $\sigma^2$ in $N(\mu,\sigma^2)$, or for
+non-linear $\psi$. A UMVUE can therefore exist with variance strictly above the CRLB --- so
+``does not attain CRLB'' never disproves UMVUE-hood.
+\item The CRLB is \textbf{meaningless} for $U[0,\theta]$: the support depends on $\theta$,
+regularity fails, and indeed $\frac{n+1}{n}X_{(n)}$ has variance of order $\theta^2/n^2$,
+far below any bound you would naively compute.
+\end{itemize}
+\end{keybox}
+
+\paragraph{Consistency of UMVUEs (Lec 4).}
+If $T_n$ is the UMVUE of $\psi(\theta)$ based on $X_1,\dots,X_n$ and there exists \emph{some}
+unbiased sequence whose variance tends to $0$, then $\Var(T_n)\le\Var(\tilde T_n)\to0$, and
+with zero bias Chebyshev gives $T_n\pto\psi(\theta)$.
+
+\section{Bayes estimation (Lec 6--7)}
+
+Prior $\pi(\theta)$ on $\Theta$; data $X\sim f(x\mid\theta)$. The \textbf{posterior} is
+\[
+\pi(\theta\mid x)=\frac{f(x\mid\theta)\pi(\theta)}{\int_\Theta f(x\mid\theta')\pi(\theta')\,d\theta'}
+\ \propto\ f(x\mid\theta)\,\pi(\theta).
+\]
+
+\begin{theorem}[Bayes estimate under squared error]
+The estimator minimising the \textbf{Bayes risk}
+$r(\pi,T)=\int_\Theta R(\theta,T)\pi(\theta)\,d\theta=\E_\pi\big[R(\theta,T)\big]$
+is the \textbf{posterior mean} $T_\pi(x)=\E[\theta\mid X=x]$.
+\end{theorem}
+
+\begin{proof}[Proof (know this)]
+Write $r(\pi,T)=\int\!\!\int (T(x)-\theta)^2 f(x\mid\theta)\pi(\theta)\,dx\,d\theta
+=\int m(x)\Big[\int (T(x)-\theta)^2\pi(\theta\mid x)\,d\theta\Big]dx$, where $m$ is the
+marginal density of $X$. For each fixed $x$ the inner bracket is minimised over the number
+$T(x)$ by the mean of $\pi(\cdot\mid x)$, since $a\mapsto\E[(a-\theta)^2\mid x]$ is minimised at
+$a=\E[\theta\mid x]$. The minimum value is the posterior variance, so
+$r(\pi,T_\pi)=\E_m\big[\Var(\theta\mid X)\big]$ --- a formula you will use repeatedly in the
+minimax problems.
+\end{proof}
+
+\begin{keybox}{Conjugate families --- derive, do not memorise}
+Drop all factors free of $\theta$ and match the kernel.
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Model & Prior & Posterior & Bayes estimate \\
+\midrule
+$X\sim\mathrm{Bin}(n,\theta)$ & $\mathrm{Beta}(p,q)$ & $\mathrm{Beta}(p+x,\,q+n-x)$ & $\dfrac{p+X}{p+q+n}$ \\
+$X\sim\mathrm{Poi}(\theta)$ & $\mathrm{Gamma}(\alpha,\lambda)$ & $\mathrm{Gamma}\big(\alpha+x,\ \tfrac{\lambda}{1+\lambda}\big)$ & $\dfrac{\lambda(\alpha+X)}{1+\lambda}$ \\
+$X\sim N(\theta,\sigma^2)$, $\sigma^2$ known & $N(\mu,\tau^2)$ & $N\!\Big(\tfrac{\tau^2x+\sigma^2\mu}{\sigma^2+\tau^2},\ \tfrac{\sigma^2\tau^2}{\sigma^2+\tau^2}\Big)$ & $\dfrac{\tau^2X+\sigma^2\mu}{\sigma^2+\tau^2}$ \\
+$X_{(n)}$ from $U[a,\theta]$ & Pareto$(\alpha,a)$ & Pareto$\big(\alpha+n,\ \max(a,x_{(n)})\big)$ & $\dfrac{(\alpha+n)\max(a,X_{(n)})}{\alpha+n-1}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+(Gamma parametrised by shape and \emph{scale}.) For $n$ iid observations replace $x$ by the
+sufficient statistic: $\sum x_i$ for Bin/Poi, and $\Xbar$ with $\sigma^2\!\to\!\sigma^2/n$ for
+the Normal.
+\end{keybox}
+
+\paragraph{Three facts the professor emphasised.}
+\begin{enumerate}
+\item \textbf{The posterior depends on the data only through a sufficient statistic.}
+If $f(x\mid\theta)=g(\theta,T(x))h(x)$ then $h(x)$ cancels between numerator and denominator:
+$\pi(\theta\mid x)=g(\theta,T(x))\pi(\theta)\big/\int g(\theta,T(x))\pi(\theta)\,d\theta$.
+Consequently \emph{every Bayes and generalized Bayes estimate is a function of the sufficient
+statistic}.
+\item \textbf{A Bayes estimate is essentially never unbiased.} Suppose $T$ is both Bayes
+(so $T=\E[\theta\mid X]$) and unbiased (so $\E[T\mid\theta]=\theta$). Writing $\E_m$ for
+expectation under the joint law and conditioning two different ways,
+\[
+\E_m[T\theta]=\E\big[\theta\,\E(T\mid\theta)\big]=\E[\theta^2],\qquad
+\E_m[T\theta]=\E\big[T\,\E(\theta\mid X)\big]=\E[T^2].
+\]
+Hence $\E_m[(T-\theta)^2]=\E[T^2]+\E[\theta^2]-2\E_m[T\theta]=0$, forcing $T=\theta$ a.s.\ ---
+impossible except in degenerate cases. \emph{Memorise this four-line argument.}
+\item \textbf{Improper priors and generalized Bayes.} $\pi$ need not integrate to 1. If the
+posterior is still a proper density, its mean is the \emph{generalized Bayes estimate}.
+Examples: $X\sim N(\theta,1)$ with $\pi\equiv1$ gives $\pi(\theta\mid x)=N(x,1)$ and estimate
+$X$; with $n$ iid observations, $\Xbar$. For $U[\theta-\tfrac12,\theta+\tfrac12]$ with
+$\pi\equiv1$ the posterior is uniform on $[x_{(n)}-\tfrac12,\ x_{(1)}+\tfrac12]$ and the
+estimate is the midrange $\tfrac12(X_{(1)}+X_{(n)})$ (HW2 Q3).
+\end{enumerate}
+
+\section{Minimax estimation (Lec 8--9)}
+
+\begin{definition}
+$T^*$ is \textbf{minimax} if
+$\displaystyle\sup_{\theta\in\Theta}R(\theta,T^*)=\inf_{T}\sup_{\theta\in\Theta}R(\theta,T)$.
+An estimator whose risk is constant in $\theta$ is called an \textbf{equalizer}.
+\end{definition}
+
+\begin{theorem}[Constant-risk criterion]
+If $T_\pi$ is Bayes w.r.t.\ $\pi$ and $R(\theta,T_\pi)=c$ is \emph{constant in $\theta$}, then
+$T_\pi$ is minimax (and $\pi$ is a least favourable prior).
+\end{theorem}
+\begin{proof}
+For any $T$: $\ \sup_\theta R(\theta,T)\ \ge\ r(\pi,T)\ \ge\ r(\pi,T_\pi)=c=\sup_\theta R(\theta,T_\pi)$.
+The first step is ``sup $\ge$ average'', the second is Bayes optimality.
+\end{proof}
+
+\begin{theorem}[Limit of Bayes rules --- the workhorse]
+Let $\{\pi_k\}$ be priors with Bayes risks $r(\pi_k,T_{\pi_k})\to c$. If $T^*$ satisfies
+$\sup_\theta R(\theta,T^*)=c$, then $T^*$ is minimax.
+\end{theorem}
+\begin{proof}
+For any $T$ and every $k$:
+$\sup_\theta R(\theta,T)\ge r(\pi_k,T)\ge r(\pi_k,T_{\pi_k})$. Let $k\to\infty$ to get
+$\sup_\theta R(\theta,T)\ge c=\sup_\theta R(\theta,T^*)$.
+\end{proof}
+
+\begin{keybox}{The three canonical minimax results}
+\begin{enumerate}
+\item \textbf{$X\sim\mathrm{Bin}(n,\theta)$.} With the prior
+$\mathrm{Beta}\big(\tfrac{\sqrt n}{2},\tfrac{\sqrt n}{2}\big)$ the Bayes estimate is
+\[
+T^*=\frac{X+\sqrt n/2}{n+\sqrt n},
+\]
+whose risk is the \emph{constant} $\dfrac{1}{4(1+\sqrt n)^2}$; hence $T^*$ is minimax. By
+contrast the UMVUE $X/n$ has $\sup_\theta R=\dfrac{1}{4n}$, which is larger --- \textbf{the
+UMVUE is not minimax}.
+\item \textbf{$X\sim N(\theta,1)$, $\theta\in\R$.} $X$ is minimax with value 1. Use
+$\pi_k=N(0,k)$: the Bayes estimate is $kX/(k+1)$ with Bayes risk
+$\dfrac{k}{k+1}\to1=\sup_\theta R(\theta,X)$; apply the limit theorem. (HW2 Q1.)
+\item \textbf{$X\sim\mathrm{Poi}(\lambda)$, $\lambda\in(0,\infty)$.} \emph{Every} estimator has
+infinite maximum risk. Use $\pi_k=\mathrm{Gamma}(1,k)$, whose Bayes risk is
+$k^2/(1+k)\to\infty$. An unbounded parameter space with unbounded variance kills the
+problem. (HW2 Q2.) The same happens for $U[a,\theta]$ with $\theta$ unbounded.
+\end{enumerate}
+\end{keybox}
+
+\section{Testing: setup and Neyman--Pearson (Lec 6, 9)}
+
+$H_0:\theta\in\Theta_0$ vs $H_A:\theta\in\Theta_A$, $\Theta=\Theta_0\cup\Theta_A$ disjointly.
+
+\begin{definition}
+A \textbf{test function} is $\phi:\mathcal{X}\to[0,1]$; $\phi(x)$ is the probability of
+rejecting $H_0$ when $X=x$. Its \textbf{power function} is $\beta_\phi(\theta)=\E_\theta\phi(X)$.
+The \textbf{size} is $\sup_{\theta\in\Theta_0}\beta_\phi(\theta)$; $\phi$ has \textbf{level}
+$\alpha$ if its size is $\le\alpha$. Type I error $=\beta_\phi(\theta)$ for $\theta\in\Theta_0$;
+Type II error $=1-\beta_\phi(\theta)$ for $\theta\in\Theta_A$.
+\end{definition}
+
+\paragraph{Sufficiency reduces the problem (Lec 6).} If $T$ is sufficient and $\phi$ is any
+test, then $\psi(T):=\E[\phi(X)\mid T]$ is a legitimate test function (free of $\theta$ by
+sufficiency) with $\E_\theta\psi=\E_\theta\phi$ for all $\theta$ --- identical size and power.
+\emph{So it is enough to search among tests depending only on a sufficient statistic.}
+
+\begin{theorem}[Neyman--Pearson lemma]
+Test $H_0: X\sim f_0$ against $H_A: X\sim f_1$ (both simple). Fix $\alpha\in(0,1)$.
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{(Existence)} There exist $k\ge0$ and $\gamma\in[0,1]$ such that
+\[
+\phi^*(x)=\begin{cases}
+1, & f_1(x)>k f_0(x),\\
+\gamma, & f_1(x)=k f_0(x),\\
+0, & f_1(x)<k f_0(x),
+\end{cases}
+\qquad \E_{0}\phi^*=\alpha .
+\]
+\item \textbf{(Sufficiency)} Any such $\phi^*$ is most powerful (MP) of its size.
+\item \textbf{(Necessity)} Any MP level-$\alpha$ test has this form a.e., except possibly on
+$\{f_1=kf_0\}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof of (ii) --- short and often asked]
+Let $\phi$ be any test with $\E_0\phi\le\alpha=\E_0\phi^*$. On $\{f_1>kf_0\}$ we have
+$\phi^*=1\ge\phi$; on $\{f_1<kf_0\}$ we have $\phi^*=0\le\phi$. In both cases
+$(\phi^*-\phi)(f_1-kf_0)\ge0$, and this holds trivially on $\{f_1=kf_0\}$ too. Integrating,
+\[
+0\le\int(\phi^*-\phi)(f_1-kf_0)=\big(\E_1\phi^*-\E_1\phi\big)-k\big(\E_0\phi^*-\E_0\phi\big)
+\le \E_1\phi^*-\E_1\phi,
+\]
+since $\E_0\phi^*-\E_0\phi\ge0$ and $k\ge0$. Hence $\E_1\phi^*\ge\E_1\phi$: $\phi^*$ is MP.
+\end{proof}
+
+\begin{recipebox}{The NP algorithm --- follow it mechanically}
+\begin{enumerate}
+\item Write $\Lambda(x)=f_1(x)/f_0(x)$ and \textbf{simplify until only a statistic remains}.
+\item Determine the shape of $\{\Lambda>k\}$: is it a one-sided region in that statistic
+(usual), or an interval, or a union of two tails? ($\Lambda$ need not be monotone --- see HW2 Q5.)
+\item Re-express the region in terms of a statistic with a \emph{known null distribution}.
+\item Solve $\Prob_{0}(\text{region})=\alpha$ for the cutoff. If the null distribution is
+\textbf{discrete}, the exact size is generally unattainable, so \textbf{randomise}: take the
+smallest $c$ with $\Prob_0(T>c)\le\alpha$ and set
+$\gamma=\dfrac{\alpha-\Prob_0(T>c)}{\Prob_0(T=c)}$.
+\item State the power if asked.
+\end{enumerate}
+\end{recipebox}
+
+\paragraph{Support matters.} If $f_1>0$ where $f_0=0$, the ratio is $+\infty$ there and the MP
+test \emph{must} reject on that set --- this costs nothing in size and gains power. That is the
+entire mechanism behind the $U[0,\theta]$ problem (HW3 Q4).
+
+\section{MLR and UMP tests (Lec 9)}
+
+\begin{definition}
+$\{f_\theta:\theta\in(a,b)\}$ has \textbf{monotone likelihood ratio (MLR)} in $T(x)$ if for
+every $\theta_0<\theta_1$ the ratio $f_{\theta_1}(x)/f_{\theta_0}(x)$ is a non-decreasing
+function of $T(x)$.
+\end{definition}
+
+\begin{theorem}
+The one-parameter exponential family $f(x\mid\theta)=p(\theta)h(x)e^{c(\theta)T(x)}$ has MLR
+in $T(x)$ provided $c(\theta)$ is non-decreasing in $\theta$.
+\end{theorem}
+\begin{proof}
+$\dfrac{f_{\theta_1}(x)}{f_{\theta_0}(x)}=\dfrac{p(\theta_1)}{p(\theta_0)}
+\exp\{[c(\theta_1)-c(\theta_0)]T(x)\}$, and $c(\theta_1)-c(\theta_0)\ge0$, so the ratio is a
+non-decreasing function of $T(x)$.
+\end{proof}
+
+\begin{theorem}[Karlin--Rubin]
+If the family has MLR in $T$, then for $H_0:\theta\le\theta_0$ vs $H_A:\theta>\theta_0$ the test
+\[
+\phi^*(x)=\begin{cases}1,&T(x)>c\\ \gamma,&T(x)=c\\ 0,&T(x)<c\end{cases}
+\qquad\text{with }\E_{\theta_0}\phi^*=\alpha
+\]
+is \textbf{UMP} of level $\alpha$. Moreover $\beta_{\phi^*}(\theta)$ is non-decreasing in
+$\theta$, so the size is attained at $\theta=\theta_0$.
+\end{theorem}
+
+\begin{keybox}{Why this works --- the sentence to write in the exam}
+Fix any $\theta_1>\theta_0$. By Neyman--Pearson, the MP test of the \emph{simple}
+$H_0:\theta=\theta_0$ against $H_A:\theta=\theta_1$ rejects for large
+$f_{\theta_1}/f_{\theta_0}$, i.e.\ for large $T$ by MLR. \textbf{The cutoff $c$ depends only on
+$\alpha$ and the null distribution, not on $\theta_1$} --- so the same test is MP against every
+$\theta_1>\theta_0$ simultaneously, hence UMP. The monotone power function then upgrades
+$H_0:\theta=\theta_0$ to $H_0:\theta\le\theta_0$ without changing the size.
+\end{keybox}
+
+\paragraph{MLR status of the standard families.}
+Binomial (in $x$), Poisson (in $\sum x_i$), Exponential (in $\sum x_i$), $N(\theta,1)$ (in
+$\Xbar$) and $U[0,\theta]$ (in $x_{(n)}$, in the generalised sense) all have MLR.
+\textbf{Cauchy does not}: $f_{\theta_1}/f_{\theta_0}$ is a ratio of two quadratics, which
+tends to $1$ as $x\to\pm\infty$ in both directions, so it cannot be monotone.
+
+\begin{warnbox}{Two-sided alternatives}
+For $H_0:\theta=\theta_0$ vs $H_A:\theta\ne\theta_0$ in an MLR family, no UMP test exists:
+the best test against $\theta_1>\theta_0$ rejects for large $T$, the best against
+$\theta_1<\theta_0$ rejects for small $T$, and no single test does both. One then restricts to
+unbiased tests (UMPU). \textbf{Exception:} in non-regular families where the support moves
+with $\theta$, a two-sided UMP test can exist --- $U[0,\theta]$ with $H_0:\theta=1$ is the
+standard example (HW3 Q4), because rejecting on $\{X>1\}$ is free under $H_0$.
+\end{warnbox}
+
+\section{Consistency and asymptotics (Lec 4, 10)}
+
+\begin{definition}
+$T_n$ is (weakly) \textbf{consistent} for $\psi(\theta)$ if $T_n\pto\psi(\theta)$ under
+$P_\theta$ for every $\theta$. For $b_n\uparrow\infty$, $T_n$ is \textbf{$b_n$-consistent} if
+$b_n(T_n-\theta)=O_p(1)$, i.e.\ $T_n-\theta=O_p(1/b_n)$.
+\end{definition}
+
+Sufficient condition: if $\E_\theta T_n\to\psi(\theta)$ and $\Var_\theta(T_n)\to0$ then $T_n$
+is consistent (Chebyshev). This handles almost every exam instance.
+
+\paragraph{Sample median (Lec 10).} Let $F(\theta)=\tfrac12$ with $F$ strictly increasing and
+continuous near $\theta$, $X_1,\dots,X_n\iid F$, and $\tilde X_n$ the sample median. Then
+\[
+\Prob(\tilde X_n-\theta>\varepsilon)=\Prob\big(\text{at least half the }X_i>\theta+\varepsilon\big)
+=\Prob\big(\mathrm{Bin}(n,1-F(\theta+\varepsilon))\ge n/2\big)\to0,
+\]
+since $1-F(\theta+\varepsilon)<\tfrac12$; symmetrically for the other tail. Hence
+$\tilde X_n\pto\theta$. \emph{This is the right starting estimator for the Cauchy location
+problem, because $\Xbar$ is not even consistent there --- $\Xbar$ is itself Cauchy$(\theta)$
+for every $n$.}
+
+\paragraph{MLE.} $\hat\theta_n=\argmax_\theta\prod_i f(X_i\mid\theta)$.
+\begin{itemize}
+\item Consistent for Binomial, Poisson, Exponential and Normal, and generally whenever the
+usual regularity conditions hold and the likelihood equation has a unique root for each $n$.
+\item $U[0,\theta]$: $\hat\theta_n=X_{(n)}$, with $\E X_{(n)}=\frac{n}{n+1}\theta$ (biased) but
+$\Prob(\hat\theta_n>\theta+\varepsilon)=0$ and
+$\Prob(\hat\theta_n<\theta-\varepsilon)=\big(\tfrac{\theta-\varepsilon}{\theta}\big)^n\to0$, so
+consistent --- and in fact $n$-consistent, not $\sqrt n$-consistent.
+\item Cauchy: the likelihood equation $\sum_i\frac{2(x_i-\theta)}{1+(x_i-\theta)^2}=0$ is a
+polynomial equation with no closed form and possibly several roots; solve numerically
+starting from the sample median (HW2 Q4).
+\end{itemize}
+
+\paragraph{Simple linear regression (Lec 10).}
+$Y_i=\alpha+\beta x_i+\varepsilon_i$, $\varepsilon_i\iid$ with mean 0, variance $\sigma^2$.
+\[
+\hat\beta_{LS}=\frac{\sum_i(x_i-\bar x)(Y_i-\bar Y)}{\sum_i(x_i-\bar x)^2},\qquad
+\E\hat\beta_{LS}=\beta,\qquad
+\Var(\hat\beta_{LS})=\frac{\sigma^2}{\sum_i(x_i-\bar x)^2}.
+\]
+So $\hat\beta_{LS}$ is consistent \textbf{iff} $\sum_i(x_i-\bar x)^2\to\infty$: the design
+points must be sufficiently spread out. And $\hat\alpha_{LS}=\bar Y-\hat\beta_{LS}\bar x$ is
+consistent provided additionally $\bar x$ converges to a constant.
+
+\section{Distribution cheat sheet}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\small
+\begin{tabular}{@{}p{2.3cm}p{2.4cm}p{3.1cm}p{3.3cm}p{3.4cm}@{}}
+\toprule
+Model ($n$ iid) & Complete suff.\ $S$ & UMVUE of $\theta$ & Bayes (conj.\ prior) & UMP for $\theta\le\theta_0$ vs $>\theta_0$ \\
+\midrule
+$\mathrm{Bern}(\theta)$ & $\sum X_i$ & $\Xbar$ & $\frac{p+S}{p+q+n}$ (Beta) & reject $S>c$, randomise \\
+$\mathrm{Poi}(\theta)$ & $\sum X_i$ & $\Xbar$ & $\frac{\lambda(\alpha+S)}{1+n\lambda}$ (Gamma) & reject $S>c$, randomise \\
+$\mathrm{Exp}(\theta)$ & $\sum X_i$ & $\Xbar$ & inverse-Gamma & reject $2S/\theta_0>\chi^2_{2n,\alpha}$ \\
+$N(\theta,1)$ & $\Xbar$ & $\Xbar$ & $\frac{\tau^2\Xbar+(\sigma^2\!/n)\mu}{\sigma^2\!/n+\tau^2}$ & reject $\Xbar>\theta_0+z_\alpha/\sqrt n$ \\
+$N(\mu,\sigma^2)$ & $(\sum X_i,\sum X_i^2)$ & $\Xbar$ and $S^2$ & --- & $t$ / $\chi^2$ tests \\
+$U[0,\theta]$ & $X_{(n)}$ & $\frac{n+1}{n}X_{(n)}$ & Pareto & reject $X_{(n)}>\theta_0\alpha^{1/n}$ \\
+Cauchy$(\theta)$ & order stat.\ (not complete) & none in closed form & --- & no MLR, no UMP \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Useful facts.}
+For $\mathrm{Exp}(\theta)$, $\sum_i X_i\sim\mathrm{Gamma}(n,\theta)$ and
+$\tfrac{2}{\theta}\sum_i X_i\sim\chi^2_{2n}$ --- the standard route to an exact cutoff.
+For $U[0,\theta]$, $X_{(n)}$ has density $n x^{n-1}/\theta^n$ on $[0,\theta]$, so
+$\E X_{(n)}=\frac{n\theta}{n+1}$ and $\Var X_{(n)}=\frac{n\theta^2}{(n+1)^2(n+2)}$.
+For Laplace$(0,1)$ with density $\tfrac12 e^{-|x|}$: $\Prob(|X|>t)=e^{-t}$ for $t\ge0$.
+$\E[X_1\mid\Xbar=t]=t$ and $\Var(X_1\mid\Xbar=t)=\sigma^2(n-1)/n$ in the normal model.
+
+\section{One-page decision tree}
+
+\begin{recipebox}{Read the question, then follow the arrow}
+\textbf{``Find the UMVUE of $\psi(\theta)$''}\\
+$\to$ Is the family exponential? Identify $T$, $c(\theta)$, and check the natural parameter
+space contains an open interval $\Rightarrow$ $S=\sum T(X_i)$ is complete sufficient.
+Then either match a series (Route A) or Rao--Blackwellise an indicator (Route B).
+If the support depends on $\theta$, use the extreme order statistic and verify completeness
+directly.
+
+\smallskip
+\textbf{``Does an unbiased estimator exist?''}\\
+$\to$ Set $\E_\theta T=\psi(\theta)$ and expand. Binomial $\Rightarrow$ polynomial of degree
+$\le n$. Poisson $\Rightarrow$ $\psi(\theta)e^{\theta}$ analytic. Exponential $\Rightarrow$
+Laplace transform uniqueness.
+
+\smallskip
+\textbf{``Does it attain the CRLB?''}\\
+$\to$ Compute $\partial_\theta\log L$; if it equals $k(\theta)[T-\psi(\theta)]$ then yes, and
+$\Var(T)=\psi'(\theta)/k(\theta)$. Otherwise no. Check regularity first --- moving support
+means the CRLB does not apply at all.
+
+\smallskip
+\textbf{``Show $A$ and $B$ are independent''}\\
+$\to$ Basu. Show $A$ is complete sufficient and $B$ is location- or scale-invariant, hence
+ancillary. (Or, in the normal case, use joint normality and zero covariance.)
+
+\smallskip
+\textbf{``Find the Bayes estimate''}\\
+$\to$ Posterior $\propto$ likelihood $\times$ prior; recognise the kernel; report the
+posterior mean. If the prior is improper, check the posterior is proper and report the
+generalized Bayes estimate.
+
+\smallskip
+\textbf{``Show $T$ is minimax''}\\
+$\to$ Constant risk? Find a prior making $T$ Bayes and quote the constant-risk theorem.
+Otherwise build $\pi_k$ with $r(\pi_k)\to\sup_\theta R(\theta,T)$ and quote the limit theorem.
+If $\Theta$ is unbounded and Bayes risks blow up, conclude every estimator has infinite
+maximum risk.
+
+\smallskip
+\textbf{``Find the MP test'' (both hypotheses simple)}\\
+$\to$ Neyman--Pearson. Form $f_1/f_0$, find the shape of $\{\Lambda>k\}$, set the size,
+randomise if the distribution is discrete or if $\Lambda$ has ties.
+
+\smallskip
+\textbf{``Find the UMP test'' (one-sided)}\\
+$\to$ Establish MLR (exponential family with monotone $c(\theta)$, or a direct computation),
+then quote Karlin--Rubin and set the cutoff from the null distribution at the boundary
+$\theta_0$.
+
+\smallskip
+\textbf{``Find the UMP test'' (two-sided)}\\
+$\to$ Normally none exists; say why (the one-sided best tests point in opposite directions).
+\emph{Unless} the support moves with $\theta$, in which case rejecting on the
+impossible-under-$H_0$ region is free and a UMP test can exist.
+\end{recipebox}
+
+\vfill
+\begin{center}
+\small\itshape Sources: lecture notes 1--10 (29 Jul --- 28 Aug 2026) and Homeworks 1--3.\\
+Companion document: \texttt{PI\_Assignment\_Solutions.pdf} --- worked solutions to all 15 homework problems.
+\end{center}
+
+\end{document}

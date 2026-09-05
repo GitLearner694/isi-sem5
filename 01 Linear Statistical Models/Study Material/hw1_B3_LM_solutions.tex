@@ -1,0 +1,439 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{microtype}
+
+% ---------- operators / macros ----------
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Corr}{Corr}
+\newcommand{\Cs}{\mathcal{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bH}{\mathbf{H}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bbeta}{\bm{\beta}}
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\bmu}{\bm{\mu}}
+\newcommand{\bSig}{\bm{\Sigma}}
+\newcommand{\beps}{\bm{\varepsilon}}
+\newcommand{\beeta}{\bm{\eta}}
+\newcommand{\T}{^{\mathsf{T}}}
+\newcommand{\inv}{^{-1}}
+\newcommand{\Sxx}{S_{xx}}
+\newcommand{\bhat}[1]{\widehat{#1}}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{3em}
+
+\newcommand{\ans}{\medskip\noindent\textbf{Solution.}\ }
+
+\begin{document}
+
+\begin{center}
+	{\large\bfseries Linear Statistical Models --- Homework 1}\\[2pt]
+	{\normalsize B.Stat.\ 3rd year, Semester 1, 2026--27}\\[2pt]
+	{\small Solutions}
+\end{center}
+
+\hrule
+\medskip
+
+\noindent\textbf{References to lecture notes.}\;
+\textbf{[GM]} \emph{Gauss--Markov Framework for Linear Models};\;
+\textbf{[SLR]} \emph{Overview of Simple Linear Regression};\;
+\textbf{[PMI]} \emph{Projection and Matrix Inversion}.
+Equation/result numbers below refer to these notes. Any result not stated there is proved.
+
+\bigskip
+
+% =====================================================================
+\section*{Problem 1}
+
+Let $X\sim\N_n(\bmu,\bSig)$ and let $A$ be a symmetric $n\times n$ matrix.
+
+\medskip
+\noindent\emph{A standardisation used in (b),(c).}
+Since $\bSig$ is a covariance matrix it is symmetric positive semidefinite, so $\bSig=LL\T$ for some
+$n\times n$ matrix $L$. If $U\sim\N_n(\mathbf 0,\bI_n)$, the affine image $\bmu+LU$ is Gaussian with mean
+$\bmu$ and covariance $L\,\Var(U)\,L\T=LL\T=\bSig$; hence $\bmu+LU\sim\N_n(\bmu,\bSig)$. We may therefore
+take
+\[
+X=\bmu+LU,\qquad U\sim\N_n(\mathbf 0,\bI_n).
+\]
+For i.i.d.\ standard normal coordinates $U_1,\dots,U_n$ we use the elementary moments
+$\E U_i=0,\ \E U_i^2=1,\ \E U_i^3=0,\ \E U_i^4=3$ and independence, which give
+\begin{align}
+\E[U_iU_j]&=\delta_{ij}, \label{eq:m2}\\
+\E[U_iU_jU_k]&=0, \label{eq:m3}\\
+\E[U_iU_jU_kU_\ell]&=\delta_{ij}\delta_{k\ell}+\delta_{ik}\delta_{j\ell}+\delta_{i\ell}\delta_{jk}.
+\label{eq:m4}
+\end{align}
+Indeed \eqref{eq:m3} holds because at least one index is unpaired (its factor contributes $\E U_i=0$), and
+\eqref{eq:m4} is checked by cases: all four indices equal gives $\E U_i^4=3=1+1+1$; two distinct pairs gives
+$1$; otherwise an unpaired index gives $0$ --- exactly what the right-hand side returns.
+
+% ---------------------------------------------------------------
+\subsection*{(a) $\E(X\T AX)=\tr(A\bSig)+\bmu\T A\bmu$}
+
+This needs only $\E X=\bmu$ and $\Var(X)=\bSig$. From
+$\bSig=\E[(X-\bmu)(X-\bmu)\T]=\E[XX\T]-\bmu\bmu\T$ we get $\E[XX\T]=\bSig+\bmu\bmu\T$. Since $X\T AX$ is a
+scalar, $X\T AX=\tr(X\T AX)=\tr(AXX\T)$, and by linearity of $\tr$ and $\E$,
+\[
+\E(X\T AX)=\tr\!\big(A\,\E[XX\T]\big)=\tr\!\big(A(\bSig+\bmu\bmu\T)\big)
+=\tr(A\bSig)+\tr(\bmu\T A\bmu)=\tr(A\bSig)+\bmu\T A\bmu. \qquad\blacksquare
+\]
+
+% ---------------------------------------------------------------
+\subsection*{(b) $\Cov(X,X\T AX)=2\bSig A\bmu$}
+
+Write $X=\bmu+LU$. Using symmetry of $A$ ($\bmu\T A L U=U\T L\T A\bmu$, both scalars),
+\[
+X\T AX=\bmu\T A\bmu+2\bmu\T ALU+U\T\!\underbrace{L\T AL}_{=:B}\,U .
+\]
+The constant $\bmu\T A\bmu$ does not affect covariance, and $X-\E X=LU$, so
+\[
+\Cov(X,X\T AX)=\Cov\!\big(LU,\;2(L\T A\bmu)\T U\big)+\Cov\!\big(LU,\;U\T BU\big).
+\]
+With $v:=L\T A\bmu$, the first term is $2L\,\E[UU\T]\,v=2Lv=2LL\T A\bmu=2\bSig A\bmu$ by \eqref{eq:m2}.
+The $i$-th component of the second term is
+$\sum_{j,k}B_{jk}\,\E[U_iU_jU_k]=0$ by \eqref{eq:m3}. Hence
+$\Cov(X,X\T AX)=2\bSig A\bmu.$ \hfill$\blacksquare$
+
+% ---------------------------------------------------------------
+\subsection*{(c) $\Var(X\T AX)=2\tr\!\big((A\bSig)^2\big)+4\bmu\T A\bSig A\bmu$}
+
+From (b), $X\T AX=\text{const}+2v\T U+U\T BU$ with $v=L\T A\bmu$, $B=L\T AL$. Thus
+\[
+\Var(X\T AX)=4\Var(v\T U)+\Var(U\T BU)+4\Cov(v\T U,\;U\T BU).
+\]
+\emph{Linear part.} $\Var(v\T U)=v\T\Var(U)v=v\T v=\bmu\T A LL\T A\bmu=\bmu\T A\bSig A\bmu$, so
+$4\Var(v\T U)=4\bmu\T A\bSig A\bmu$.
+
+\emph{Cross term.} $\Cov(v\T U,U\T BU)=\sum_i v_i\sum_{j,k}B_{jk}\,\E[U_iU_jU_k]=0$ by \eqref{eq:m3}.
+
+\emph{Quadratic part.} $\E[U\T BU]=\sum_i B_{ii}=\tr B$, and by \eqref{eq:m4},
+\[
+\E\big[(U\T BU)^2\big]=\sum_{i,j,k,\ell}B_{ij}B_{k\ell}\,\E[U_iU_jU_kU_\ell]
+=(\tr B)^2+\sum_{i,j}B_{ij}^2+\sum_{i,j}B_{ij}B_{ji}
+=(\tr B)^2+2\tr(B^2),
+\]
+where the last equality uses $B\T=B$. Hence $\Var(U\T BU)=2\tr(B^2)$. Finally, since $LL\T=\bSig$,
+\[
+\tr(B^2)=\tr(L\T AL\,L\T AL)=\tr(A\,LL\T\!A\,LL\T)=\tr\!\big((A\bSig)^2\big).
+\]
+Collecting the three parts,
+\[
+\Var(X\T AX)=4\bmu\T A\bSig A\bmu+2\tr\!\big((A\bSig)^2\big). \qquad\blacksquare
+\]
+
+% =====================================================================
+\section*{Problem 2}
+
+$X\sim\N_n(\bmu,\bSig)$ with $\bSig$ positive definite; $A,B$ symmetric. \emph{Claim:} $X\T AX$ and $BX$
+are independent $\iff B\bSig A=\mathbf 0$.
+
+\ans
+Because $\bSig$ is positive definite we may write $\bSig=LL\T$ with $L$ \emph{invertible} (e.g.\ a Cholesky
+factor), and put $X=\bmu+LU$, $U\sim\N_n(\mathbf 0,\bI_n)$. Set
+\[
+M:=BL,\qquad P:=L\T AL\ (\text{symmetric}),\qquad a:=L\T A\bmu .
+\]
+Then $BX=B\bmu+MU$ and $X\T AX=c+2a\T U+U\T PU$ with $c=\bmu\T A\bmu$. Note
+\[
+MP=BL\,L\T AL=B\bSig A\,L,\qquad Ma=BL\,L\T A\bmu=B\bSig A\bmu,
+\]
+so, as $L$ is invertible, $MP=\mathbf 0\iff B\bSig A=\mathbf 0$, and this implies $Ma=B\bSig A\bmu=\mathbf 0$.
+
+\medskip
+\emph{Joint MGF.} For $z\sim\N_n(\mathbf 0,\bI_n)$ and any vector $b$ and symmetric $Q$ with $\bI-2Q$
+positive definite,
+\[
+\E\exp\!\big(b\T z+z\T Qz\big)
+=\int\frac{e^{-\frac12 z\T(\bI-2Q)z+b\T z}}{(2\pi)^{n/2}}\,dz
+=\det(\bI-2Q)^{-1/2}\exp\!\Big(\tfrac12 b\T(\bI-2Q)\inv b\Big),
+\]
+by completing the square. Apply this with $s\in\R^n$, $t\in\R$ small (so $\bI-2tP\succ0$): since
+$s\T BX+t\,X\T AX=(s\T B\bmu+tc)+(M\T s+2ta)\T U+t\,U\T PU$, writing $N:=(\bI-2tP)\inv$ and $b:=M\T s+2ta$,
+\[
+\varphi(s,t):=\E\,e^{\,s\T BX+t X\T AX}
+=e^{\,s\T B\bmu+tc}\,\det(\bI-2tP)^{-1/2}\exp\!\big(\tfrac12 b\T N b\big).
+\]
+The marginals are $\varphi(s,0)=e^{s\T B\bmu}\exp(\tfrac12 s\T MM\T s)$ and
+$\varphi(0,t)=e^{tc}\det(\bI-2tP)^{-1/2}\exp(2t^2 a\T N a)$. Since the MGF is finite on a neighbourhood of the
+origin, $BX$ and $X\T AX$ are independent \emph{iff} $\varphi(s,t)=\varphi(s,0)\varphi(0,t)$ there, i.e.\ iff
+$\tfrac12 b\T Nb=\tfrac12 s\T MM\T s+2t^2a\T Na$. Expanding $b\T Nb=s\T MNM\T s+4t\,s\T MNa+4t^2 a\T Na$ and
+cancelling $2t^2a\T Na$, the condition becomes
+\begin{equation*}
+\tfrac12\,s\T MNM\T s+2t\,s\T MNa=\tfrac12\,s\T MM\T s\qquad\text{for all }s\in\R^n,\ t\ \text{near }0.
+\tag{$\star$}
+\end{equation*}
+For fixed $t$, ($\star$) holds for all $s$ iff its quadratic and linear parts in $s$ match separately
+(replace $s\mapsto-s$), i.e.
+\[
+M N M\T=MM\T\quad\text{and}\quad MNa=\mathbf 0,\qquad N=(\bI-2tP)\inv .
+\]
+Using the convergent expansion $N=\sum_{k\ge0}(2t)^kP^k$ for small $t$:
+\[
+MNM\T-MM\T=\sum_{k\ge1}(2t)^k MP^kM\T=\mathbf 0\ \forall\,t
+\iff MP^kM\T=\mathbf0\ \forall k\ge1 .
+\]
+Taking $k=2$ gives $MP^2M\T=(MP)(MP)\T=\mathbf 0$, and $CC\T=\mathbf 0\Rightarrow C=\mathbf 0$ (its diagonal
+entries are squared row norms); hence $MP=\mathbf 0$. Conversely $MP=\mathbf 0$ gives $MP^kM\T=\mathbf0$ for
+all $k\ge1$ and $MN=M$, so also $MNa=Ma$. Thus ($\star$) holds for all $s,t$ iff
+\[
+MP=\mathbf 0\ \text{ and }\ Ma=\mathbf 0.
+\]
+Finally $MP=\mathbf0\iff B\bSig A=\mathbf0$, and $B\bSig A=\mathbf0$ already forces $Ma=B\bSig A\bmu=\mathbf0$.
+Therefore
+\[
+X\T AX\ \text{and}\ BX\ \text{are independent}\iff B\bSig A=\mathbf 0. \qquad\blacksquare
+\]
+
+\begin{remark}
+The ``if'' direction has a shorter argument: $B\bSig A=\mathbf0\Rightarrow A\bSig B=(B\bSig A)\T=\mathbf0$, so
+$\Cov(AX,BX)=A\bSig B\T=\mathbf0$; jointly normal and uncorrelated $\Rightarrow AX\perp BX$; and
+$X\T AX=(AX)\T A^{+}(AX)$ (using the Moore--Penrose inverse $A^{+}$, which exists by [PMI, Prop.~15], and
+$AA^{+}A=A$) is a function of $AX$, hence independent of $BX$. The MGF computation is needed for ``only if''.
+\end{remark}
+
+% =====================================================================
+\section*{Problem 3}
+
+Model $Y_i=\beta_0+\beta_1x_i+\varepsilon_i$, $\bx_i=(1,x_i)\T$, $\bX$ the $n\times2$ design with rows
+$\bx_i\T$, and $\bbeta=(\beta_0,\beta_1)\T$. Assume $\bX$ has full column rank, so $\bX\T\bX$ is nonsingular
+and $\bhat{\bbeta}^{(n)}=(\bX\T\bX)\inv\bX\T\bY$ \;[GM, full-rank LSE]. Write $G:=(\bX\T\bX)\inv$
+and $\bu:=\bx_{n+1}$.
+
+\medskip
+\noindent\emph{A rank-one inverse update (Sherman--Morrison).} For nonsingular $M$ and a vector $\bu$ with
+$1+\bu\T M\inv\bu\ne0$,
+\begin{equation*}
+(M+\bu\bu\T)\inv=M\inv-\frac{M\inv\bu\bu\T M\inv}{1+\bu\T M\inv\bu}.
+\tag{SM}
+\end{equation*}
+\emph{Proof:} multiply the right-hand side by $(M+\bu\bu\T)$ and let $\gamma:=1+\bu\T M\inv\bu$:
+\begin{align*}
+&(M+\bu\bu\T)\Big(M\inv-\tfrac{1}{\gamma}M\inv\bu\bu\T M\inv\Big)\\
+&\qquad=\bI+\bu\bu\T M\inv-\tfrac1\gamma\bu\bu\T M\inv-\tfrac1\gamma\bu(\bu\T M\inv\bu)\bu\T M\inv\\
+&\qquad=\bI+\bu\bu\T M\inv\Big(1-\tfrac{\gamma}{\gamma}\Big)=\bI. \quad\checkmark
+\end{align*}
+Here $M=\bX\T\bX$ is positive definite, so $\bu\T G\bu\ge0$ and $\gamma=1+\bu\T G\bu\ge1>0$; thus
+$c_{n+1}=(1+\bx_{n+1}\T G\,\bx_{n+1})\inv\in(0,1]$ is well defined.
+
+% ---------------------------------------------------------------
+\subsection*{(a)}
+
+Adding $(x_{n+1},Y_{n+1})$ stacks one row $\bx_{n+1}\T$ on $\bX$ and one entry $Y_{n+1}$ on $\bY$, so
+\[
+\bX_{n+1}\T\bX_{n+1}=\bX\T\bX+\bu\bu\T,\qquad
+\bX_{n+1}\T\bY_{(n+1)}=\bX\T\bY+\bu\,Y_{n+1}.
+\]
+By (SM) with $M=\bX\T\bX$, and writing $c:=c_{n+1}$,
+$(\bX_{n+1}\T\bX_{n+1})\inv=G-c\,G\bu\bu\T G$. Hence
+\[
+\bhat{\bbeta}^{(n+1)}=(G-c\,G\bu\bu\T G)(\bX\T\bY+\bu Y_{n+1})
+=\bhat{\bbeta}^{(n)}+G\bu\,Y_{n+1}-c\,G\bu\,\bu\T\bhat{\bbeta}^{(n)}-c\,G\bu(\bu\T G\bu)Y_{n+1},
+\]
+using $G\bX\T\bY=\bhat{\bbeta}^{(n)}$ and $\bu\T G\bX\T\bY=\bu\T\bhat{\bbeta}^{(n)}$. Now
+$\bu\T\bhat{\bbeta}^{(n)}=\bx_{n+1}\T\bhat{\bbeta}^{(n)}=\bhat Y^{(n)}_{n+1}$ (the value predicted for
+$Y_{n+1}$ from the first $n$ observations --- this is the BLUE of
+$\E Y_{n+1}=\bx_{n+1}\T\bbeta$, [GM, Thm~1]), and $c(\bu\T G\bu)=c(\tfrac1c-1)=1-c$. Factoring out $G\bu$,
+\[
+\bhat{\bbeta}^{(n+1)}-\bhat{\bbeta}^{(n)}
+=G\bu\Big[\,Y_{n+1}\big(1-c\,\bu\T G\bu\big)-c\,\bhat Y^{(n)}_{n+1}\Big]
+=G\bu\Big[c\,Y_{n+1}-c\,\bhat Y^{(n)}_{n+1}\Big],
+\]
+because $1-c\,\bu\T G\bu=1-(1-c)=c$. Therefore
+\[
+\boxed{\ \bhat{\bbeta}^{(n+1)}-\bhat{\bbeta}^{(n)}
+=c_{n+1}\big(Y_{n+1}-\bhat Y^{(n)}_{n+1}\big)(\bX\T\bX)\inv\bx_{n+1}.\ } \qquad\blacksquare
+\]
+
+% ---------------------------------------------------------------
+\subsection*{(b)}
+
+Left-multiply the boxed identity by $\bx_{n+1}\T=\bu\T$. Since
+$\bhat Y^{(n+1)}_{n+1}=\bx_{n+1}\T\bhat{\bbeta}^{(n+1)}$ and $\bhat Y^{(n)}_{n+1}=\bu\T\bhat{\bbeta}^{(n)}$,
+\[
+\bhat Y^{(n+1)}_{n+1}-\bhat Y^{(n)}_{n+1}
+=c_{n+1}\big(Y_{n+1}-\bhat Y^{(n)}_{n+1}\big)\,\bu\T G\bu .
+\]
+Subtract both sides from $Y_{n+1}-\bhat Y^{(n)}_{n+1}$ and use $1-c_{n+1}\,\bu\T G\bu=c_{n+1}$:
+\[
+Y_{n+1}-\bhat Y^{(n+1)}_{n+1}
+=\big(Y_{n+1}-\bhat Y^{(n)}_{n+1}\big)\big(1-c_{n+1}\bu\T G\bu\big)
+=c_{n+1}\big(Y_{n+1}-\bhat Y^{(n)}_{n+1}\big).
+\]
+Dividing by $c_{n+1}\in(0,1]$,
+\[
+Y_{n+1}-\bhat Y^{(n)}_{n+1}=\frac{Y_{n+1}-\bhat Y^{(n+1)}_{n+1}}{c_{n+1}}. \qquad\blacksquare
+\]
+
+% =====================================================================
+\section*{Problem 4}
+
+Normal simple linear regression, $\varepsilon_i\overset{\text{iid}}{\sim}\N(0,\sigma^2)$; test
+$H_0:\beta_1=0$ vs $H_1:\beta_1\ne0$. Put $\Sxx:=\sum_i(x_i-\bar x)^2$.
+
+\begin{remark}
+With two parameters $(\beta_0,\beta_1)$ the residual degrees of freedom are $n-2$. The correct statement ---
+matching [SLR, eq.~(12)] and part (b) below --- is $T\sim t_{n-2}$; the ``$t_{(n-1)}$'' in the problem is a
+typo for $t_{(n-2)}$. We prove $T\sim t_{n-2}$ under $H_0$.
+\end{remark}
+
+% ---------------------------------------------------------------
+\subsection*{(a) $T=\bhat\beta_1/s(\bhat\beta_1)\sim t_{n-2}$ under $H_0$}
+
+Write $\bhat\beta_1=\sum_i c_iY_i$ with $c_i=(x_i-\bar x)/\Sxx$ \;[SLR, eq.~(4)]. Then
+$\sum_i c_i=0$ and $\sum_i c_ix_i=\sum_i(x_i-\bar x)x_i/\Sxx=1$, so
+$\E\bhat\beta_1=\sum_i c_i(\beta_0+\beta_1x_i)=\beta_1$ and
+$\Var(\bhat\beta_1)=\sigma^2\sum_i c_i^2=\sigma^2/\Sxx$ \;[SLR, eq.~(7)]. Being a linear combination of
+independent normals, $\bhat\beta_1$ is normal:
+\[
+\bhat\beta_1\sim\N\!\Big(\beta_1,\ \tfrac{\sigma^2}{\Sxx}\Big),
+\qquad\text{so under }H_0:\ \ Z:=\frac{\bhat\beta_1\sqrt{\Sxx}}{\sigma}\sim\N(0,1).
+\]
+By [SLR, eq.~(12)], $\mathrm{SSE}\sim\sigma^2\chi^2_{n-2}$ and $\mathrm{SSE}$ is independent of $\bhat\beta_1$;
+write $W:=\mathrm{SSE}/\sigma^2\sim\chi^2_{n-2}$, independent of $Z$. Since $s^2(\bhat\beta_1)=\mathrm{MSE}/\Sxx$
+with $\mathrm{MSE}=\mathrm{SSE}/(n-2)$ \;[SLR, eq.~(8)],
+\[
+T=\frac{\bhat\beta_1}{s(\bhat\beta_1)}
+=\frac{\bhat\beta_1\sqrt{\Sxx}}{\sqrt{\mathrm{MSE}}}
+=\frac{\bhat\beta_1\sqrt{\Sxx}/\sigma}{\sqrt{\mathrm{SSE}/\big((n-2)\sigma^2\big)}}
+=\frac{Z}{\sqrt{W/(n-2)}}.
+\]
+A ratio $Z/\sqrt{W/k}$ with $Z\sim\N(0,1)\perp W\sim\chi^2_k$ is, by definition, $t_k$. Hence under $H_0$,
+$T\sim t_{n-2}$. \hfill$\blacksquare$
+
+% ---------------------------------------------------------------
+\subsection*{(b) $F=\mathrm{MSR}/\mathrm{MSE}=T^2$}
+
+The ANOVA decomposition $\mathrm{SSTO}=\mathrm{SSR}+\mathrm{SSE}$ has $\mathrm{d.f.}(\mathrm{SSR})=1$ with
+$\mathrm{SSR}=\bhat\beta_1^{\,2}\,\Sxx$ \;[SLR, ANOVA]. Thus
+$\mathrm{MSR}=\mathrm{SSR}/1=\bhat\beta_1^{\,2}\,\Sxx$ and, since $s^2(\bhat\beta_1)=\mathrm{MSE}/\Sxx$,
+\[
+F=\frac{\mathrm{MSR}}{\mathrm{MSE}}=\frac{\bhat\beta_1^{\,2}\,\Sxx}{\mathrm{MSE}}
+=\frac{\bhat\beta_1^{\,2}}{\mathrm{MSE}/\Sxx}
+=\frac{\bhat\beta_1^{\,2}}{s^2(\bhat\beta_1)}
+=\Big(\frac{\bhat\beta_1}{s(\bhat\beta_1)}\Big)^{2}=T^2. \qquad\blacksquare
+\]
+
+% ---------------------------------------------------------------
+\subsection*{(c) The two tests always agree}
+
+If $T\sim t_{n-2}$ then $T^2=Z^2/(W/(n-2))$ with $Z^2\sim\chi^2_1\perp W\sim\chi^2_{n-2}$, so
+$T^2\sim F_{1,n-2}$ (consistent with (b)). For the level-$\alpha$ tests:
+\[
+\text{$t$-test rejects}\iff |T|>t_{n-2}(1-\tfrac\alpha2),\qquad
+\text{$F$-test rejects}\iff F=T^2>F_{1,n-2}(1-\alpha).
+\]
+Let $c:=t_{n-2}(1-\tfrac\alpha2)$. Then
+\[
+\Pr\big(F_{1,n-2}>c^2\big)=\Pr(T^2>c^2)=\Pr(|T|>c)
+=\Pr(T>c)+\Pr(T<-c)=\tfrac\alpha2+\tfrac\alpha2=\alpha,
+\]
+so $c^2$ is exactly the upper-$\alpha$ point of $F_{1,n-2}$, i.e.\ $F_{1,n-2}(1-\alpha)=c^2$. Consequently
+\[
+|T|>c\iff T^2>c^2\iff F>F_{1,n-2}(1-\alpha),
+\]
+so for every data set and every $\alpha$ the two rejection regions coincide; the tests reach identical
+conclusions. \hfill$\blacksquare$
+
+% =====================================================================
+\section*{Problem 5}
+
+$\bH=\bX(\bX\T\bX)\inv\bX\T$ with rows $\bx_i\T=(1,x_i)$; $h_{ii}=\bx_i\T(\bX\T\bX)\inv\bx_i$ is the $i$-th
+diagonal of $\bH$. Let $\bhat Y_i=\bx_i\T\bhat{\bbeta}$ (full-data fit) and $\bhat Y_i^{(-i)}$ the fit at
+$x_i$ from the regression that omits observation $i$. \emph{Claim:}
+$Y_i-\bhat Y_i^{(-i)}=(Y_i-\bhat Y_i)/(1-h_{ii})$.
+
+\ans
+Apply Problem 3 with the roles reversed: take the ``base'' data set to be the $n-1$ observations
+$\{(x_j,Y_j)\}_{j\ne i}$ (design $\bX_{(-i)}$, assumed full rank) and let observation $i$ play the role of the
+``$(n{+}1)$-th'' added point. In Problem 3's notation this identifies
+\[
+\bhat{\bbeta}^{(n)}\!\to\bhat{\bbeta}^{(-i)},\quad
+\bhat{\bbeta}^{(n+1)}\!\to\bhat{\bbeta},\quad
+\bhat Y^{(n)}_{n+1}\!\to\bhat Y_i^{(-i)},\quad
+\bhat Y^{(n+1)}_{n+1}\!\to\bhat Y_i,\quad
+c_{n+1}\!\to c:=\big(1+\bx_i\T M\inv\bx_i\big)\inv,
+\]
+where $M:=\bX_{(-i)}\T\bX_{(-i)}$. Problem 3(b) then reads
+\begin{equation*}
+Y_i-\bhat Y_i^{(-i)}=\frac{Y_i-\bhat Y_i}{c}.
+\tag{5.1}
+\end{equation*}
+It remains to show $c=1-h_{ii}$. Deleting row $i$ gives $\bX\T\bX=M+\bx_i\bx_i\T$, so with
+$g:=\bx_i\T M\inv\bx_i$ and (SM) from Problem 3,
+\[
+h_{ii}=\bx_i\T(\bX\T\bX)\inv\bx_i
+=\bx_i\T M\inv\bx_i-\frac{(\bx_i\T M\inv\bx_i)^2}{1+\bx_i\T M\inv\bx_i}
+=g-\frac{g^2}{1+g}=\frac{g}{1+g}.
+\]
+Therefore $1-h_{ii}=\dfrac{1}{1+g}=\big(1+\bx_i\T M\inv\bx_i\big)\inv=c$. Substituting into (5.1),
+\[
+Y_i-\bhat Y_i^{(-i)}=\frac{Y_i-\bhat Y_i}{1-h_{ii}},\qquad i=1,\dots,n. \qquad\blacksquare
+\]
+
+% =====================================================================
+\section*{Problem 6}
+
+$\mathcal M_1:\bY=\bX\bbeta+\beps$ and $\mathcal M_2:\bY=\bZ\btheta+\beeta$, both with mean-zero errors of
+covariance $\sigma^2\bI$, $\bZ$ of full column rank. Being a \emph{reparametrisation} means the two models
+describe the same mean vector, i.e.\ $\{\bX\bbeta\}=\{\bZ\btheta\}$, so the model spaces coincide:
+$\Cs(\bX)=\Cs(\bZ)=:\mathcal M$.
+
+\ans
+\emph{BLUE of $\bX\bbeta$.} Each component $(\bX\bbeta)_i=\bx_i\T\bbeta$ has coefficient vector $\bx_i$ (the
+$i$-th row of $\bX$) lying in $\Cs(\bX\T)=\mathcal R(\bX)$, hence is estimable [GM, Lemma~1]; by the
+Gauss--Markov theorem [GM, Thm~1] its BLUE is the corresponding component of the (unique) fitted vector
+\[
+\widehat{\bX\bbeta}=\bP_{\!\mathcal M}\,\bY,
+\]
+the orthogonal projection of $\bY$ onto $\mathcal M=\Cs(\bX)$ [GM, eq.~(2)]. The orthogonal projector onto a
+subspace is unique [PMI, Prop.~4], so it is the same whether computed from $\bX$ or $\bZ$:
+$\bP_{\!\mathcal M}=\bX(\bX\T\bX)\inv\bX\T=\bZ(\bZ\T\bZ)\inv\bZ\T$ (the latter valid since $\bZ$ has full
+column rank, [PMI, Prop.~5]).
+
+\emph{BLUE of $\btheta$.} As $\bZ$ has full column rank, every $\btheta_j=\mathbf e_j\T\btheta$ is estimable
+and, by the Gauss--Markov theorem, the BLUE of $\btheta$ is the least-squares estimator under $\mathcal M_2$,
+\[
+\bhat\btheta=(\bZ\T\bZ)\inv\bZ\T\bY .
+\]
+Moreover $\bZ\bhat\btheta=\bZ(\bZ\T\bZ)\inv\bZ\T\bY=\bP_{\!\mathcal M}\bY$.
+
+\emph{The two BLUEs in terms of each other.} Combining the displays,
+\[
+\boxed{\ \widehat{\bX\bbeta}=\bP_{\!\mathcal M}\bY=\bZ\bhat\btheta\ }
+\qquad\text{and}\qquad
+\boxed{\ \bhat\btheta=(\bZ\T\bZ)\inv\bZ\T\,\widehat{\bX\bbeta}.\ }
+\]
+The second identity is consistent since, using $\bP_{\!\mathcal M}\bY=\bZ\bhat\btheta$,
+\begin{align*}
+(\bZ\T\bZ)\inv\bZ\T\bP_{\!\mathcal M}\bY
+&=(\bZ\T\bZ)\inv\bZ\T\bZ(\bZ\T\bZ)\inv\bZ\T\bY\\
+&=(\bZ\T\bZ)\inv\bZ\T\bY=\bhat\btheta.
+\end{align*}
+Thus the BLUE of $\bX\bbeta$ is $\bZ$ times the
+BLUE of $\btheta$, and the BLUE of $\btheta$ is recovered from that of $\bX\bbeta$ by the left inverse
+$(\bZ\T\bZ)\inv\bZ\T$ of $\bZ$. \hfill$\blacksquare$
+
+\end{document}
