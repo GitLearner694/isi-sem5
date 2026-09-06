@@ -1,0 +1,718 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small UMP, MLR \& Consistency --- Crash Course}
+\rhead{\small Parametric Inference, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\pto}{\overset{p}{\longrightarrow}}
+\newcommand{\dto}{\overset{d}{\longrightarrow}}
+\newcommand{\I}{\mathbb{I}}
+
+\newtcolorbox{idea}[1]{colback=Blue!4,colframe=Blue!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{confusion}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={Common confusion: #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{recipe}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Testing: MP, MLR and UMP}\\[2pt]
+{\large\bfseries --- and Consistency}\\[5pt]
+{\large A Crash Course from First Principles}\\[5pt]
+{\small Parametric Inference, B.Stat.\ 3rd Year --- Lectures 6, 9, 10}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\noindent
+Companion to \texttt{PI\_Bayes\_Crash\_Course.pdf}, same style: motivation first, then
+machinery, with numbers you can check. Sections 1--7 are testing; Section 8 is consistency,
+which is a separate topic that happens to sit in the same corner of the syllabus.
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The problem, and the asymmetry that defines it}
+
+You must decide between $H_0:\theta\in\Theta_0$ and $H_A:\theta\in\Theta_A$. Two things can
+go wrong:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \textbf{$H_0$ true} & \textbf{$H_A$ true} \\
+\midrule
+Accept $H_0$ & correct & \textbf{Type II error} \\
+Reject $H_0$ & \textbf{Type I error} & correct (this is \emph{power}) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+You would like both error probabilities to be small. \textbf{You cannot have that.} Shrinking
+the rejection region reduces Type I error and increases Type II; growing it does the reverse.
+The two are in direct conflict, and there is no way to minimise both --- exactly the same
+structural problem as ``no uniformly best estimator'' from Lecture 1.
+
+\begin{idea}{The Neyman--Pearson resolution --- treat the two errors asymmetrically}
+\begin{enumerate}
+\item \textbf{Cap} the Type I error at a level you choose: $\Prob_{\theta}(\text{reject})\le\alpha$
+for all $\theta\in\Theta_0$.
+\item Subject to that cap, \textbf{maximise the power} $\Prob_\theta(\text{reject})$ for
+$\theta\in\Theta_A$.
+\end{enumerate}
+This is a constrained optimisation, and it is well posed. Everything in Lectures 6 and 9 is
+solving it in increasing generality.
+\end{idea}
+
+Why the asymmetry? Because $H_0$ is the default --- the claim you will only abandon on strong
+evidence. Rejecting a true $H_0$ is the error you have decided to control; failing to detect a
+true $H_A$ is the one you merely try to minimise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{What a test actually is}
+
+\begin{idea}{Definitions --- learn these exactly, they are free marks}
+A \textbf{test function} is any map
+\[
+\phi:\mathcal X\to[0,1],\qquad
+\phi(x)=\Prob\big(\text{reject }H_0\ \big|\ X=x\big).
+\]
+Its \textbf{power function} is $\beta_\phi(\theta)=\E_\theta\,\phi(X)$. Then
+\begin{itemize}
+\item \textbf{size} $=\displaystyle\sup_{\theta\in\Theta_0}\beta_\phi(\theta)$
+\quad(the worst Type I error across the null);
+\item $\phi$ has \textbf{level} $\alpha$ if its size is $\le\alpha$;
+\item for $\theta\in\Theta_0$, $\beta_\phi(\theta)$ \emph{is} the Type I error at $\theta$;
+\item for $\theta\in\Theta_A$, $1-\beta_\phi(\theta)$ is the Type II error at $\theta$.
+\end{itemize}
+Note $\beta_\phi$ is \emph{one} function; whether its value is called ``error'' or ``power''
+depends only on which side $\theta$ is on.
+\end{idea}
+
+\begin{confusion}{``Why is $\phi$ allowed to take values strictly between 0 and 1?''}
+Because with \textbf{discrete} data you often cannot hit size $\alpha$ exactly otherwise.
+
+Example: $X\sim\mathrm{Bin}(10,\tfrac12)$ under $H_0$, and you want $\alpha=0.05$. Rejecting
+$\{X\ge9\}$ gives size $0.0107$; rejecting $\{X\ge8\}$ gives $0.0547$. Nothing gives $0.05$.
+Non-randomised tests can only achieve the countably many sizes their rejection regions happen
+to have.
+
+The fix: on the boundary, reject with probability $\gamma$. Set
+$\phi=1$ on $\{X\ge9\}$, $\phi=\gamma$ on $\{X=8\}$, $\phi=0$ below, with
+\[
+0.0107+\gamma\cdot\Prob(X=8)=0.05\ \Longrightarrow\ \gamma=\frac{0.05-0.0107}{0.0439}=0.893 .
+\]
+Now the size is exactly $0.05$. In practice nobody flips a coin to decide a scientific
+question --- randomisation is a theoretical device that makes the optimality theorems clean.
+But in an exam, \textbf{if the null distribution is discrete you must randomise}, or you have
+not answered the question.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Neyman--Pearson: the budget picture}
+
+Start with the simplest case: both hypotheses \textbf{simple},
+\[
+H_0: X\sim f_0 \qquad\text{against}\qquad H_A: X\sim f_1 .
+\]
+
+Here is the way to think about it that makes the lemma obvious rather than magical.
+
+\begin{idea}{Testing as a shopping problem}
+You are choosing a rejection region $R$. Think of each point $x$ as an item in a shop:
+\begin{itemize}
+\item \textbf{Putting $x$ into $R$ costs you} $f_0(x)$ --- that is how much Type I error it
+consumes.
+\item \textbf{Putting $x$ into $R$ buys you} $f_1(x)$ --- that is how much power it adds.
+\end{itemize}
+Your total budget is $\alpha$: you need $\int_R f_0\le\alpha$. You want to maximise
+$\int_R f_1$.
+
+So the ``value for money'' of the point $x$ is
+\[
+\Lambda(x)=\frac{f_1(x)}{f_0(x)}\qquad\text{(power bought per unit of budget spent).}
+\]
+\textbf{Obviously you should buy the best-value items first.} Sort the sample space by
+$\Lambda$ decreasing, and fill the region greedily until the budget runs out. That is the
+whole Neyman--Pearson lemma.
+\end{idea}
+
+This single picture explains every feature of the formal statement:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}p{6.2cm}p{9.3cm}@{}}
+\toprule
+\textbf{Feature of the NP lemma} & \textbf{Why, in the shopping picture} \\
+\midrule
+The region has the form $\{\Lambda>k\}$ & You buy everything above some value-for-money
+threshold; $k$ is where the budget ran out. \\
+Randomise on $\{\Lambda=k\}$ & The last item is only partially affordable, so you buy a
+fraction $\gamma$ of it. \\
+Ties in $\Lambda$ don't matter & Items of equal value-for-money are interchangeable: any
+split of the remaining budget across them gives the same power. \\
+If $f_1>0$ where $f_0=0$, always reject & Those items are \textbf{free} --- zero cost, positive
+gain. Take them before spending a rupee. ($\Lambda=+\infty$ there.) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}{Neyman--Pearson lemma (the formal statement)}
+Fix $\alpha\in(0,1)$. There exist $k\ge0$ and $\gamma\in[0,1]$ such that
+\[
+\phi^*(x)=\begin{cases}
+1, & f_1(x)>k\,f_0(x),\\
+\gamma, & f_1(x)=k\,f_0(x),\\
+0, & f_1(x)<k\,f_0(x),
+\end{cases}
+\qquad\text{with}\quad \E_0\phi^*=\alpha .
+\]
+\textbf{(Sufficiency)} Any such $\phi^*$ is most powerful of its size.
+\textbf{(Necessity)} Any MP level-$\alpha$ test agrees with this form a.e.\ off $\{f_1=kf_0\}$.
+\end{idea}
+
+\textbf{Proof of sufficiency} (three lines; know it). Let $\phi$ be any test with
+$\E_0\phi\le\E_0\phi^*$. On $\{f_1>kf_0\}$ we have $\phi^*=1\ge\phi$; on $\{f_1<kf_0\}$ we have
+$\phi^*=0\le\phi$; on $\{f_1=kf_0\}$ the second factor is zero. So in every case
+$(\phi^*-\phi)(f_1-kf_0)\ge0$. Integrate:
+\[
+0\le\int(\phi^*-\phi)(f_1-kf_0)=\big(\E_1\phi^*-\E_1\phi\big)-k\big(\E_0\phi^*-\E_0\phi\big)
+\le\E_1\phi^*-\E_1\phi ,
+\]
+since $k\ge0$ and $\E_0\phi^*-\E_0\phi\ge0$. Hence $\E_1\phi^*\ge\E_1\phi$. $\square$
+
+\subsection{A worked example where the greedy fill is visible}
+
+$H_0: p_0(x)=(\tfrac12)^{x+1}$ (geometric) against $H_A: p_1(x)=e^{-1}/x!$ (Poisson(1)),
+$x=0,1,2,\dots$ Then
+\[
+\Lambda(x)=\frac{e^{-1}/x!}{2^{-(x+1)}}=\frac2e\cdot\frac{2^{x}}{x!} .
+\]
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+$x$ & 0 & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+$\Lambda(x)$ (value for money) & $0.736$ & $\mathbf{1.472}$ & $\mathbf{1.472}$ & $0.981$ & $0.491$ & $0.196$ \\
+$p_0(x)$ (cost) & $0.500$ & $0.250$ & $0.125$ & $0.0625$ & $0.03125$ & $0.0156$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Sort by $\Lambda$ descending and fill:
+\[
+\underbrace{\{1,2\}}_{\text{cost }0.375}\ \succ\
+\underbrace{\{3\}}_{\text{cumulative }0.4375}\ \succ\
+\underbrace{\{0\}}_{\text{cumulative }0.9375}\ \succ\ \{4\}\ \succ\cdots
+\]
+So for $\alpha=0.05$ the budget runs out inside the very first group: reject with probability
+$\gamma=0.05/0.375=0.1333$ when $X\in\{1,2\}$, never otherwise. Power
+$=0.1333\times(0.368+0.184)=0.0736$.
+
+\begin{confusion}{``Isn't the rejection region always a tail?''}
+\textbf{No}, and this example shows why: $x=0$ ranks \emph{below} $x=3$. For
+$\alpha$ between $0.4375$ and $0.9375$ the region is $\{0,1,2,3\}$ --- both ends, nothing in
+between excluded by accident.
+
+The region is one-sided in $\Lambda$, \emph{never necessarily one-sided in $x$}. Always
+compute $\Lambda$ and look at its shape before declaring a region. A second example: for
+Laplace ($H_0$) versus $N(0,1)$ ($H_A$), $\Lambda\propto e^{|x|-x^2/2}$ peaks at $|x|=1$ and
+falls away in both directions, so the MP region is an \emph{annulus} $a<|X|<2-a$. Rejecting in
+the tails --- the instinctive answer --- is exactly wrong there, because the normal has
+\emph{lighter} tails than the Laplace.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{From MP to UMP: the actual difficulty}
+
+Neyman--Pearson solves \emph{simple vs simple} completely. But real hypotheses are composite:
+$H_0:\theta\le\theta_0$ against $H_A:\theta>\theta_0$. What now?
+
+\begin{idea}{The key manoeuvre}
+Pick \emph{one} alternative $\theta_1>\theta_0$ and pretend the problem is simple:
+$H_0:\theta=\theta_0$ vs $H_A:\theta=\theta_1$. NP gives you the MP test --- call it
+$\phi_{\theta_1}$.
+
+Now do this for every $\theta_1>\theta_0$. You get a whole family of tests. Two cases:
+\begin{itemize}
+\item \textbf{The tests all turn out to be the same.} Then that single test is most powerful
+against \emph{every} alternative simultaneously. It is \textbf{UMP}.
+\item \textbf{The tests differ.} Then no single test can be best against all of them, and
+\textbf{no UMP test exists}.
+\end{itemize}
+So the entire question ``does a UMP test exist?'' reduces to:
+\textbf{does the MP test depend on $\theta_1$?}
+\end{idea}
+
+Where could the dependence on $\theta_1$ creep in? Two places: the \emph{shape} of
+$\{\Lambda_{\theta_0,\theta_1}>k\}$, and the \emph{cutoff} $k$. MLR is precisely the condition
+that kills both.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{MLR: the condition that makes UMP possible}
+
+\begin{idea}{Definition}
+The family $\{f_\theta:\theta\in(a,b)\}$ has \textbf{monotone likelihood ratio} in the
+statistic $T(x)$ if, for \textbf{every} pair $\theta_0<\theta_1$,
+\[
+\frac{f_{\theta_1}(x)}{f_{\theta_0}(x)}\ \text{ is a non-decreasing function of } T(x).
+\]
+Two things to stress, because both are missed:
+\begin{itemize}
+\item It is monotone \textbf{in $T(x)$}, not in $x$.
+\item It must be \textbf{the same $T$} for every pair $(\theta_0,\theta_1)$.
+\end{itemize}
+\end{idea}
+
+\begin{idea}{Why MLR is exactly the right condition --- the punchline}
+Suppose the family has MLR in $T$. Fix any $\theta_1>\theta_0$. By NP, the MP test rejects
+when $\Lambda_{\theta_0,\theta_1}(x)$ is large; by MLR, ``$\Lambda$ large'' $\equiv$
+``$T(x)$ large''. So the region is
+\[
+\{T(x)>c\}\qquad\text{--- the \emph{shape} does not involve }\theta_1 .
+\]
+And $c$ is fixed by the size equation $\Prob_{\theta_0}(T>c)=\alpha$, which involves only the
+\emph{null} distribution --- so the \emph{cutoff} does not involve $\theta_1$ either.
+
+\textbf{Therefore the same test is MP against every $\theta_1>\theta_0$: it is UMP.}
+That sentence is the whole theory, and it is what to write in an exam.
+\end{idea}
+
+\begin{idea}{Exponential families have MLR --- one line}
+If $f(x\mid\theta)=p(\theta)h(x)e^{c(\theta)T(x)}$ then
+\[
+\frac{f_{\theta_1}(x)}{f_{\theta_0}(x)}=\frac{p(\theta_1)}{p(\theta_0)}\,
+\exp\big\{[c(\theta_1)-c(\theta_0)]\,T(x)\big\},
+\]
+which is increasing in $T(x)$ whenever $c(\theta_1)\ge c(\theta_0)$. So:
+\textbf{any one-parameter exponential family with $c$ non-decreasing has MLR in $T$.}
+That covers almost everything in the course.
+\end{idea}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Family & $T(x)$ & $c(\theta)$ & MLR? \\
+\midrule
+$\mathrm{Bin}(n,\theta)$ & $x$ & $\log\frac{\theta}{1-\theta}$, increasing & yes, in $x$ \\
+$\mathrm{Poi}(\theta)$, $n$ obs & $\sum x_i$ & $\log\theta$, increasing & yes \\
+$\mathrm{Exp}(\text{mean }\theta)$, $n$ obs & $\sum x_i$ & $-1/\theta$, increasing & yes \\
+$N(\theta,1)$, $n$ obs & $\Xbar$ & $\theta$, increasing & yes \\
+$N(0,\sigma^2)$ & $x^2$ & $-\frac{1}{2\sigma^2}$, increasing & yes, in $x^2$ \\
+$U[0,\theta]$ & $x_{(n)}$ & --- (not exp.\ family) & yes, directly \\
+$\mathrm{Cauchy}(\theta)$ & --- & --- (not exp.\ family) & \textbf{no} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{confusion}{``Why does the Cauchy fail?''}
+$\dfrac{f_{\theta_1}(x)}{f_{\theta_0}(x)}=\dfrac{1+(x-\theta_0)^2}{1+(x-\theta_1)^2}$, a ratio
+of two quadratics. As $x\to+\infty$ it tends to $1$, and as $x\to-\infty$ it also tends to $1$.
+A function that starts at $1$, moves away, and comes back to $1$ \textbf{cannot be monotone}.
+
+So for the Cauchy the MP test genuinely changes as $\theta_1$ moves, and no UMP test exists.
+This is the same non-exponential-family pathology that already cost you completeness (the order
+statistic is sufficient but not complete) and a closed-form MLE. \emph{One structural fact,
+three consequences} --- a good thing to be able to say.
+\end{confusion}
+
+\begin{confusion}{``$U[0,\theta]$ isn't an exponential family, so how can it have MLR?''}
+MLR is a property in its own right; exponential families are just the easiest way to
+\emph{verify} it. Check $U[0,\theta]$ directly. For $\theta_0<\theta_1$,
+\[
+\frac{f_{\theta_1}(\mathbf x)}{f_{\theta_0}(\mathbf x)}
+=\Big(\frac{\theta_0}{\theta_1}\Big)^{n}\frac{\I[x_{(n)}\le\theta_1]}{\I[x_{(n)}\le\theta_0]}
+=\begin{cases}
+(\theta_0/\theta_1)^n, & x_{(n)}\le\theta_0,\\
++\infty, & \theta_0<x_{(n)}\le\theta_1 .
+\end{cases}
+\]
+As a function of $x_{(n)}$ this is constant and then jumps to $+\infty$: non-decreasing.
+So MLR holds in $X_{(n)}$, in the extended sense that allows the value $+\infty$.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Karlin--Rubin, and how to use it}
+
+\begin{idea}{Karlin--Rubin theorem}
+Suppose $\{f_\theta\}$ has MLR in $T$. For $H_0:\theta\le\theta_0$ against
+$H_A:\theta>\theta_0$, the test
+\[
+\phi^*(x)=\begin{cases}1,&T(x)>c,\\ \gamma,&T(x)=c,\\ 0,&T(x)<c,\end{cases}
+\qquad\text{with }\E_{\theta_0}\phi^*=\alpha,
+\]
+is \textbf{UMP of level $\alpha$}. Moreover its power function $\beta_{\phi^*}(\theta)$ is
+non-decreasing in $\theta$.
+\end{idea}
+
+The monotone power function is what upgrades the \emph{simple} null $\theta=\theta_0$ to the
+\emph{composite} null $\theta\le\theta_0$ for free:
+\[
+\sup_{\theta\le\theta_0}\beta_{\phi^*}(\theta)=\beta_{\phi^*}(\theta_0)=\alpha ,
+\]
+so the size over the whole null is still exactly $\alpha$. \textbf{Always say this sentence} ---
+it is usually worth a mark on its own.
+
+\begin{recipe}{The four-step UMP drill}
+\begin{enumerate}
+\item \textbf{Establish MLR.} Write the family in exponential form, identify $T$ and $c(\theta)$,
+check $c$ is monotone. (Or verify the ratio directly for non-regular families.)
+\item \textbf{Quote Karlin--Rubin} to get the region $\{T>c\}$.
+\item \textbf{Find $c$ from the null distribution of $T$ at the boundary $\theta_0$.}
+This is the only computation. If $T$ is discrete, randomise:
+$c=\min\{t:\Prob_{\theta_0}(T>t)\le\alpha\}$ and
+$\gamma=\dfrac{\alpha-\Prob_{\theta_0}(T>c)}{\Prob_{\theta_0}(T=c)}$.
+\item \textbf{State the power function} and note it is increasing, so the size is attained at
+$\theta_0$.
+\end{enumerate}
+\end{recipe}
+
+\subsection{The four standard instances}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{@{}p{3.1cm}p{2.4cm}p{9.4cm}@{}}
+\toprule
+Model & $T$ & UMP test for $H_0:\theta\le\theta_0$ vs $H_A:\theta>\theta_0$ \\
+\midrule
+$N(\theta,\sigma_0^2)$, $n$ obs & $\Xbar$ &
+Reject iff $\Xbar>\theta_0+z_\alpha\sigma_0/\sqrt n$. Continuous, so no randomisation. \\
+$\mathrm{Exp}(\text{mean }\theta)$, $n$ obs & $\sum X_i$ &
+Under $\theta_0$, $\tfrac{2}{\theta_0}\sum X_i\sim\chi^2_{2n}$, so reject iff
+$\tfrac{2}{\theta_0}\sum X_i>\chi^2_{2n,\alpha}$. \\
+$\mathrm{Poi}(\lambda)$, $n$ obs & $\sum X_i$ &
+$T\sim\mathrm{Poi}(n\lambda_0)$ under the boundary. \textbf{Discrete, so randomise}:
+$c=\min\{t:\Prob(T>t)\le\alpha\}$, $\gamma=\frac{\alpha-\Prob(T>c)}{\Prob(T=c)}$. \\
+$U[0,\theta]$, $n$ obs & $X_{(n)}$ &
+$\Prob_{\theta_0}(X_{(n)}>c)=1-(c/\theta_0)^n=\alpha$ gives
+$c=\theta_0(1-\alpha)^{1/n}$. Reject iff $X_{(n)}>\theta_0(1-\alpha)^{1/n}$. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{confusion}{``For $U[0,\theta]$, shouldn't I just reject when $X_{(n)}>\theta_0$?''}
+That region has probability \emph{zero} under $H_0$, so it is a size-$0$ test, not a
+size-$\alpha$ one --- and it wastes your whole budget. Note the correct cutoff
+$c=\theta_0(1-\alpha)^{1/n}$ is \textbf{strictly below} $\theta_0$: you reject on
+$\{X_{(n)}>\theta_0\}$ \emph{and} on a sliver just below $\theta_0$, and the sliver is where
+the $\alpha$ gets spent. Getting the cutoff on the wrong side of $\theta_0$ is the single most
+common error on this question.
+\end{confusion}
+
+\subsection{Worked numerical example (Poisson, with randomisation)}
+
+$n=5$, $H_0:\lambda\le2$ vs $H_A:\lambda>2$, $\alpha=0.05$. At the boundary
+$T=\sum X_i\sim\mathrm{Poi}(10)$:
+\[
+\Prob(T>14)=0.0835,\qquad \Prob(T>15)=0.0487,\qquad \Prob(T=15)=0.0347 .
+\]
+So $c=15$ (the smallest $t$ with $\Prob(T>t)\le0.05$) and
+\[
+\gamma=\frac{0.05-0.0487}{0.0347}=0.036 .
+\]
+\textbf{Test:} reject if $T\ge16$; if $T=15$, reject with probability $0.036$; otherwise
+accept. Size exactly $0.05$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{When UMP fails --- and the one exception}
+
+\begin{idea}{Two-sided alternatives: the generic failure}
+Take $H_0:\theta=\theta_0$ against $H_A:\theta\ne\theta_0$ in an MLR family.
+\begin{itemize}
+\item Against $\theta_1>\theta_0$: MLR says $\Lambda$ increases in $T$, so the MP test rejects
+for \textbf{large} $T$.
+\item Against $\theta_1<\theta_0$: now the roles swap, $\Lambda$ \emph{decreases} in $T$, so
+the MP test rejects for \textbf{small} $T$.
+\end{itemize}
+A single level-$\alpha$ test cannot reject both the largest and the smallest values of $T$ ---
+it has only $\alpha$ of budget, and NP's necessity clause says an MP test must have the
+prescribed form a.e. So \textbf{no UMP test exists}. One then restricts to \emph{unbiased}
+tests and seeks a UMPU test.
+\end{idea}
+
+\begin{idea}{The exception: when the support moves with $\theta$}
+$X\sim U[0,\theta]$, $H_0:\theta=1$ vs $H_A:\theta\ne1$. Consider
+\[
+\phi^*(x)=\begin{cases}1,& x\le\alpha\ \text{ or }\ x>1,\\ 0,&\alpha<x\le1.\end{cases}
+\]
+Size: $\Prob_{1}(X\le\alpha)+\Prob_{1}(X>1)=\alpha+0=\alpha$. \checkmark
+
+\smallskip
+\textbf{Against $\theta_1>1$}: $\Lambda=+\infty$ on $(1,\theta_1]$ and the constant
+$1/\theta_1$ on $[0,1]$. So NP \emph{forces} rejection on $\{x>1\}$ and is \emph{indifferent}
+on $[0,1]$ --- any allocation of $\alpha$ there is MP. $\phi^*$ qualifies.
+
+\textbf{Against $\theta_1<1$}: $\Lambda=1/\theta_1$ on $[0,\theta_1]$ and $0$ above, so the MP
+test packs its budget as far left as possible. $\phi^*$ does exactly that.
+
+Both requirements are satisfied \emph{at once}, so $\phi^*$ is \textbf{UMP} for a two-sided
+alternative.
+\end{idea}
+
+\begin{idea}{Why this works --- back to the budget picture}
+$\{X>1\}$ is impossible under $H_0$, so it is a \textbf{free} item: it costs zero budget and
+buys real power against every $\theta>1$. Take it for nothing, and you still have the entire
+$\alpha$ left to spend on the low end, where the $\theta<1$ alternatives want it.
+
+In a regular family nothing is free, so the two sides compete for the same $\alpha$ and one
+must lose. \textbf{Moving support is what breaks the competition.} That is the whole
+explanation, and it is why ``no UMP for two-sided'' is a statement about \emph{regular}
+families, not a law of nature.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Testing: the decision tree}
+
+\begin{recipe}{Read the question, follow the arrow}
+\textbf{Both hypotheses simple} $\to$ Neyman--Pearson. Form $\Lambda=f_1/f_0$, simplify to a
+statistic, find the \emph{shape} of $\{\Lambda>k\}$ (do not assume a tail!), set the size,
+randomise if discrete.
+
+\smallskip
+\textbf{One-sided composite} $\to$ Establish MLR (exponential family with monotone $c$, or
+direct), quote Karlin--Rubin, get $c$ from the null distribution at the boundary, note the
+power is increasing so the size is attained at $\theta_0$.
+
+\smallskip
+\textbf{Two-sided composite} $\to$ Normally \emph{no UMP exists}; say why (the two one-sided
+best tests point in opposite directions). \textbf{Check first} whether the support depends on
+$\theta$ --- if it does, a UMP test may well exist, and the free region is the reason.
+
+\smallskip
+\textbf{Anything Cauchy} $\to$ Not an exponential family, not MLR, no UMP. Say so and stop.
+\end{recipe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Consistency}
+
+Different topic entirely --- nothing to do with testing. This is about what happens to an
+estimator as $n\to\infty$.
+
+\begin{idea}{Definition}
+A \emph{sequence} of estimators $T_n=T_n(X_1,\dots,X_n)$ is \textbf{(weakly) consistent} for
+$\psi(\theta)$ if
+\[
+T_n\pto\psi(\theta)\quad\text{under }P_\theta,\ \text{ for every }\theta ,
+\]
+i.e.\ $\Prob_\theta(|T_n-\psi(\theta)|>\varepsilon)\to0$ for every $\varepsilon>0$.
+
+Note it is a property of a \emph{sequence}, not of a single estimator. ``Is $\Xbar$
+consistent?'' means ``is the sequence $\Xbar_1,\Xbar_2,\dots$ consistent?''
+\end{idea}
+
+\begin{idea}{The workhorse: Chebyshev}
+\[
+\textbf{If }\ \E_\theta T_n\to\psi(\theta)\ \textbf{ and }\ \Var_\theta(T_n)\to0,
+\ \textbf{ then } T_n \text{ is consistent.}
+\]
+Proof: $\Prob(|T_n-\psi|>\varepsilon)\le\frac{\E(T_n-\psi)^2}{\varepsilon^2}
+=\frac{\text{bias}^2+\Var}{\varepsilon^2}\to0$. This settles almost every exam instance ---
+check the bias goes to zero and the variance goes to zero, and you are done.
+\end{idea}
+
+\begin{confusion}{``So a consistent estimator must be unbiased?''}
+No. The condition is that the bias $\to0$, not that it is zero. $X_{(n)}$ for $U[0,\theta]$
+has $\E X_{(n)}=\frac{n}{n+1}\theta$ --- biased for every $n$ --- and is perfectly consistent.
+
+And the condition is \emph{sufficient, not necessary}: an estimator with no mean at all can
+still be consistent, since convergence in probability does not require moments.
+\end{confusion}
+
+\subsection{Rates: $b_n$-consistency}
+
+Consistency says $T_n\to\theta$; it says nothing about \emph{how fast}. That is what rates
+capture.
+
+\begin{idea}{Definition}
+For a positive sequence $b_n\uparrow\infty$, $T_n$ is \textbf{$b_n$-consistent} if
+\[
+b_n(T_n-\theta)=O_p(1),\qquad\text{equivalently}\qquad T_n-\theta=O_p(1/b_n),
+\]
+where $O_p(1)$ means ``bounded in probability'': for every $\epsilon>0$ there is $M$ with
+$\Prob(|b_n(T_n-\theta)|>M)<\epsilon$ for all $n$. In practice you show it by exhibiting a
+non-degenerate limit in distribution.
+\end{idea}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}lccp{6.4cm}@{}}
+\toprule
+Situation & Rate $b_n$ & Limit law & Why \\
+\midrule
+Regular models (Normal, Poisson, Exponential, \dots) & $\sqrt n$ &
+$\sqrt n(T_n-\theta)\dto N(0,\sigma^2)$ & The CLT rate. Information accumulates at rate $n$,
+so error shrinks like $n^{-1/2}$. \\
+$U[0,\theta]$, $T_n=X_{(n)}$ & $n$ & $\dfrac{n(\theta-X_{(n)})}{\theta}\dto\mathrm{Exp}(1)$ &
+Non-regular: the density does not vanish at the boundary, so each new observation has a
+$1/n$ chance of improving the estimate a lot. \textbf{Much faster than $\sqrt n$.} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\emph{Derivation of the $U[0,\theta]$ limit} (short, and a plausible exam part):
+\[
+\Prob\Big(\frac{n(\theta-X_{(n)})}{\theta}>t\Big)
+=\Prob\Big(X_{(n)}<\theta\Big(1-\frac tn\Big)\Big)
+=\Big(1-\frac tn\Big)^{n}\longrightarrow e^{-t},
+\]
+so the limit is $\mathrm{Exp}(1)$. Hence $X_{(n)}$ is $n$-consistent, not merely
+$\sqrt n$-consistent.
+
+\subsection{The four examples from Lecture 10}
+
+\textbf{(1) Sample median.} $X_1,\dots,X_n\iid F$ with $F(\theta)=\tfrac12$, $F$ strictly
+increasing and continuous near $\theta$. Then
+\[
+\Prob(\tilde X_n-\theta>\varepsilon)
+=\Prob\big(\text{at least half the }X_i>\theta+\varepsilon\big)
+=\Prob\Big(\mathrm{Bin}\big(n,1-F(\theta+\varepsilon)\big)\ge\tfrac n2\Big)\to0
+\]
+because $1-F(\theta+\varepsilon)<\tfrac12$ strictly --- a binomial with success probability
+below $\tfrac12$ is very unlikely to exceed half its trials. Symmetrically for the other
+tail. So $\tilde X_n\pto\theta$.
+
+\textbf{(2) Cauchy: $\Xbar$ fails.} The Cauchy is \emph{stable}: if
+$X_i\iid\mathrm{Cauchy}(\theta,1)$ then $\Xbar\sim\mathrm{Cauchy}(\theta,1)$ for
+\emph{every} $n$ (characteristic function $e^{i\theta t-|t|}$ raised to the $n$th power at
+$t/n$ returns itself). Hence
+\[
+\Prob(|\Xbar-\theta|>\varepsilon)=1-\frac2\pi\arctan\varepsilon
+\]
+--- a positive constant, independent of $n$. \textbf{Averaging buys nothing at all.} This is
+why Lecture 10 says: for anything Cauchy, start from the sample median.
+
+\textbf{(3) MLE.} Consistent under regularity (identifiability, common support, a uniform LLN,
+unique root). The argument: the population criterion
+$M(\theta)=\E_{\theta_0}\log f(X\mid\theta)$ is \emph{strictly} maximised at $\theta_0$ by
+Jensen,
+\[
+M(\theta)-M(\theta_0)=\E_{\theta_0}\log\frac{f(X\mid\theta)}{f(X\mid\theta_0)}
+\le\log\E_{\theta_0}\frac{f(X\mid\theta)}{f(X\mid\theta_0)}=\log1=0 ,
+\]
+with equality only at $\theta=\theta_0$; the sample criterion converges to $M$ uniformly; so
+its maximiser converges to $\theta_0$. Note $U[0,\theta]$ \emph{violates} the regularity
+conditions (moving support) yet its MLE is consistent anyway --- regularity is sufficient, not
+necessary.
+
+\textbf{(4) Simple linear regression.} $Y_i=\alpha+\beta x_i+\varepsilon_i$,
+\[
+\hat\beta_{LS}=\frac{\sum_i(x_i-\bar x)Y_i}{S_{xx}},\qquad
+\E\hat\beta_{LS}=\beta,\qquad
+\Var(\hat\beta_{LS})=\frac{\sigma^2}{S_{xx}},\qquad S_{xx}=\sum_i(x_i-\bar x)^2 .
+\]
+So by Chebyshev, $\hat\beta_{LS}$ is consistent \textbf{iff $S_{xx}\to\infty$}. More data is
+\emph{not} enough --- the design points must spread out. If every $x_i$ were equal, $S_{xx}=0$
+and $\beta$ is not even identifiable.
+
+For the intercept, $\Var(\hat\alpha_{LS})=\frac{\sigma^2}{n}+\frac{\bar x^2\sigma^2}{S_{xx}}$
+(the cross term vanishes since $\sum_i(x_i-\bar x)=0$), so you additionally need $\bar x$ to
+converge to a constant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Practice, with answers}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item $X_1,\dots,X_n\iid N(\theta,1)$. Derive the UMP test of size $\alpha$ for
+$H_0:\theta\le0$ vs $H_A:\theta>0$, and write its power function.
+
+\item $X\sim\mathrm{Bin}(n,\theta)$. Show the family has MLR in $X$, directly from the
+definition (not by quoting the exponential-family result).
+
+\item $H_0: X\sim\mathrm{Exp}(1)$ vs $H_A: X\sim\mathrm{Exp}(2)$ (means $1$ and $2$). Find the
+MP test of size $\alpha$ and its power.
+
+\item Explain in two sentences why no UMP test exists for $H_0:\theta=\theta_0$ vs
+$H_A:\theta\ne\theta_0$ when $X_1,\dots,X_n\iid N(\theta,1)$, but one \emph{does} exist for
+$U[0,\theta]$ with $H_0:\theta=1$.
+
+\item $X_1,\dots,X_n\iid U[0,\theta]$ and $T_n=\frac{n+1}{n}X_{(n)}$. Show $T_n$ is consistent
+and find its rate.
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} Exponential family with $T=\Xbar$ and $c(\theta)=n\theta$, increasing, so
+MLR in $\Xbar$. Karlin--Rubin: reject iff $\Xbar>c$ with
+$\Prob_{0}(\Xbar>c)=\alpha$. Under $\theta=0$, $\Xbar\sim N(0,1/n)$, so
+$c=z_\alpha/\sqrt n$ and the test is
+\[
+\text{reject iff }\ \Xbar>\frac{z_\alpha}{\sqrt n},\qquad
+\beta(\theta)=\Prob_\theta\Big(\Xbar>\frac{z_\alpha}{\sqrt n}\Big)
+=1-\Phi\big(z_\alpha-\sqrt n\,\theta\big),
+\]
+which is increasing in $\theta$ with $\beta(0)=\alpha$, so the size over $\theta\le0$ is
+$\alpha$. \checkmark
+
+\smallskip
+\noindent\textbf{P2.} For $\theta_0<\theta_1$,
+\[
+\frac{f_{\theta_1}(x)}{f_{\theta_0}(x)}
+=\frac{\binom nx\theta_1^{x}(1-\theta_1)^{n-x}}{\binom nx\theta_0^{x}(1-\theta_0)^{n-x}}
+=\Big(\frac{1-\theta_1}{1-\theta_0}\Big)^{n}
+\left[\frac{\theta_1(1-\theta_0)}{\theta_0(1-\theta_1)}\right]^{x}.
+\]
+The bracket exceeds $1$ because $\theta\mapsto\theta/(1-\theta)$ is strictly increasing, so the
+ratio is (constant) $\times$ (something $>1$)$^{x}$: strictly increasing in $x$. MLR in $x$.
+\checkmark
+
+\smallskip
+\noindent\textbf{P3.} $f_0(x)=e^{-x}$, $f_1(x)=\tfrac12e^{-x/2}$ on $x>0$, so
+\[
+\Lambda(x)=\tfrac12 e^{x/2},
+\]
+increasing in $x$: reject for large $X$. Size: $\Prob_0(X>c)=e^{-c}=\alpha$ gives
+$c=-\log\alpha$. Power: $\Prob_1(X>c)=e^{-c/2}=\alpha^{1/2}=\sqrt\alpha$.
+At $\alpha=0.05$: reject iff $X>2.996$, power $=\sqrt{0.05}=0.224$.
+
+\smallskip
+\noindent\textbf{P4.} For $N(\theta,1)$ the MP test against $\theta_1>\theta_0$ rejects for
+large $\Xbar$ and against $\theta_1<\theta_0$ rejects for small $\Xbar$; a single size-$\alpha$
+test cannot do both, so no UMP exists. For $U[0,\theta]$ the region $\{X>1\}$ has probability
+zero under $H_0$, so it can be included free of charge --- it serves every $\theta>1$ at no
+cost in size, leaving the whole budget $\alpha$ available at the low end for the $\theta<1$
+alternatives, so one test serves both sides.
+
+\smallskip
+\noindent\textbf{P5.} $T_n$ is unbiased with
+$\Var(T_n)=\big(\tfrac{n+1}{n}\big)^2\tfrac{n\theta^2}{(n+1)^2(n+2)}=\tfrac{\theta^2}{n(n+2)}\to0$,
+so by Chebyshev $T_n\pto\theta$: consistent.
+
+\emph{Rate.} $\Var(T_n)\asymp\theta^2/n^2$, so the standard deviation is of order $1/n$ and we
+expect $n$-consistency. Indeed $T_n-\theta=\frac{n+1}{n}\big(X_{(n)}-\theta\big)+\frac\theta n$,
+and $n(\theta-X_{(n)})/\theta\dto\mathrm{Exp}(1)$ from Section 8.2, so
+\[
+\frac{n(T_n-\theta)}{\theta}\ \dto\ 1-E,\qquad E\sim\mathrm{Exp}(1),
+\]
+a non-degenerate limit. So $T_n$ is $n$-consistent --- again far faster than the usual
+$\sqrt n$, and the reason the CRLB is meaningless for this family.
+
+\vfill
+\begin{center}
+\small\itshape
+Companions: \texttt{PI\_Bayes\_Crash\_Course.pdf};
+\texttt{PI\_Exam\_Revision.pdf} \S10--\S12;
+\texttt{PI\_Assignment\_Solutions.pdf} (HW2 Q5, HW3);
+\texttt{PI\_Mock\_Exam.pdf} Q7--Q9.
+\end{center}
+
+\end{document}
