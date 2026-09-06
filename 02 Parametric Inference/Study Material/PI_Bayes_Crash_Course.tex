@@ -1,0 +1,648 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Bayes Estimation --- Crash Course}
+\rhead{\small Parametric Inference, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\I}{\mathbb{I}}
+
+\newtcolorbox{idea}[1]{colback=Blue!4,colframe=Blue!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{confusion}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={Common confusion: #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{recipe}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Bayes Estimation}\\[3pt]
+{\large A Crash Course from First Principles}\\[5pt]
+{\small Parametric Inference, B.Stat.\ 3rd Year --- Lectures 6--7}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\noindent
+This assumes you know nothing about Bayes methods and everything about the first half of the
+course (risk, unbiasedness, sufficiency, UMVUE). Read it front to back --- each section is
+built on the one before. Worked examples use real numbers so you can check every step.
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why Bayes exists at all}
+
+Go back to the very first thing proved in Lecture 1.
+
+\begin{idea}{The problem the whole course is trying to solve}
+For an estimator $T$ of $\theta$ we measure quality by the \emph{risk}
+\[
+R(\theta,T)=\E_\theta\big[(T-\theta)^2\big].
+\]
+We would love to find the $T$ that minimises this. \textbf{But we can't}, because
+$R(\theta,T)$ is a \emph{function of $\theta$}, not a number, and $\theta$ is unknown.
+
+Concretely: whatever $T$ you propose, I beat you at the single point $\theta_0$ by proposing
+the silly estimator $T'\equiv\theta_0$, which has $R(\theta_0,T')=0$. So no estimator is best
+everywhere, and ``minimise the risk'' is not a well-posed problem.
+\end{idea}
+
+There are exactly three ways out of this, and the course does all three:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{3.3cm}p{5.4cm}p{6.8cm}@{}}
+\toprule
+\textbf{Escape route} & \textbf{What you do to $R(\theta,T)$} & \textbf{What you get} \\
+\midrule
+Restrict the class & Only compare estimators that are unbiased --- this rules out the silly
+$T\equiv\theta_0$ & \textbf{UMVUE} (Lectures 1--5) \\
+Average it & Collapse the function $R(\cdot,T)$ to a single number by averaging over $\theta$
+& \textbf{Bayes} (Lectures 6--7) \\
+Take the worst case & Collapse it to a single number by taking $\sup_\theta$ &
+\textbf{Minimax} (Lectures 8--9) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}{So what \emph{is} Bayes estimation, in one sentence?}
+It is what you get when you turn the risk \emph{function} into a single \emph{number} by
+averaging it with weights, and then minimise that number.
+
+The weights are called the \textbf{prior}. That is the whole idea. Everything else ---
+posteriors, conjugacy, Beta and Gamma distributions --- is machinery for actually doing the
+computation.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The one conceptual jump: $\theta$ becomes random}
+
+This is the step that trips everyone, so go slowly.
+
+Everywhere in the first half of the course, $\theta$ was a \textbf{fixed unknown constant} and
+$X$ was random. That is why we wrote $\E_\theta$ --- the subscript said ``the distribution
+depends on this fixed number $\theta$''.
+
+To average the risk over $\theta$, we need a weighting function on $\Theta$. Choose one and
+call it $\pi(\theta)$, and require $\int_\Theta\pi(\theta)\,d\theta=1$. But a non-negative
+function integrating to 1 \emph{is a probability density}. So the moment we decide to average
+the risk, we have --- whether we like it or not --- treated $\theta$ as a random variable.
+
+\begin{confusion}{``But $\theta$ isn't random, it's a fixed unknown number!''}
+Correct, and the Bayesian machinery does not claim otherwise. Two readings, both legitimate:
+
+\smallskip
+\textbf{(i) Purely technical.} $\pi$ is just a set of weights you picked to turn
+$R(\cdot,T)$ into a number. Nothing philosophical is being asserted. This is the reading that
+makes minimax work in Lectures 8--9, where the prior is a \emph{device} for proving a theorem
+about worst-case risk, and nobody believes in it.
+
+\smallskip
+\textbf{(ii) Subjective.} $\pi$ encodes what you believed about $\theta$ before seeing data,
+and the posterior is your updated belief.
+
+\smallskip
+For this exam, reading (i) is enough. When a question says ``find the Bayes estimate under
+prior $\pi$'', it is a computation, not a worldview.
+\end{confusion}
+
+\begin{idea}{The four objects, and how they fit together}
+Once $\theta$ is random, you have a \emph{joint} distribution of the pair $(X,\theta)$, and it
+can be factored two ways. Learn this table --- it is the entire subject.
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}llp{7.6cm}@{}}
+\toprule
+\textbf{Name} & \textbf{Symbol} & \textbf{What it is} \\
+\midrule
+Prior & $\pi(\theta)$ & Distribution of $\theta$ \emph{before} seeing data. You choose it. \\
+Likelihood & $f(x\mid\theta)$ & The model. Distribution of $X$ \emph{given} $\theta$ --- this
+is the same $f$ you have used all semester. \\
+Marginal & $m(x)=\displaystyle\int_\Theta f(x\mid\theta)\pi(\theta)\,d\theta$ &
+Distribution of $X$ with $\theta$ averaged out. Usually you never compute it. \\
+Posterior & $\pi(\theta\mid x)$ & Distribution of $\theta$ \emph{after} seeing $X=x$.
+\textbf{This is the object you actually want.} \\
+\bottomrule
+\end{tabular}
+\end{center}
+The joint density is
+\[
+\underbrace{f(x\mid\theta)\,\pi(\theta)}_{\text{factor as (data given }\theta)\times\text{(prior)}}
+\ =\ \text{joint}(x,\theta)\ =\
+\underbrace{\pi(\theta\mid x)\,m(x)}_{\text{factor as }(\theta\text{ given data})\times\text{(marginal)}}
+\]
+and rearranging gives Bayes' theorem:
+\[
+\boxed{\ \pi(\theta\mid x)=\frac{f(x\mid\theta)\,\pi(\theta)}{m(x)}
+=\frac{f(x\mid\theta)\,\pi(\theta)}{\int_\Theta f(x\mid\theta')\pi(\theta')\,d\theta'}\ }
+\]
+\end{idea}
+
+\begin{idea}{The single most useful practical fact}
+The denominator $m(x)$ does \emph{not} involve $\theta$. It is just whatever constant makes
+$\pi(\theta\mid x)$ integrate to 1. So you almost never compute it. Instead write
+\[
+\pi(\theta\mid x)\ \propto\ f(x\mid\theta)\,\pi(\theta)
+\qquad\text{i.e.}\qquad
+\textbf{posterior}\ \propto\ \textbf{likelihood}\times\textbf{prior},
+\]
+throw away every factor that does not contain $\theta$, and \emph{recognise the shape} of what
+is left. That is $90\%$ of the technique.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{A complete worked example, slowly}
+
+Let us do one from scratch with numbers before any theory.
+
+\textbf{Setup.} You toss a bent coin $n=10$ times and see $x=7$ heads. So
+$X\sim\mathrm{Bin}(10,\theta)$ and you want to estimate $\theta=\Prob(\text{head})$.
+
+\textbf{Step 1: choose a prior.} Say you believe the coin is probably not wildly biased, but
+you are not confident. The $\mathrm{Beta}(2,2)$ density,
+$\pi(\theta)\propto\theta(1-\theta)$ on $(0,1)$, is symmetric about $\tfrac12$ and gently
+humped --- a reasonable ``mildly sceptical of extremes'' choice. Its mean is $\tfrac12$.
+
+\textbf{Step 2: write down likelihood $\times$ prior, dropping constants.}
+\[
+\pi(\theta\mid x=7)\ \propto\
+\underbrace{\binom{10}{7}\theta^{7}(1-\theta)^{3}}_{\text{likelihood}}
+\cdot
+\underbrace{\frac{\theta^{2-1}(1-\theta)^{2-1}}{B(2,2)}}_{\text{prior}}
+\ \propto\ \theta^{7}(1-\theta)^{3}\cdot\theta^{1}(1-\theta)^{1}
+=\theta^{8}(1-\theta)^{4}.
+\]
+Note what got thrown away: $\binom{10}{7}$ and $1/B(2,2)$ are pure numbers, free of $\theta$.
+
+\textbf{Step 3: recognise the shape.} A density proportional to
+$\theta^{a-1}(1-\theta)^{b-1}$ is $\mathrm{Beta}(a,b)$. Here
+$a-1=8$ and $b-1=4$, so
+\[
+\theta\mid X=7\ \sim\ \mathrm{Beta}(9,5).
+\]
+No integration was needed anywhere.
+
+\textbf{Step 4: report the Bayes estimate}, which (Section 4) is the posterior mean. For
+$\mathrm{Beta}(a,b)$ the mean is $a/(a+b)$:
+\[
+\widehat\theta_{\text{Bayes}}=\frac{9}{9+5}=\frac{9}{14}\approx0.643 .
+\]
+
+\begin{idea}{What just happened --- read this twice}
+Compare three numbers:
+\[
+\text{prior mean}=0.500,\qquad
+\widehat\theta_{\text{Bayes}}=0.643,\qquad
+\text{MLE}=\frac{7}{10}=0.700 .
+\]
+The Bayes estimate sits \emph{between} the prior mean and the data-only estimate. That is not
+a coincidence --- rearranging,
+\[
+\frac{a+x}{a+b+n}
+=\underbrace{\frac{n}{a+b+n}}_{=10/14}\cdot\underbrace{\frac{x}{n}}_{\text{MLE}}
+\;+\;\underbrace{\frac{a+b}{a+b+n}}_{=4/14}\cdot\underbrace{\frac{a}{a+b}}_{\text{prior mean}} ,
+\]
+and indeed $\tfrac{10}{14}(0.7)+\tfrac{4}{14}(0.5)=0.5+0.1429=0.643$. \checkmark
+
+\smallskip
+\textbf{A Bayes estimate is a weighted average of the data and the prior}, with weights
+proportional to $n$ and to $a+b$. So $a+b$ behaves like a \emph{prior sample size}: a
+$\mathrm{Beta}(2,2)$ prior is worth about 4 imaginary observations. As $n\to\infty$ the data
+weight $\to1$ and the prior is forgotten. This picture is worth more than any formula.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why the posterior mean? (Bayes risk)}
+
+We have not yet justified ``take the posterior mean''. Here is where it comes from.
+
+\begin{idea}{Definition: Bayes risk}
+For a prior $\pi$ and an estimator $T$,
+\[
+r(\pi,T)\ :=\ \int_\Theta R(\theta,T)\,\pi(\theta)\,d\theta\ =\ \E_\pi\big[R(\theta,T)\big].
+\]
+\textbf{$R(\theta,T)$ is a function of $\theta$; $r(\pi,T)$ is a single number.} That is the
+whole point --- numbers can be compared and minimised, functions cannot. An estimator
+minimising $r(\pi,\cdot)$ is called \emph{the Bayes estimate with respect to $\pi$}, written
+$T_\pi$.
+\end{idea}
+
+\begin{idea}{Theorem (the central result of Lecture 7)}
+Under squared error loss, the Bayes estimate is the posterior mean:
+\[
+T_\pi(x)=\E[\theta\mid X=x].
+\]
+Moreover the minimum value achieved is
+\[
+r(\pi,T_\pi)=\E_m\big[\Var(\theta\mid X)\big]\qquad\text{(the average posterior variance).}
+\]
+\end{idea}
+
+\textbf{Proof, with every step explained.} Start from the definition and write both
+integrals out:
+\[
+r(\pi,T)=\int_\Theta\!\!\int_{\mathcal X}\big(T(x)-\theta\big)^2 f(x\mid\theta)\,\pi(\theta)\,dx\,d\theta .
+\]
+Now use the two-way factorisation of the joint density,
+$f(x\mid\theta)\pi(\theta)=m(x)\,\pi(\theta\mid x)$, and swap the order of integration:
+\[
+r(\pi,T)=\int_{\mathcal X} m(x)\ \underbrace{\left[\int_\Theta\big(T(x)-\theta\big)^2
+\pi(\theta\mid x)\,d\theta\right]}_{\text{call this }Q(x)}\,dx .
+\]
+This rewriting is the whole proof. Look at what it says: the Bayes risk is an average, over
+$x$, of the quantity $Q(x)$, with non-negative weights $m(x)$.
+
+So to minimise $r(\pi,T)$ it suffices to \textbf{minimise $Q(x)$ separately for each $x$}.
+And for a \emph{fixed} $x$, the value $T(x)$ is just a number --- call it $a$. So we need
+\[
+\min_a\ \E\big[(a-\theta)^2\ \big|\ X=x\big].
+\]
+This is the standard fact that the mean minimises expected squared deviation:
+\[
+\E\big[(a-\theta)^2\mid x\big]
+=\big(a-\E[\theta\mid x]\big)^2+\Var(\theta\mid x),
+\]
+which is minimised at $a=\E[\theta\mid x]$, with minimum value $\Var(\theta\mid x)$.
+Therefore $T_\pi(x)=\E[\theta\mid X=x]$, and
+$r(\pi,T_\pi)=\int m(x)\Var(\theta\mid x)dx=\E_m[\Var(\theta\mid X)]$. $\square$
+
+\begin{idea}{Why you should care about that last formula}
+$r(\pi,T_\pi)=\E_m[\Var(\theta\mid X)]$ is how \emph{every} minimax problem in this course is
+computed. In the $N(\theta,1)$ problem with prior $N(0,k)$, the posterior variance is the
+constant $k/(k+1)$, so the Bayes risk is $k/(k+1)$ immediately --- no integration. Memorise
+it.
+\end{idea}
+
+\begin{confusion}{``Is the Bayes estimate always the posterior mean?''}
+No --- \emph{only under squared error loss}. The loss function decides which feature of the
+posterior you report:
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Loss $L(\theta,a)$ & Bayes estimate & Why \\
+\midrule
+$(\theta-a)^2$ (squared error) & posterior \textbf{mean} & mean minimises squared deviation \\
+$|\theta-a|$ (absolute error) & posterior \textbf{median} & median minimises absolute deviation \\
+$\I\{|\theta-a|>\epsilon\}$ (0--1) & posterior \textbf{mode} (MAP) & mode maximises local mass \\
+\bottomrule
+\end{tabular}
+\end{center}
+This course uses squared error throughout, so ``posterior mean'' is right here --- but say
+\emph{under squared error loss} in your answer. It is a free mark.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conjugacy: making the computation easy}
+
+In principle you now know everything. In practice the integral defining $m(x)$ is usually
+horrible. \textbf{Conjugate priors} are the families for which it is free.
+
+\begin{idea}{Definition}
+A family $\Pi$ of priors is \textbf{conjugate} for the model $f(x\mid\theta)$ if
+\[
+\pi\in\Pi\quad\Longrightarrow\quad \pi(\cdot\mid x)\in\Pi\quad\text{for every }x.
+\]
+That is: the posterior belongs to the same family as the prior, only with updated parameters.
+Updating then reduces to arithmetic on the hyperparameters.
+\end{idea}
+
+\begin{recipe}{How to find or verify a conjugate family --- the kernel-matching drill}
+\begin{enumerate}
+\item Write the likelihood and \textbf{delete every factor free of $\theta$}. What survives is
+the \emph{kernel}.
+\item Ask: what family of $\theta$-densities has this same functional shape? That family is
+the conjugate one.
+\item Multiply prior kernel $\times$ likelihood kernel and collect exponents.
+\item Read off the updated parameters. Never integrate.
+\end{enumerate}
+\end{recipe}
+
+\subsection{Beta--Binomial}
+$X\sim\mathrm{Bin}(n,\theta)$. Likelihood kernel: $\theta^{x}(1-\theta)^{n-x}$ --- a power of
+$\theta$ times a power of $(1-\theta)$. Which densities on $(0,1)$ look like that?
+$\mathrm{Beta}(a,b)\propto\theta^{a-1}(1-\theta)^{b-1}$. Multiply:
+\[
+\theta^{x}(1-\theta)^{n-x}\cdot\theta^{a-1}(1-\theta)^{b-1}=\theta^{(a+x)-1}(1-\theta)^{(b+n-x)-1}
+\]
+\[
+\boxed{\ \theta\mid x\sim\mathrm{Beta}(a+x,\ b+n-x),\qquad
+T_\pi=\frac{a+X}{a+b+n}\ }
+\]
+\emph{Interpretation:} add the successes to $a$, the failures to $b$.
+
+\subsection{Gamma--Poisson}
+$X_1,\dots,X_n\iid\mathrm{Poi}(\lambda)$, $S=\sum X_i$. Likelihood kernel:
+$e^{-n\lambda}\lambda^{S}$ --- a power of $\lambda$ times $e^{-\text{const}\cdot\lambda}$.
+Which densities on $(0,\infty)$ look like that? $\mathrm{Gamma}(\alpha,\text{scale }\beta)
+\propto\lambda^{\alpha-1}e^{-\lambda/\beta}$. Multiply:
+\[
+e^{-n\lambda}\lambda^{S}\cdot\lambda^{\alpha-1}e^{-\lambda/\beta}
+=\lambda^{(\alpha+S)-1}\exp\Big\{-\lambda\Big(n+\frac1\beta\Big)\Big\}
+\]
+\[
+\boxed{\ \lambda\mid\mathbf x\sim\mathrm{Gamma}\Big(\alpha+S,\ \frac{\beta}{1+n\beta}\Big),
+\qquad T_\pi=\frac{\beta(\alpha+S)}{1+n\beta}\ }
+\]
+\emph{Numerical check.} $n=5$, $S=12$, prior $\mathrm{Gamma}(2,1)$ (mean 2). Posterior is
+$\mathrm{Gamma}(14,\tfrac16)$ with mean $14/6\approx2.333$. Compare MLE $=12/5=2.4$ and prior
+mean $=2$: again strictly between. \checkmark
+
+\subsection{Normal--Normal}
+$X_1,\dots,X_n\iid N(\theta,\sigma^2)$ with $\sigma^2$ \emph{known}; prior $\theta\sim N(\mu,\tau^2)$.
+The exponent is a sum of two quadratics in $\theta$, so completing the square gives a normal
+again. The cleanest way to state the answer uses \textbf{precision} $=1/\text{variance}$:
+\[
+\boxed{\
+\text{posterior precision}=\frac{n}{\sigma^{2}}+\frac{1}{\tau^{2}},\qquad
+\text{posterior mean}=
+\frac{\dfrac{n}{\sigma^{2}}\Xbar+\dfrac{1}{\tau^{2}}\mu}
+     {\dfrac{n}{\sigma^{2}}+\dfrac{1}{\tau^{2}}}\ }
+\]
+In words: \emph{precisions add, and the posterior mean is the precision-weighted average of
+the data mean and the prior mean.} If you remember only one thing about Normal--Normal,
+remember that sentence --- you can reconstruct the algebra from it.
+
+\emph{Numerical check.} $n=4$, $\Xbar=10$, $\sigma^2=4$ (so $\sigma^2/n=1$, data precision 1);
+prior $N(8,4)$ (precision $\tfrac14$). Posterior precision $=1+\tfrac14=1.25$, so posterior
+variance $=0.8$; posterior mean $=\dfrac{1\cdot10+\tfrac14\cdot8}{1.25}=\dfrac{12}{1.25}=9.6$.
+Between the prior mean 8 and the data mean 10, closer to the data because the data are four
+times as precise. \checkmark
+
+\subsection{Summary table}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Model & Conjugate prior & Posterior & Bayes estimate \\
+\midrule
+$\mathrm{Bin}(n,\theta)$ & $\mathrm{Beta}(a,b)$ & $\mathrm{Beta}(a+x,\,b+n-x)$ & $\dfrac{a+X}{a+b+n}$ \\
+$\mathrm{Poi}(\lambda)$, $n$ obs & $\mathrm{Gamma}(\alpha,\beta)$ & $\mathrm{Gamma}\big(\alpha+S,\tfrac{\beta}{1+n\beta}\big)$ & $\dfrac{\beta(\alpha+S)}{1+n\beta}$ \\
+$N(\theta,\sigma^2)$, $n$ obs & $N(\mu,\tau^2)$ & $N\big(\text{prec.\ wtd.\ mean},\ (\tfrac{n}{\sigma^2}+\tfrac1{\tau^2})^{-1}\big)$ & precision-weighted mean \\
+$\mathrm{Exp}(\theta)$, $n$ obs & Inverse-Gamma$(\alpha,\beta)$ & Inv-Gamma$(\alpha+n,\ \beta+S)$ & $\dfrac{\beta+S}{\alpha+n-1}$ \\
+$U[a,\theta]$, $n$ obs & $\mathrm{Pareto}(\alpha,a)$ & $\mathrm{Pareto}\big(\alpha+n,\max(a,X_{(n)})\big)$ & $\dfrac{(\alpha+n)M}{\alpha+n-1}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{confusion}{``Do I have to memorise this table?''}
+No, and you should not try. Every row is 30 seconds of kernel matching. What you \emph{must}
+know cold is the \emph{drill}: strip constants, match the shape, add the exponents. In the
+exam, derive the row you need --- it is more reliable than a half-remembered formula, and
+derivations earn marks that quoted answers do not.
+\end{confusion}
+
+\begin{confusion}{``Why can't the Cauchy have a nice conjugate family?''}
+Because conjugacy is really a property of \emph{exponential families}. In an exponential
+family, $\prod_i f(x_i\mid\theta)$ depends on the data only through $\sum_iT(x_i)$ and $n$,
+so a two-parameter prior family suffices --- and the update is just ``add $\sum T(x_i)$ to one
+hyperparameter and $n$ to the other''. Look back at the table: every update has exactly that
+form.
+
+The Cauchy is not an exponential family, so its likelihood cannot be compressed into a fixed
+number of summaries. A conjugate family still exists (products of Cauchy kernels), but it has
+to grow by one hyperparameter per observation --- useless in practice. This is the point of
+the ``find a conjugate family for any density'' exercise in Lecture 7: the class of \emph{all}
+densities is trivially conjugate, and equally useless. \textbf{Conjugacy is only valuable
+when the family is small.}
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Three properties you will be asked about}
+
+\subsection{A Bayes estimate is essentially never unbiased}
+
+You saw it numerically in Section 3: the estimate is pulled toward the prior mean. That pull
+is \emph{shrinkage}, and shrinkage is exactly bias. Concretely, for Beta--Binomial,
+\[
+\E_\theta\Big[\frac{a+X}{a+b+n}\Big]=\frac{a+n\theta}{a+b+n},
+\]
+which equals $\theta$ for all $\theta$ only if $a=0$ and $a+b=0$ --- not a proper prior.
+
+The general argument is four lines and is a standard exam question. Suppose $T$ is both
+Bayes ($T=\E[\theta\mid X]$) and unbiased ($\E[T\mid\theta]=\theta$). Write $\E_m$ for
+expectation under the joint law and condition two different ways:
+\[
+\E_m[T\theta]=\E\big[\theta\,\E(T\mid\theta)\big]=\E[\theta^2],
+\qquad
+\E_m[T\theta]=\E\big[T\,\E(\theta\mid X)\big]=\E[T^2].
+\]
+Then
+\[
+\E_m\big[(T-\theta)^2\big]=\E[T^2]+\E[\theta^2]-2\E_m[T\theta]=0,
+\]
+which forces $T=\theta$ almost surely --- impossible unless the problem is degenerate.
+
+\begin{confusion}{``So Bayes estimates are worse than UMVUEs?''}
+No. Bias is not a defect, it is a \emph{trade}. Shrinking toward the prior costs you a little
+bias and buys you a lot of variance reduction, and MSE is the sum of the two. You already met
+this in Lecture 1: $\frac{1}{n+1}\sum(X_i-\Xbar)^2$ is biased and beats the unbiased $S^2$ at
+every $\sigma^2$. And in Lecture 8 the \emph{minimax} estimator of a binomial proportion is a
+biased Bayes estimate, not the UMVUE. Unbiasedness is a constraint we impose for
+tractability, not a virtue.
+\end{confusion}
+
+\subsection{The posterior depends on the data only through a sufficient statistic}
+
+If $f(\mathbf x\mid\theta)=g(\theta,T(\mathbf x))\,h(\mathbf x)$ by the factorisation theorem,
+then
+\[
+\pi(\theta\mid\mathbf x)=\frac{g(\theta,T(\mathbf x))\,h(\mathbf x)\,\pi(\theta)}
+{\int g(\theta',T(\mathbf x))\,h(\mathbf x)\,\pi(\theta')\,d\theta'}
+=\frac{g(\theta,T(\mathbf x))\,\pi(\theta)}{\int g(\theta',T(\mathbf x))\,\pi(\theta')\,d\theta'} ,
+\]
+since $h(\mathbf x)$ cancels between numerator and denominator. So the posterior --- and hence
+every Bayes estimate --- is a function of $T$ alone. Check the table: every entry depends on
+the data only through $\sum X_i$, $\Xbar$, or $X_{(n)}$. \checkmark
+
+\subsection{Improper priors and generalized Bayes}
+
+Sometimes you want to express ``no prior information''. The natural choice on $\theta\in\R$ is
+$\pi(\theta)\equiv1$ --- but $\int_\R 1\,d\theta=\infty$, so this is \textbf{not} a probability
+density. Such a $\pi$ is called \emph{improper}.
+
+Remarkably, the posterior can still be a perfectly good density. If it is, its mean is called
+the \textbf{generalized Bayes estimate}.
+
+\begin{idea}{The three examples from the course}
+\begin{enumerate}
+\item $X_1,\dots,X_n\iid N(\theta,1)$, $\pi\equiv1$. Then
+$\pi(\theta\mid\mathbf x)\propto\exp\{-\tfrac n2(\theta-\bar x)^2\}$, i.e.\
+$N(\bar x,1/n)$ --- proper. Generalized Bayes estimate: $\boxed{\Xbar}$. Note this is also the
+MLE and the UMVUE. (Sanity check on Normal--Normal: let $\tau^2\to\infty$, so prior precision
+$\to0$ and the posterior mean $\to\Xbar$. \checkmark)
+\item $X_1,\dots,X_n\iid U[\theta-\tfrac12,\theta+\tfrac12]$, $\pi\equiv1$. The likelihood is
+the indicator $\I[x_{(n)}-\tfrac12\le\theta\le x_{(1)}+\tfrac12]$, so the posterior is
+\emph{uniform} on that interval and the estimate is its midpoint:
+$\boxed{\tfrac12(X_{(1)}+X_{(n)})}$, the midrange. (This is Homework 2 Q3.)
+\item $X_1,\dots,X_n\iid\mathrm{Exp}(\theta)$, $\pi(\theta)=1/\theta$. Posterior is
+Inverse-Gamma$(n,S)$ with mean $\boxed{S/(n-1)}$ for $n\ge2$ --- note this is \emph{not}
+$\Xbar$.
+\end{enumerate}
+\end{idea}
+
+\begin{confusion}{``If the prior is improper, is the estimate still Bayes?''}
+Not in the technical sense --- and this matters in Lecture 8. The theorem ``Bayes with
+constant risk $\Rightarrow$ minimax'' needs $\pi$ to be a \emph{probability} measure, because
+its proof uses ``$\sup\ \ge$ average''. Under an improper prior the Bayes risk is infinite and
+that step is meaningless.
+
+That is exactly why $X$ being minimax for $N(\theta,1)$ needs the \emph{sequence} argument
+with proper priors $\pi_k=N(0,k)$, rather than the one-line constant-risk argument. If you
+are asked ``can a generalized Bayes equalizer estimate be minimax?'', the answer is: yes it
+can, but you must prove it via limits of proper Bayes rules, not via the constant-risk
+theorem.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How Bayes connects to the rest of the course}
+
+\begin{idea}{The map}
+\[
+\textbf{Bayes}\ \xrightarrow[\text{take }\sup_\theta]{\text{constant risk}}\ \textbf{Minimax}
+\]
+The reason Bayes appears immediately before minimax is that \emph{Bayes estimates are the tool
+for proving minimaxity}. Two theorems:
+\begin{enumerate}
+\item \textbf{Constant-risk criterion.} If $T_\pi$ is Bayes for a proper $\pi$ and
+$R(\theta,T_\pi)=c$ for all $\theta$, then $T_\pi$ is minimax. Proof:
+$\sup_\theta R(\theta,T)\ge r(\pi,T)\ge r(\pi,T_\pi)=c=\sup_\theta R(\theta,T_\pi)$.
+\item \textbf{Limit of Bayes rules.} If $r(\pi_k,T_{\pi_k})\to c$ and
+$\sup_\theta R(\theta,T^*)=c$, then $T^*$ is minimax.
+\end{enumerate}
+In both, the middle inequality ``$\sup\ \ge$ average'' is what does the work --- and averaging
+is precisely what the prior was introduced for in Section 1. The circle closes.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Answering an exam question}
+
+\begin{recipe}{The standard six lines}
+\begin{enumerate}
+\item Write \textbf{posterior $\propto$ likelihood $\times$ prior}.
+\item Delete every factor free of $\theta$.
+\item Collect exponents; \textbf{name} the resulting standard density.
+\item Quote its mean. State ``\emph{the Bayes estimate under squared error loss is the
+posterior mean}''.
+\item If asked about bias, compute $\E_\theta T$ directly and observe it is not $\theta$.
+\item If asked for the Bayes \emph{risk}, use $r(\pi,T_\pi)=\E_m[\Var(\theta\mid X)]$ --- take
+the posterior variance and average it over the marginal.
+\end{enumerate}
+\end{recipe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Practice, with answers}
+
+Do these with the answers covered. They take about 25 minutes together.
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item $X_1,\dots,X_n\iid\mathrm{Bern}(\theta)$ with prior $\mathrm{Beta}(a,b)$. Find the Bayes
+estimate, express it as a weighted average of the MLE and the prior mean, and say what happens
+as $n\to\infty$.
+
+\item $X\sim\mathrm{Geometric}$, $f(x\mid\theta)=\theta(1-\theta)^{x}$, $x=0,1,2,\dots$
+Find a conjugate family and the Bayes estimate of $\theta$.
+
+\item $X_1,\dots,X_n\iid N(\theta,\sigma^2)$, $\sigma^2$ known, prior $N(\mu,\tau^2)$. Show
+the posterior variance is strictly smaller than both $\sigma^2/n$ and $\tau^2$. Interpret.
+
+\item $X_1,\dots,X_n\iid U[0,\theta]$ with prior $\mathrm{Pareto}(\alpha,m)$, i.e.\
+$\pi(\theta)=\alpha m^{\alpha}/\theta^{\alpha+1}$ for $\theta>m$. Find the posterior and the
+Bayes estimate.
+
+\item $X\sim N(\theta,1)$ with prior $N(0,k)$. Find the Bayes estimate and show the Bayes
+risk equals $k/(k+1)$. What happens as $k\to\infty$, and why does it matter?
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} Posterior $\propto\theta^{S}(1-\theta)^{n-S}\theta^{a-1}(1-\theta)^{b-1}$
+with $S=\sum X_i$, so $\mathrm{Beta}(a+S,\ b+n-S)$ and
+\[
+T_\pi=\frac{a+S}{a+b+n}
+=\frac{n}{a+b+n}\cdot\Xbar+\frac{a+b}{a+b+n}\cdot\frac{a}{a+b}.
+\]
+As $n\to\infty$ the data weight $\to1$, so $T_\pi-\Xbar\to0$: \textbf{the prior washes out}.
+This is why the choice of prior matters little for large samples and a lot for small ones.
+
+\smallskip
+\noindent\textbf{P2.} Likelihood kernel $\theta(1-\theta)^{x}$ --- a power of $\theta$ times a
+power of $(1-\theta)$, so try $\mathrm{Beta}(a,b)$ again:
+\[
+\theta(1-\theta)^{x}\cdot\theta^{a-1}(1-\theta)^{b-1}=\theta^{(a+1)-1}(1-\theta)^{(b+x)-1},
+\]
+so $\theta\mid x\sim\mathrm{Beta}(a+1,\ b+x)$ and
+$T_\pi=\dfrac{a+1}{a+b+x+1}$. The Beta family is conjugate for the geometric too --- as it
+must be, since both are exponential families in $\theta$ with the same $(1-\theta)$ structure.
+
+\smallskip
+\noindent\textbf{P3.} Posterior variance
+$=\Big(\dfrac{n}{\sigma^2}+\dfrac{1}{\tau^2}\Big)^{-1}=\dfrac{\sigma^2\tau^2}{n\tau^2+\sigma^2}$.
+Then
+\[
+\frac{\sigma^2\tau^2}{n\tau^2+\sigma^2}<\frac{\sigma^2}{n}
+\iff n\tau^2<n\tau^2+\sigma^2\ \checkmark,
+\qquad
+\frac{\sigma^2\tau^2}{n\tau^2+\sigma^2}<\tau^2
+\iff \sigma^2<n\tau^2+\sigma^2\ \checkmark .
+\]
+\emph{Interpretation:} precisions add, so combining two sources of information is always at
+least as good as either alone. The posterior is sharper than the data alone \emph{and} sharper
+than the prior alone.
+
+\smallskip
+\noindent\textbf{P4.} Likelihood $\theta^{-n}\I[\theta\ge x_{(n)}]$, prior
+$\propto\theta^{-(\alpha+1)}\I[\theta>m]$. Multiply:
+\[
+\pi(\theta\mid\mathbf x)\propto\theta^{-(\alpha+n)-1}\,\I\big[\theta>\max(m,x_{(n)})\big]
+\]
+which is $\mathrm{Pareto}\big(\alpha+n,\ M\big)$ with $M=\max(m,X_{(n)})$. A
+$\mathrm{Pareto}(\beta,M)$ has mean $\beta M/(\beta-1)$ for $\beta>1$, so
+\[
+T_\pi=\frac{(\alpha+n)\,M}{\alpha+n-1}.
+\]
+Note the shape: like the UMVUE $\tfrac{n+1}{n}X_{(n)}$, it inflates the largest observation ---
+sensible, since $X_{(n)}$ always \emph{under}estimates $\theta$.
+
+\smallskip
+\noindent\textbf{P5.} Precision form: data precision 1, prior precision $1/k$, so posterior
+precision $=1+\tfrac1k=\tfrac{k+1}{k}$ and
+\[
+\theta\mid X=x\ \sim\ N\Big(\frac{k}{k+1}x,\ \frac{k}{k+1}\Big),
+\qquad T_\pi=\frac{k}{k+1}X .
+\]
+The posterior variance is the \emph{constant} $k/(k+1)$ (it does not involve $x$), so
+\[
+r(\pi_k,T_{\pi_k})=\E_m\big[\Var(\theta\mid X)\big]=\frac{k}{k+1}.
+\]
+As $k\to\infty$ this $\to1$, which is exactly $\sup_\theta R(\theta,X)=1$. By the
+limit-of-Bayes-rules theorem, $X$ is \textbf{minimax}. This is Homework 2 Q1, and it is the
+single most important place Bayes machinery is used in this course --- note that $X$ itself is
+not Bayes for any proper prior; the sequence is what does the work.
+
+\vfill
+\begin{center}
+\small\itshape
+Companions: \texttt{PI\_Exam\_Revision.pdf} \S8--\S9,
+\texttt{PI\_Class\_Exercises\_Solved.pdf} \S6--\S7,
+\texttt{PI\_Mock\_Exam.pdf} Q5 and Q6.
+\end{center}
+
+\end{document}
