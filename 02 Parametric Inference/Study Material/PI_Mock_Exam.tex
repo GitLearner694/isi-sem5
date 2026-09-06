@@ -1,0 +1,197 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.95in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+
+\setlist{itemsep=4pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Parametric Inference --- Mock Semestral}
+\rhead{\small Page \thepage\ of \pageref{LastPage}}
+\usepackage{lastpage}
+\cfoot{}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\Ybar}{\overline{Y}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\ind}{\perp\!\!\!\perp}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\qmk}[1]{\hfill\textnormal{[\textbf{#1}]}}
+
+\newcounter{q}
+\newenvironment{question}[1]{%
+  \medskip\refstepcounter{q}%
+  \noindent\textbf{Q\theq.}\ \qmk{#1}\par\nopagebreak\smallskip}{\par\medskip\hrule height 0pt}
+
+\begin{document}
+
+\thispagestyle{empty}
+\begin{center}
+{\large\scshape Indian Statistical Institute}\\[10pt]
+{\LARGE\bfseries Parametric Inference}\\[6pt]
+{\large Mock Semestral Examination}\\[4pt]
+{B.Stat.\ 3rd Year \quad$\cdot$\quad Semester 1, 2026--27}
+\end{center}
+
+\vspace{6pt}
+\hrule
+\vspace{6pt}
+
+\noindent
+\begin{tabular}{@{}ll@{\hspace{2.2cm}}ll@{}}
+\textbf{Time:} & 3 hours & \textbf{Maximum marks:} & 100 \\
+\end{tabular}
+
+\vspace{4pt}
+\hrule
+\vspace{10pt}
+
+\noindent\textbf{Instructions.}
+\begin{itemize}[leftmargin=1.5em]
+\item Answer \textbf{all} questions. Marks are shown in brackets against each part.
+\item State clearly any theorem you invoke, and verify that its hypotheses hold. Quoting
+Lehmann--Scheff\'e, Basu or Karlin--Rubin without checking completeness, ancillarity or MLR
+respectively will not earn full credit.
+\item Throughout, $\Phi$ and $\varphi$ denote the standard normal cdf and pdf.
+\item You may use, without proof, the following values:
+\[
+z_{0.05}=1.645,\qquad z_{0.025}=1.960,\qquad
+\Phi(0.98)=0.8365,\qquad \Phi(1.645)=0.9500 .
+\]
+\item Unless stated otherwise, ``risk'' means mean squared error and ``loss'' means squared
+error loss.
+\end{itemize}
+
+\vspace{8pt}
+\hrule
+\vspace{14pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q1
+\begin{question}{12 marks}
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item State the Neyman--Fisher factorisation theorem. \qmk{3}
+\item State and prove the Rao--Blackwell theorem. State precisely when the improvement is
+strict. \qmk{6}
+\item Give, with justification, an example of a family of distributions possessing a
+sufficient statistic that is \emph{not} complete. \qmk{3}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q2
+\begin{question}{12 marks}
+Let $X\sim\mathrm{Bin}(m,\theta)$ with $m$ known and $0<\theta<1$ unknown.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Show that $X$ is a complete sufficient statistic for $\theta$. \qmk{4}
+\item For $1\le k\le m$, find the UMVUE of $\theta^{k}$. \qmk{5}
+\item Show that $\psi(\theta)=\theta^{m+1}$ admits no unbiased estimator. \qmk{3}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q3
+\begin{question}{12 marks}
+Let $X_1,\dots,X_n\iid\mathrm{Poisson}(\lambda)$, $\lambda>0$.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Find the UMVUE of $\Prob_\lambda\{X_1=0\}=e^{-\lambda}$. \qmk{6}
+\item Compute the variance of your estimator. \qmk{3}
+\item Does it attain the Cram\'er--Rao lower bound? Justify your answer, and comment on what
+happens as $n\to\infty$. \qmk{3}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q4
+\begin{question}{10 marks}
+Let $X_1,\dots,X_n\iid N(\mu,\sigma^{2})$ with $n\ge3$ and both parameters unknown. Write
+$S^{2}=\frac{1}{n-1}\sum_i(X_i-\Xbar)^{2}$ and $R=X_{(n)}-X_{(1)}$ for the sample range.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Show that $\big(\sum_iX_i,\ \sum_iX_i^{2}\big)$ is complete and sufficient. \qmk{4}
+\item Show that $V=R/S$ is ancillary. \qmk{3}
+\item Deduce that $\E[R]=\E[V]\,\E[S]$. \qmk{3}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q5
+\begin{question}{12 marks}
+Let $X_1,\dots,X_n\iid f(x\mid\theta)=\frac1\theta e^{-x/\theta}$, $x>0$, $\theta>0$.
+Consider the inverse-gamma family of priors
+\[
+\pi_{\alpha,\beta}(\theta)\ \propto\ \theta^{-(\alpha+1)}e^{-\beta/\theta},
+\qquad \alpha,\beta>0 .
+\]
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Show that this family is conjugate and identify the posterior. \qmk{5}
+\item Find the Bayes estimate of $\theta$ under squared error loss, stating any condition
+needed for it to exist. \qmk{3}
+\item Is the Bayes estimate unbiased for $\theta$? \qmk{2}
+\item Find the generalized Bayes estimate of $\theta$ under the improper prior
+$\pi(\theta)=1/\theta$, and comment on how it compares with $\Xbar$. \qmk{2}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q6
+\begin{question}{12 marks}
+Let $X\sim\mathrm{Bin}(n,\theta)$, $0<\theta<1$, and let the prior be
+$\mathrm{Beta}(p,q)$.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Show that the Bayes estimate of $\theta$ under squared error loss is
+$T_{p,q}=\dfrac{p+X}{p+q+n}$. \qmk{3}
+\item Compute $R(\theta,T_{p,q})$ and determine all $(p,q)$ for which the risk is constant in
+$\theta$. \qmk{6}
+\item Hence identify a minimax estimator of $\theta$, and compare its maximum risk with that
+of the UMVUE $X/n$. \qmk{3}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q7
+\begin{question}{12 marks}
+A single observation $X$ is available. Consider
+\[
+H_0:\ X\sim N(0,1)\qquad\text{against}\qquad H_A:\ X\sim N(0,4).
+\]
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Derive the form of the most powerful test of level $\alpha$. \qmk{6}
+\item For $\alpha=0.05$, state the rejection region explicitly and compute the power.
+\qmk{3}
+\item Now let $X\sim N(0,\sigma^{2})$ with $\sigma^{2}>0$ unknown. Does a UMP test of size
+$\alpha$ exist for $H_0:\sigma^{2}=1$ against $H_A:\sigma^{2}\ne1$? Justify carefully.
+\qmk{3}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q8
+\begin{question}{10 marks}
+Let $X_1,\dots,X_n\iid \mathrm{Uniform}[0,\theta]$, $\theta>0$.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Show that the family has monotone likelihood ratio in $X_{(n)}$. \qmk{4}
+\item Derive the UMP test of size $\alpha$ for $H_0:\theta\le\theta_0$ against
+$H_A:\theta>\theta_0$. \qmk{4}
+\item Write down its power function and verify that the size is attained at
+$\theta=\theta_0$. \qmk{2}
+\end{enumerate}
+\end{question}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q9
+\begin{question}{10 marks}
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Let $X_1,\dots,X_n\iid\mathrm{Cauchy}(\theta)$, i.e.\ with density
+$\frac{1}{\pi\{1+(x-\theta)^{2}\}}$. Show that $\Xbar$ is \emph{not} a consistent estimator
+of $\theta$, whereas the sample median is. \qmk{6}
+\item In the model $Y_i=\alpha+\beta x_i+\varepsilon_i$, $i=1,\dots,n$, with $x_i$ known
+constants and $\varepsilon_i$ iid with mean $0$ and variance $\sigma^{2}$, state and justify
+the condition on $\{x_i\}$ under which the least squares estimate $\hat\beta_{LS}$ is
+consistent for $\beta$. \qmk{4}
+\end{enumerate}
+\end{question}
+
+\vspace{20pt}
+\begin{center}
+\rule{0.35\textwidth}{0.4pt}\\[4pt]
+\textit{End of paper}
+\end{center}
+
+\end{document}

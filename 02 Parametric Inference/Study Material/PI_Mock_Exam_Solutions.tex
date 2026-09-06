@@ -1,0 +1,578 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=3pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Mock Semestral --- Solutions}
+\rhead{\small Parametric Inference, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\Ybar}{\overline{Y}}
+\newcommand{\Zbar}{\overline{Z}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\dto}{\overset{d}{\longrightarrow}}
+\newcommand{\pto}{\overset{p}{\longrightarrow}}
+\newcommand{\ind}{\perp\!\!\!\perp}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\mk}[1]{{\small\color{ForestGreen}\textbf{[#1]}}}
+
+\newtcolorbox{trapbox}{colback=BrickRed!5,colframe=BrickRed!60,
+  title=\textbf{Where marks are lost},fonttitle=\bfseries,breakable}
+
+\newcommand{\qhead}[2]{\bigskip\noindent{\large\bfseries Question #1}\quad\textnormal{\small(#2)}\par
+  \vspace{2pt}\hrule\vspace{6pt}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Mock Semestral --- Solutions}\\[4pt]
+{\large Parametric Inference, B.Stat.\ 3rd Year, Semester 1, 2026--27}\\[6pt]
+{\small Marks in \mk{green} are indicative; total 100.}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\noindent\textbf{Do not read this before attempting the paper under timed conditions.}
+
+\section*{What each question tests}
+\renewcommand{\arraystretch}{1.25}
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+\textbf{Q} & \textbf{Marks} & \textbf{Topic} & \textbf{Source in the course} \\
+\midrule
+1 & 12 & Factorisation, Rao--Blackwell, incompleteness & Lec 2--5 \\
+2 & 12 & Completeness, UMVUE, polynomial estimability & Lec 2--4; HW1 Q1 \\
+3 & 12 & Rao--Blackwellisation, CRLB non-attainment & Lec 2--4; HW1 Q2--Q3 \\
+4 & 10 & Multiparameter completeness, ancillarity, Basu & Lec 4--5; HW1 Q5--Q6 \\
+5 & 12 & Conjugacy, Bayes estimate, improper priors & Lec 6--7; HW2 Q3 \\
+6 & 12 & Bayes risk, equalizer rules, minimax & Lec 8; HW2 Q1--Q2 \\
+7 & 12 & Neyman--Pearson; failure of two-sided UMP & Lec 6, 9; HW2 Q5, HW3 Q3 \\
+8 & 10 & MLR and Karlin--Rubin & Lec 9; HW3 Q1--Q2, Q4 \\
+9 & 10 & Consistency; Cauchy pathology; regression & Lec 10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Self-assessment.} $\ge80$: you are in good shape --- spend the remaining time
+on Q3(c), Q6(b) and Q7(c), which are the discriminating parts. $60$--$80$: re-derive the
+exponential-family completeness criterion and the Karlin--Rubin statement until they are
+automatic. $<60$: work Part II of \texttt{PI\_Class\_Exercises\_Solved.pdf} before anything
+else.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q1
+\qhead{1}{12 marks --- bookwork}
+
+\noindent\textbf{(a)} \mk{3}
+\emph{Neyman--Fisher factorisation.} Let $X_1,\dots,X_n$ have joint pdf/pmf
+$f(\mathbf x\mid\theta)$. A statistic $S(\mathbf X)$ is sufficient for $\theta$ if and only if
+there exist functions $g$ and $h\ge0$ with
+\[
+f(\mathbf x\mid\theta)=g\big(\theta,\ S(\mathbf x)\big)\cdot h(\mathbf x)
+\qquad\text{for all }\mathbf x,\ \theta,
+\]
+where $h$ does not involve $\theta$ and the dependence on $\mathbf x$ in $g$ is only through
+$S(\mathbf x)$.
+
+\smallskip\noindent\textbf{(b)} \mk{6}
+\emph{Rao--Blackwell.} Let $T$ be an estimator of $\psi(\theta)$ with
+$\E_\theta T^2<\infty$, and let $S$ be sufficient for $\theta$. Put $T^{*}=\E[T\mid S]$. Then
+$T^{*}$ is a statistic, $\E_\theta T^{*}=\E_\theta T$, and
+$R(\theta,T^{*})\le R(\theta,T)$ for every $\theta$.
+
+\emph{Proof.} $T^{*}$ is a genuine statistic because sufficiency of $S$ makes the conditional
+distribution of $\mathbf X$ given $S$, and hence $\E[T\mid S]$, free of $\theta$ \mk{1}. By the
+tower property,
+\[
+\E_\theta T^{*}=\E_\theta\big[\E(T\mid S)\big]=\E_\theta T ,
+\]
+so $T$ and $T^{*}$ have the \emph{same bias} \mk{1}. By the conditional variance decomposition,
+\[
+\Var_\theta(T)=\E_\theta\big[\Var(T\mid S)\big]+\Var_\theta\big(\E[T\mid S]\big)
+\ \ge\ \Var_\theta(T^{*}) ,
+\]
+since the first term is non-negative \mk{2}. Adding the common squared bias,
+\[
+R(\theta,T)=\mathrm{Bias}^2+\Var_\theta(T)\ \ge\ \mathrm{Bias}^2+\Var_\theta(T^{*})=R(\theta,T^{*}).
+\ \square \ \mk{1}
+\]
+\emph{Strictness} \mk{1}: the inequality is strict at $\theta$ iff
+$\E_\theta[\Var(T\mid S)]>0$, i.e.\ iff $T$ is not already (a.s.) a function of $S$.
+
+\smallskip\noindent\textbf{(c)} \mk{3}
+Take $X_1,\dots,X_n\iid\mathrm{Uniform}[\theta,\theta+1]$, $\theta\in\R$. By factorisation
+$S=(X_{(1)},X_{(n)})$ is sufficient. Writing $X_i=\theta+U_i$ with $U_i\iid U[0,1]$, the range
+$X_{(n)}-X_{(1)}=U_{(n)}-U_{(1)}$ has a distribution free of $\theta$ --- it is
+$\mathrm{Beta}(n-1,2)$, with mean $\tfrac{n-1}{n+1}$. Hence
+\[
+g(u,v):=(v-u)-\frac{n-1}{n+1}
+\quad\text{satisfies}\quad \E_\theta\,g(X_{(1)},X_{(n)})=0\ \ \forall\theta,
+\]
+while $g\not\equiv0$. So $S$ is sufficient but not complete.
+
+\smallskip
+(Equally acceptable: $X_1,\dots,X_n\iid\mathrm{Cauchy}(\theta)$, where the order statistic is
+sufficient and $g(X_{(i)}-X_{(j)})$ gives the same obstruction; or $N(\theta,\theta^2)$, whose
+natural parameter space is a curve, not a rectangle.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q2
+\qhead{2}{12 marks --- Binomial: completeness, UMVUE, estimability}
+
+\noindent\textbf{(a)} \mk{4}
+\[
+f(x\mid\theta)=\binom mx\theta^{x}(1-\theta)^{m-x}
+=\underbrace{(1-\theta)^{m}}_{p(\theta)}\ \underbrace{\binom mx}_{h(x)}\
+\exp\Big\{\underbrace{\log\tfrac{\theta}{1-\theta}}_{c(\theta)}\cdot\underbrace{x}_{T(x)}\Big\},
+\]
+a one-parameter exponential family with $T(x)=x$ \mk{2}. As $\theta$ ranges over $(0,1)$, the
+natural parameter $\eta=\log\frac{\theta}{1-\theta}$ ranges over all of $\R$, which certainly
+contains an interval with non-empty interior; the support $\{0,1,\dots,m\}$ is free of
+$\theta$. By the completeness criterion for exponential families, $X$ is complete sufficient
+\mk{2}.
+
+\emph{Direct verification, if preferred.} $\E_\theta g(X)=0\ \forall\theta$ gives, after
+dividing by $(1-\theta)^m$ and setting $r=\theta/(1-\theta)\in(0,\infty)$,
+$\sum_{x=0}^m g(x)\binom mx r^{x}=0$ for all $r>0$; a polynomial vanishing on an interval has
+all coefficients zero, so $g\equiv0$.
+
+\smallskip\noindent\textbf{(b)} \mk{5}
+Use factorial moments. For $1\le k\le m$, with
+$X^{\underline k}=X(X-1)\cdots(X-k+1)$,
+\[
+\E_\theta\big[X^{\underline k}\big]
+=\sum_{x=k}^{m}\frac{m!}{(x-k)!\,(m-x)!}\theta^{x}(1-\theta)^{m-x}
+=m^{\underline k}\,\theta^{k}\sum_{y=0}^{m-k}\binom{m-k}{y}\theta^{y}(1-\theta)^{m-k-y}
+=m^{\underline k}\,\theta^{k},
+\]
+substituting $y=x-k$ and recognising the $\mathrm{Bin}(m-k,\theta)$ total \mk{3}. Hence
+\[
+\boxed{\ \widehat{\theta^{k}}=\frac{X(X-1)\cdots(X-k+1)}{m(m-1)\cdots(m-k+1)}\ }
+\]
+is unbiased, and being a function of the complete sufficient statistic $X$ it is the UMVUE by
+Lehmann--Scheff\'e \mk{2}.
+
+\emph{Check $k=1$:} $X/m$. \emph{Check $k=2$:} $X(X-1)/\{m(m-1)\}$, which combined with $k=1$
+gives the familiar UMVUE $\frac{X(m-X)}{m(m-1)}$ of $\theta(1-\theta)$.
+
+\smallskip\noindent\textbf{(c)} \mk{3}
+For any estimator $T$,
+\[
+\E_\theta T=\sum_{x=0}^{m}T(x)\binom mx\theta^{x}(1-\theta)^{m-x}
+\]
+is a \emph{polynomial in $\theta$ of degree at most $m$} \mk{2}. If it equalled
+$\theta^{m+1}$ for every $\theta\in(0,1)$, then two polynomials would agree on an interval and
+hence be identical --- but their degrees are $\le m$ and $m+1$. Contradiction \mk{1}. So no
+unbiased estimator of $\theta^{m+1}$ exists.
+
+\begin{trapbox}
+In (c) it is not enough to say ``$\theta^{m+1}$ has degree $m+1$''. You must say \emph{why}
+agreement on an interval forces equality of coefficients --- a polynomial with infinitely many
+roots is identically zero. The same one-line principle is what makes $1/\theta$ non-estimable.
+\end{trapbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q3
+\qhead{3}{12 marks --- Poisson: UMVUE of $e^{-\lambda}$ and the CRLB}
+
+\noindent\textbf{(a)} \mk{6}
+$S=\sum_iX_i\sim\mathrm{Poisson}(n\lambda)$ is complete sufficient (exponential family,
+$T(x)=x$, $c(\lambda)=\log\lambda$, natural parameter space $\R$) \mk{1}.
+
+\emph{Route B (Rao--Blackwell).} $T_0=\I\{X_1=0\}$ is unbiased for $e^{-\lambda}$, so the
+UMVUE is $\E[T_0\mid S]=\Prob(X_1=0\mid S=s)$. Given $S=s$, the conditional law of $X_1$ is
+$\mathrm{Bin}\big(s,\tfrac1n\big)$ (from the multinomial conditional distribution of Lecture 2,
+Ex 5), so
+\[
+\Prob(X_1=0\mid S=s)=\Big(1-\frac1n\Big)^{s}=\Big(\frac{n-1}{n}\Big)^{s}. \ \mk{4}
+\]
+Being unbiased and a function of the complete sufficient statistic, by Lehmann--Scheff\'e
+\[
+\boxed{\ \widehat{e^{-\lambda}}=\Big(\frac{n-1}{n}\Big)^{S},\qquad S=\sum_{i=1}^nX_i.\ }\ \mk{1}
+\]
+
+\emph{Route A (series matching), equally acceptable.} Require
+$\E_\lambda g(S)=e^{-\lambda}$:
+\[
+\sum_{s\ge0}g(s)\frac{e^{-n\lambda}(n\lambda)^{s}}{s!}=e^{-\lambda}
+\iff
+\sum_{s\ge0}\frac{g(s)n^{s}}{s!}\lambda^{s}=e^{(n-1)\lambda}=\sum_{s\ge0}\frac{(n-1)^{s}}{s!}\lambda^{s},
+\]
+so $g(s)n^{s}=(n-1)^{s}$, giving the same answer.
+
+\smallskip\noindent\textbf{(b)} \mk{3}
+For $S\sim\mathrm{Poisson}(n\lambda)$ and any $a>0$,
+$\E[a^{S}]=e^{-n\lambda}\sum_s\frac{(an\lambda)^s}{s!}=e^{n\lambda(a-1)}$ \mk{1}.
+With $a=\frac{n-1}{n}$ this gives $e^{-\lambda}$, confirming unbiasedness. With
+$a=\big(\frac{n-1}{n}\big)^{2}$,
+\[
+n\lambda(a-1)=n\lambda\cdot\frac{(n-1)^2-n^2}{n^{2}}=\frac{\lambda(1-2n)}{n}
+=-2\lambda+\frac{\lambda}{n},
+\]
+so $\E\big[a^{S}\big]=e^{-2\lambda}e^{\lambda/n}$ and
+\[
+\boxed{\ \Var_\lambda\Big(\big(\tfrac{n-1}{n}\big)^{S}\Big)=e^{-2\lambda}\big(e^{\lambda/n}-1\big).\ }\ \mk{2}
+\]
+
+\smallskip\noindent\textbf{(c)} \mk{3}
+With $\psi(\lambda)=e^{-\lambda}$ we have $\psi'(\lambda)=-e^{-\lambda}$, and for the Poisson
+$I(\lambda)=1/\lambda$, so
+\[
+\text{CRLB}=\frac{[\psi'(\lambda)]^{2}}{n\,I(\lambda)}=\frac{\lambda e^{-2\lambda}}{n}. \ \mk{1}
+\]
+Since $e^{u}-1>u$ for every $u>0$, with $u=\lambda/n$,
+\[
+\Var=e^{-2\lambda}\big(e^{\lambda/n}-1\big)\ >\ e^{-2\lambda}\cdot\frac{\lambda}{n}=\text{CRLB}. \ \mk{1}
+\]
+So the bound is \textbf{not attained}, at any $\lambda$ or $n$. This is consistent with the
+attainment criterion: equality requires the score to factor as
+$k(\lambda)[T-\psi(\lambda)]$, i.e.\ $\psi$ must be the mean of the natural sufficient
+statistic --- here $\psi(\lambda)=e^{-\lambda}$ is a non-linear function of $\lambda$, so it
+cannot be.
+
+\emph{As $n\to\infty$} \mk{1}: $e^{\lambda/n}-1=\frac{\lambda}{n}+O(n^{-2})$, so the ratio
+$\Var/\text{CRLB}\to1$. The UMVUE is asymptotically efficient even though it never attains the
+bound exactly.
+
+\begin{trapbox}
+``Does not attain the CRLB'' does \emph{not} contradict being the UMVUE. The CRLB is a lower
+bound on the variance of \emph{all} unbiased estimators; if no estimator attains it, the best
+one still sits above it. Writing ``since the variance exceeds the CRLB, it is not the UMVUE''
+is the single most common error on this type of question.
+\end{trapbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q4
+\qhead{4}{10 marks --- Basu applied to the sample range}
+
+\noindent\textbf{(a)} \mk{4}
+\[
+f(\mathbf x\mid\mu,\sigma^{2})
+=(2\pi\sigma^{2})^{-n/2}\exp\Big\{-\frac{1}{2\sigma^{2}}\sum_ix_i^{2}
++\frac{\mu}{\sigma^{2}}\sum_ix_i-\frac{n\mu^{2}}{2\sigma^{2}}\Big\},
+\]
+a two-parameter exponential family with $T=\big(\sum X_i^{2},\ \sum X_i\big)$ and natural
+parameters
+\[
+(\eta_1,\eta_2)=\Big(-\frac{1}{2\sigma^{2}},\ \frac{\mu}{\sigma^{2}}\Big)\ \mk{2}.
+\]
+As $(\mu,\sigma^{2})$ ranges over $\R\times(0,\infty)$, $(\eta_1,\eta_2)$ ranges over the open
+half-plane $(-\infty,0)\times\R$, which contains a two-dimensional rectangle with non-empty
+interior. By the multiparameter completeness criterion, $T$ is complete sufficient \mk{2}.
+(Equivalently $(\Xbar,S^{2})$, a one-to-one function of $T$.)
+
+\smallskip\noindent\textbf{(b)} \mk{3}
+Write $X_i=\mu+\sigma Z_i$ with $Z_i\iid N(0,1)$. Order statistics are monotone equivariant
+and $\sigma>0$, so $X_{(k)}=\mu+\sigma Z_{(k)}$; hence
+\[
+R=X_{(n)}-X_{(1)}=\sigma\big(Z_{(n)}-Z_{(1)}\big),\qquad
+S=\sigma\,S_Z\quad\text{where }S_Z^2=\tfrac{1}{n-1}\textstyle\sum_i(Z_i-\Zbar)^2 .
+\]
+Therefore
+\[
+V=\frac{R}{S}=\frac{Z_{(n)}-Z_{(1)}}{S_Z},
+\]
+whose distribution involves neither $\mu$ (it cancelled in the differences) nor $\sigma$ (it
+cancelled in the ratio). So $V$ is \textbf{ancillary}.
+
+\smallskip\noindent\textbf{(c)} \mk{3}
+$(\Xbar,S^{2})$ is complete sufficient by (a) and $V$ is ancillary by (b), so Basu's theorem
+gives $V\ind(\Xbar,S^{2})$; in particular $V\ind S$ \mk{2}. Since $R=VS$,
+\[
+\E[R]=\E[VS]=\E[V]\,\E[S]. \ \mk{1}
+\]
+(This is exactly the classical identity behind tabulated ``$d_2$'' constants: $\E[R]=d_2\sigma$
+with $d_2=\E[V]\,\E[S]/\sigma$ a pure function of $n$.)
+
+\begin{trapbox}
+$V$ is ancillary for the \emph{pair} $(\mu,\sigma^2)$ --- both must cancel. A common slip is
+to check only the location cancellation and forget the scale, which is what the division by
+$S$ (rather than by a constant) achieves.
+\end{trapbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q5
+\qhead{5}{12 marks --- conjugate and generalized Bayes for the exponential scale}
+
+\noindent\textbf{(a)} \mk{5}
+The likelihood is $L(\theta)=\theta^{-n}\exp\{-S/\theta\}$ with $S=\sum_ix_i$ \mk{1}. Hence
+\[
+\pi(\theta\mid\mathbf x)\ \propto\ \theta^{-n}e^{-S/\theta}\cdot\theta^{-(\alpha+1)}e^{-\beta/\theta}
+=\theta^{-(\alpha+n+1)}\exp\Big\{-\frac{\beta+S}{\theta}\Big\}\ \mk{3},
+\]
+which is again an inverse-gamma kernel. So the family is conjugate and
+\[
+\boxed{\ \theta\mid\mathbf X\ \sim\ \text{Inverse-Gamma}\big(\alpha+n,\ \beta+S\big).\ }\ \mk{1}
+\]
+
+\smallskip\noindent\textbf{(b)} \mk{3}
+An Inverse-Gamma$(a,b)$ variable has mean $b/(a-1)$, finite iff $a>1$ \mk{1}. Hence the Bayes
+estimate under squared error is the posterior mean
+\[
+\boxed{\ T_{\alpha,\beta}=\frac{\beta+\sum_iX_i}{\alpha+n-1}\ }\qquad\text{provided }\alpha+n>1,
+\]
+which holds for every $n\ge1$ since $\alpha>0$ \mk{2}.
+
+\smallskip\noindent\textbf{(c)} \mk{2}
+$\E_\theta\big[\sum_iX_i\big]=n\theta$, so
+\[
+\E_\theta T_{\alpha,\beta}=\frac{\beta+n\theta}{\alpha+n-1}.
+\]
+For this to equal $\theta$ for \emph{all} $\theta>0$ we would need $\beta=0$ and
+$n=\alpha+n-1$, i.e.\ $\alpha=1,\ \beta=0$ --- which is not a proper prior. So for every
+proper inverse-gamma prior the Bayes estimate is \textbf{biased}. This is an instance of the
+general fact that a Bayes estimate is unbiased only in degenerate problems.
+
+\smallskip\noindent\textbf{(d)} \mk{2}
+$\pi(\theta)=1/\theta$ is the $\alpha=\beta=0$ member of the family (improper, since
+$\int_0^\infty\theta^{-1}d\theta=\infty$). The posterior kernel is
+$\theta^{-(n+1)}e^{-S/\theta}$, i.e.\ Inverse-Gamma$(n,S)$, which is a \emph{proper} density.
+Its mean exists for $n\ge2$, giving the generalized Bayes estimate
+\[
+\boxed{\ \widehat\theta=\frac{\sum_iX_i}{n-1}=\frac{n}{n-1}\,\Xbar\qquad(n\ge2).\ }
+\]
+This is \emph{not} $\Xbar$: it inflates the UMVUE by the factor $n/(n-1)$, so
+$\E_\theta\widehat\theta=\frac{n\theta}{n-1}>\theta$ --- biased upwards, though the bias is
+$O(1/n)$ and vanishes asymptotically. As always, the generalized Bayes estimate is a function
+of the sufficient statistic $\sum X_i$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q6
+\qhead{6}{12 marks --- the minimax Binomial estimator}
+
+\noindent\textbf{(a)} \mk{3}
+$\pi(\theta\mid x)\propto\theta^{x}(1-\theta)^{n-x}\cdot\theta^{p-1}(1-\theta)^{q-1}
+=\theta^{p+x-1}(1-\theta)^{q+n-x-1}$, the kernel of $\mathrm{Beta}(p+x,\ q+n-x)$ \mk{2}.
+A $\mathrm{Beta}(a,b)$ has mean $a/(a+b)$, so the Bayes estimate is
+\[
+T_{p,q}=\E[\theta\mid X]=\frac{p+X}{(p+X)+(q+n-X)}=\frac{p+X}{p+q+n}. \ \mk{1}
+\]
+
+\smallskip\noindent\textbf{(b)} \mk{6}
+Write $c=p+q+n$. Since $\E_\theta X=n\theta$ and $\Var_\theta X=n\theta(1-\theta)$,
+\[
+\text{Bias}=\frac{p+n\theta}{c}-\theta=\frac{p-(p+q)\theta}{c},
+\qquad
+\Var_\theta(T_{p,q})=\frac{n\theta(1-\theta)}{c^{2}}\ \mk{2},
+\]
+so
+\[
+R(\theta,T_{p,q})=\frac{1}{c^{2}}\Big[n\theta(1-\theta)+\big(p-(p+q)\theta\big)^{2}\Big]
+=\frac{1}{c^{2}}\Big[\underbrace{\big((p+q)^{2}-n\big)}_{\theta^{2}}\theta^{2}
++\underbrace{\big(n-2p(p+q)\big)}_{\theta}\theta+p^{2}\Big]\ \mk{2}.
+\]
+The risk is free of $\theta$ iff both bracketed coefficients vanish:
+\[
+(p+q)^{2}=n\ \Longrightarrow\ p+q=\sqrt n,
+\qquad
+n=2p(p+q)=2p\sqrt n\ \Longrightarrow\ p=\frac{\sqrt n}{2},\ \ q=\frac{\sqrt n}{2}\ \mk{2}.
+\]
+This is the \emph{only} such pair. Then $c=n+\sqrt n=\sqrt n(1+\sqrt n)$ and
+\[
+R(\theta,T^{*})=\frac{p^{2}}{c^{2}}=\frac{n/4}{n(1+\sqrt n)^{2}}
+=\boxed{\ \frac{1}{4(1+\sqrt n)^{2}}\ }\quad\text{for every }\theta .
+\]
+
+\smallskip\noindent\textbf{(c)} \mk{3}
+$T^{*}=\dfrac{X+\sqrt n/2}{n+\sqrt n}$ is Bayes with respect to the proper prior
+$\mathrm{Beta}\big(\tfrac{\sqrt n}{2},\tfrac{\sqrt n}{2}\big)$ and has constant risk. By the
+constant-risk criterion --- for any $T$,
+\[
+\sup_\theta R(\theta,T)\ \ge\ r(\pi,T)\ \ge\ r(\pi,T^{*})=\frac{1}{4(1+\sqrt n)^{2}}
+=\sup_\theta R(\theta,T^{*})
+\]
+--- $T^{*}$ is \textbf{minimax} \mk{2}, and $\mathrm{Beta}(\sqrt n/2,\sqrt n/2)$ is least
+favourable.
+
+The UMVUE $X/n$ has $R(\theta,X/n)=\theta(1-\theta)/n$, maximised at $\theta=\tfrac12$:
+\[
+\max_\theta R(\theta,X/n)=\frac{1}{4n}\ >\ \frac{1}{4(1+\sqrt n)^{2}}
+\quad\text{since }(1+\sqrt n)^{2}=n+2\sqrt n+1>n .
+\]
+So the UMVUE is \textbf{not} minimax \mk{1}; but the ratio
+$\frac{(1+\sqrt n)^{2}}{n}\to1$, so the advantage disappears for large $n$. (Note also that
+$T^{*}$ beats $X/n$ only near $\theta=\tfrac12$ --- near the endpoints $X/n$ has much smaller
+risk. Minimaxity is a worst-case criterion, not a uniform one.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q7
+\qhead{7}{12 marks --- Neyman--Pearson, and why two-sided UMP fails}
+
+\noindent\textbf{(a)} \mk{6}
+Both hypotheses are simple, so Neyman--Pearson applies. With
+$f_0=\varphi(x)$ and $f_1(x)=\frac{1}{2\sqrt{2\pi}}e^{-x^{2}/8}$,
+\[
+\Lambda(x)=\frac{f_1(x)}{f_0(x)}
+=\frac{\tfrac12 e^{-x^{2}/8}}{e^{-x^{2}/2}}
+=\frac12\exp\Big\{x^{2}\Big(\frac12-\frac18\Big)\Big\}
+=\frac12\,e^{3x^{2}/8}\ \mk{3}.
+\]
+$\Lambda$ is a strictly increasing function of $x^{2}$, so $\{\Lambda>k\}=\{x^{2}>k'\}=\{|x|>c\}$
+\mk{2}. Both distributions are continuous, so no randomisation is needed and $c$ is fixed by
+the size:
+\[
+\boxed{\ \text{Reject }H_0\iff |X|>c,\qquad \Prob_{H_0}(|X|>c)=2\{1-\Phi(c)\}=\alpha,
+\ \text{ i.e. } c=z_{\alpha/2}.\ }\ \mk{1}
+\]
+
+\smallskip\noindent\textbf{(b)} \mk{3}
+For $\alpha=0.05$, $c=z_{0.025}=1.960$: reject iff $|X|>1.96$ \mk{1}. Under $H_A$,
+$X\sim N(0,4)$ so $X/2\sim N(0,1)$ and
+\[
+\text{power}=\Prob\big(|X|>1.96\big)=2\Big\{1-\Phi\Big(\frac{1.96}{2}\Big)\Big\}
+=2\{1-\Phi(0.98)\}=2(1-0.8365)=\boxed{0.327}\ \mk{2}.
+\]
+(Only $0.327$ against a variance four times too large: a single observation carries very little
+information about a scale parameter.)
+
+\smallskip\noindent\textbf{(c)} \mk{3}
+\textbf{No UMP test exists.} The family $N(0,\sigma^{2})$ is a one-parameter exponential
+family in $T(x)=x^{2}$ with $c(\sigma^{2})=-\frac{1}{2\sigma^{2}}$, increasing in $\sigma^{2}$,
+so it has MLR in $X^{2}$ \mk{1}. Consequently:
+\begin{itemize}
+\item Against any $\sigma_1^{2}>1$, the same computation as in (a) gives
+$\Lambda(x)=\frac{1}{\sigma_1}\exp\{\frac{x^2}{2}(1-\sigma_1^{-2})\}$, increasing in $x^{2}$,
+so the MP test rejects for \emph{large} $|X|$ \mk{1}.
+\item Against any $\sigma_1^{2}<1$, the coefficient $\frac12(1-\sigma_1^{-2})$ is
+\emph{negative}, so $\Lambda$ is decreasing in $x^{2}$ and the MP test rejects for
+\emph{small} $|X|$ \mk{1}.
+\end{itemize}
+The two families of MP tests are disjoint (a level-$\alpha$ test cannot reject both the largest
+and the smallest $|x|$ values), so no single test of size $\alpha$ is simultaneously most
+powerful against every $\sigma^{2}\ne1$. Hence no UMP test exists, and one restricts attention
+to unbiased tests (UMPU), where the two-sided $\chi^2$ test with suitably chosen --- not
+equal-tailed --- cutoffs is optimal.
+
+\begin{trapbox}
+The contrast worth remembering: the failure here is the \emph{generic} one (MLR family,
+two-sided alternative). It is not contradicted by HW3 Q4, where a two-sided UMP test
+\emph{does} exist for $U[0,\theta]$ --- there the support moves with $\theta$, so rejecting on
+$\{X>\theta_0\}$ costs nothing under $H_0$ and both sides can be served at once.
+\end{trapbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q8
+\qhead{8}{10 marks --- MLR and Karlin--Rubin for the uniform}
+
+\noindent\textbf{(a)} \mk{4}
+The joint density is $f_\theta(\mathbf x)=\theta^{-n}\I[0\le x_{(1)}]\,\I[x_{(n)}\le\theta]$,
+so $X_{(n)}$ is sufficient. For $\theta_0<\theta_1$,
+\[
+\frac{f_{\theta_1}(\mathbf x)}{f_{\theta_0}(\mathbf x)}
+=\Big(\frac{\theta_0}{\theta_1}\Big)^{n}\cdot
+\frac{\I[x_{(n)}\le\theta_1]}{\I[x_{(n)}\le\theta_0]}
+=\begin{cases}
+\big(\theta_0/\theta_1\big)^{n}, & x_{(n)}\le\theta_0,\\[3pt]
++\infty, & \theta_0<x_{(n)}\le\theta_1,
+\end{cases}
+\]
+(the region $x_{(n)}>\theta_1$ has probability zero under both) \mk{3}. As a function of
+$x_{(n)}$ this takes the constant value $(\theta_0/\theta_1)^{n}<1$ and then jumps to
+$+\infty$: it is \textbf{non-decreasing in $x_{(n)}$}, so the family has MLR in $X_{(n)}$
+\mk{1}.
+
+\smallskip\noindent\textbf{(b)} \mk{4}
+By Karlin--Rubin the UMP level-$\alpha$ test of $H_0:\theta\le\theta_0$ against
+$H_A:\theta>\theta_0$ rejects for large $X_{(n)}$ \mk{1}. Under $\theta_0$, $X_{(n)}$ has cdf
+$(x/\theta_0)^{n}$ on $[0,\theta_0]$, so with rejection region $\{X_{(n)}>c\}$,
+\[
+\Prob_{\theta_0}\big(X_{(n)}>c\big)=1-\Big(\frac{c}{\theta_0}\Big)^{n}=\alpha
+\ \Longrightarrow\ c=\theta_0(1-\alpha)^{1/n}\ \mk{2}.
+\]
+$X_{(n)}$ is continuous, so no randomisation is needed:
+\[
+\boxed{\ \text{Reject }H_0\iff X_{(n)}>\theta_0(1-\alpha)^{1/n}.\ }\ \mk{1}
+\]
+
+\smallskip\noindent\textbf{(c)} \mk{2}
+With $c=\theta_0(1-\alpha)^{1/n}$,
+\[
+\beta(\theta)=\Prob_\theta\big(X_{(n)}>c\big)=
+\begin{cases}
+0, & \theta\le c,\\[3pt]
+1-\dfrac{(1-\alpha)\theta_0^{\,n}}{\theta^{n}}, & \theta>c .
+\end{cases}
+\]
+$\beta$ is non-decreasing in $\theta$, with $\beta(\theta_0)=1-(1-\alpha)=\alpha$ and
+$\beta(\theta)\to1$ as $\theta\to\infty$. Monotonicity gives
+$\sup_{\theta\le\theta_0}\beta(\theta)=\beta(\theta_0)=\alpha$, so the test has size exactly
+$\alpha$ over the composite null.
+
+\begin{trapbox}
+Note that $\{X_{(n)}>\theta_0\}$ is \emph{contained} in the rejection region, since
+$c<\theta_0$. That is forced: any observation exceeding $\theta_0$ is impossible under $H_0$,
+so an optimal test must reject there. Answers that take the rejection region to be
+$\{X_{(n)}>\theta_0\}$ alone have size $0$, not $\alpha$, and are not UMP.
+\end{trapbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q9
+\qhead{9}{10 marks --- consistency}
+
+\noindent\textbf{(a)} \mk{6}
+\emph{$\Xbar$ is not consistent.} The Cauchy family is \emph{stable}: if
+$X_1,\dots,X_n\iid\mathrm{Cauchy}(\theta,1)$ then $\sum_iX_i\sim\mathrm{Cauchy}(n\theta,n)$,
+and hence
+\[
+\Xbar\sim\mathrm{Cauchy}(\theta,1)\qquad\text{for \emph{every} }n \ \mk{2}.
+\]
+(Quickest justification: the characteristic function of $\mathrm{Cauchy}(\theta,1)$ is
+$e^{i\theta t-|t|}$, so that of $\Xbar$ is $\big(e^{i\theta t/n-|t|/n}\big)^{n}=e^{i\theta t-|t|}$.)
+Therefore, for any $\varepsilon>0$,
+\[
+\Prob_\theta\big(|\Xbar-\theta|>\varepsilon\big)=1-\frac{2}{\pi}\arctan\varepsilon,
+\]
+a strictly positive constant that does not depend on $n$ \mk{1}. So $\Xbar\not\pto\theta$:
+averaging buys nothing at all. (Consistent with $\E|X_1|=\infty$, so the weak law does not
+apply.)
+
+\emph{The sample median is consistent.} Let $F$ be the Cauchy$(\theta)$ cdf, so
+$F(\theta)=\tfrac12$ and $F$ is continuous and strictly increasing. Let $\tilde X_n$ be the
+sample median. For $\varepsilon>0$,
+\[
+\Prob\big(\tilde X_n-\theta>\varepsilon\big)
+\le\Prob\big(\text{at least }\tfrac n2\text{ of the }X_i\text{ exceed }\theta+\varepsilon\big)
+=\Prob\Big(\mathrm{Bin}\big(n,\,1-F(\theta+\varepsilon)\big)\ge\tfrac n2\Big),
+\]
+and $1-F(\theta+\varepsilon)<\tfrac12$ strictly, so by the weak law (or Chebyshev) this
+probability $\to0$ \mk{2}. Symmetrically
+$\Prob(\tilde X_n-\theta<-\varepsilon)=\Prob\big(\mathrm{Bin}(n,F(\theta-\varepsilon))\ge\tfrac n2\big)\to0$
+since $F(\theta-\varepsilon)<\tfrac12$ \mk{1}. Hence $\tilde X_n\pto\theta$.
+
+\smallskip\noindent\textbf{(b)} \mk{4}
+With $S_{xx}=\sum_i(x_i-\bar x)^{2}$,
+\[
+\hat\beta_{LS}=\frac{\sum_i(x_i-\bar x)Y_i}{S_{xx}},\qquad
+\E\hat\beta_{LS}=\frac{\sum_i(x_i-\bar x)(\alpha+\beta x_i)}{S_{xx}}=\beta,
+\qquad
+\Var(\hat\beta_{LS})=\frac{\sigma^{2}}{S_{xx}}\ \mk{2}
+\]
+(using $\sum_i(x_i-\bar x)=0$ for the first and independence for the second).
+The estimator is unbiased, so by Chebyshev
+\[
+\Prob\big(|\hat\beta_{LS}-\beta|>\varepsilon\big)\le\frac{\sigma^{2}}{\varepsilon^{2}S_{xx}} .
+\]
+Hence the condition is
+\[
+\boxed{\ \sum_{i=1}^{n}(x_i-\bar x)^{2}\longrightarrow\infty\ \text{ as }n\to\infty\ }\ \mk{2}
+\]
+i.e.\ \textbf{the design points must be sufficiently spread out}. Merely taking $n\to\infty$
+is not enough: if all $x_i$ were equal, $S_{xx}=0$ and $\beta$ is not even identifiable; if the
+$x_i$ cluster fast enough that $S_{xx}$ stays bounded, the variance does not vanish and
+$\hat\beta_{LS}$ is inconsistent however large $n$ becomes.
+
+\vfill
+\begin{center}
+\small\itshape
+Companions: \texttt{PI\_Exam\_Revision.pdf}, \texttt{PI\_Assignment\_Solutions.pdf},
+\texttt{PI\_Class\_Exercises\_Solved.pdf}.
+\end{center}
+
+\end{document}
