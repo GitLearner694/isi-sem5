@@ -29,6 +29,8 @@
 \newcommand{\Xbar}{\overline{X}}
 \newcommand{\iid}{\overset{\text{iid}}{\sim}}
 \newcommand{\pto}{\overset{p}{\longrightarrow}}
+\newcommand{\dto}{\overset{d}{\longrightarrow}}
+\newcommand{\I}{\mathbb{I}}
 \newcommand{\ind}{\perp\!\!\!\perp}
 \DeclareMathOperator{\MSE}{MSE}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -93,7 +95,7 @@ observed question space.
 \multicolumn{3}{@{}l}{\textbf{Exam morning ($\approx$ 2 h) --- consolidate}}\\
 \midrule
 0.5 h & \S12: consistency, $b_n$-consistency, MLE consistency & Light read; the cheapest section to score on. \\
-1.0 h & \S13--\S14: the cheat sheets & Re-derive every row of the distribution table from the exponential-family form. If you can rebuild the table, you are ready. \\
+1.0 h & \S13 loose ends, then \S14--\S15: the cheat sheets & Skim \S13, then re-derive every row of the distribution table from the exponential-family form. If you can rebuild the table, you are ready. \\
 0.5 h & Skim your own notes 1--10 & Only to catch anything idiosyncratic the professor stressed. \\
 \bottomrule
 \end{tabular}
@@ -134,6 +136,26 @@ beat everything everywhere. That is exactly \emph{why} we impose unbiasedness (g
 or average the risk (giving Bayes), or look at the worst case (giving minimax). Be able to
 say this in one sentence --- it is a standard opening bookwork part.
 \end{warnbox}
+
+\begin{keybox}{Uniqueness of the UMVUE (Lec 1) --- a five-line ``state and prove'' answer}
+\textbf{Claim.} If a UMVUE exists, it is unique (a.s.).
+
+\smallskip
+\textbf{Proof.} Let $T_1$ and $T_2$ both be UMVUEs of $\psi(\theta)$, so both are unbiased and
+$\Var_\theta(T_1)=\Var_\theta(T_2)=\sigma^2$, say. Then $T=\tfrac12(T_1+T_2)$ is also
+unbiased, so by minimality of the UMVUE variance,
+\[
+\sigma^{2}\ \le\ \Var_\theta(T)=\frac14\big[\Var(T_1)+\Var(T_2)+2\Cov(T_1,T_2)\big]
+=\frac{\sigma^{2}}{4}\big[2+2\rho\big],
+\]
+where $\rho=\mathrm{Corr}_\theta(T_1,T_2)$. Hence $1\le\tfrac12(1+\rho)$, i.e.\ $\rho\ge1$.
+But $\rho\le1$ always, so $\rho=1$ --- and correlation exactly $1$ forces $T_2=aT_1+b$ a.s.\
+with $a>0$. Matching means and variances gives $a=1$, $b=0$, so $T_1=T_2$ a.s. $\square$
+
+\smallskip
+This is a \emph{separate} fact from Lehmann--Scheff\'e: it holds whenever a UMVUE exists,
+with no complete sufficient statistic in sight. Know both.
+\end{keybox}
 
 \paragraph{Worked example (Lec 1, and a classic exam part).}
 $X_1,\dots,X_n\iid N(\mu,\sigma^2)$. Among estimators $T_c=c\sum_{i}(X_i-\Xbar)^2$ of
@@ -703,6 +725,17 @@ $\tilde X_n\pto\theta$. \emph{This is the right starting estimator for the Cauch
 problem, because $\Xbar$ is not even consistent there --- $\Xbar$ is itself Cauchy$(\theta)$
 for every $n$.}
 
+\paragraph{Convergence in distribution (Lec 10).}
+$X_n\dto X$ --- equivalently $F_n\overset{\mathcal L}{\longrightarrow}F$ --- means
+\[
+F_n(x)\longrightarrow F(x)\qquad\textbf{only at the continuity points $x$ of $F$.}
+\]
+The restriction is essential, not a technicality: take $X_n\equiv\tfrac1n$, so
+$F_n=\I[x\ge\tfrac1n]$, and $X\equiv0$ with $F=\I[x\ge0]$. Then $X_n\dto X$, yet
+$F_n(0)=0\not\to1=F(0)$ --- the convergence fails at the single discontinuity point $x=0$.
+Note also that convergence in probability implies convergence in distribution, and the
+converse holds only when the limit is a constant.
+
 \paragraph{MLE.} $\hat\theta_n=\argmax_\theta\prod_i f(X_i\mid\theta)$.
 \begin{itemize}
 \item Consistent for Binomial, Poisson, Exponential and Normal, and generally whenever the
@@ -726,6 +759,64 @@ $Y_i=\alpha+\beta x_i+\varepsilon_i$, $\varepsilon_i\iid$ with mean 0, variance 
 So $\hat\beta_{LS}$ is consistent \textbf{iff} $\sum_i(x_i-\bar x)^2\to\infty$: the design
 points must be sufficiently spread out. And $\hat\alpha_{LS}=\bar Y-\hat\beta_{LS}\bar x$ is
 consistent provided additionally $\bar x$ converges to a constant.
+
+\section{Loose ends the professor covered}
+
+Short items that came up in class and are easy marks if they appear, but which do not belong
+to any of the threads above.
+
+\paragraph{Method of scoring for the MLE (Lec 8).}
+The likelihood equation is $\sum_i\frac{\partial}{\partial\theta}\log f(X_i\mid\theta)=0$.
+Newton--Raphson would iterate using the observed second derivative
+$\sum_i\frac{\partial^2}{\partial\theta^2}\log f(X_i\mid\theta)$; the \emph{method of scoring}
+replaces it by its expectation, $-nI(\theta)$, giving
+\[
+\theta^{(m+1)}=\theta^{(m)}+\frac{1}{n I(\theta^{(m)})}\sum_i\frac{\partial}{\partial\theta}\log f(X_i\mid\theta)\Big|_{\theta^{(m)}} .
+\]
+The point of the substitution: the Fisher information is often free of $\theta$ (e.g.\ for a
+location parameter), which makes the iteration cheaper and more stable.
+
+\paragraph{Invariance (Lec 8).}
+Let $\psi$ be a function of $\theta$.
+\begin{itemize}
+\item If $\hat\theta$ is \emph{unbiased} for $\theta$, then $\psi(\hat\theta)$ is unbiased for
+$\psi(\theta)$ \textbf{only when $\psi$ is linear} (by Jensen, a strictly convex or concave
+$\psi$ introduces bias). The same caveat applies to Bayes estimates.
+\item The \textbf{MLE is invariant} under any one-one $\psi$: $\widehat{\psi(\theta)}=\psi(\hat\theta)$.
+This is a genuine advantage of maximum likelihood over unbiasedness, and a standard one-mark
+comparison question.
+\end{itemize}
+
+\paragraph{Multinomial as a multiparameter exponential family (Lec 5, Ex 2).}
+With $\mathbf Y=(Y_1,\dots,Y_k)$, $\sum_iY_i=n$ and $\theta=(p_1,\dots,p_{k-1})$,
+\[
+f(\mathbf y)=\underbrace{\frac{n!}{\prod_i y_i!}}_{h}\ \underbrace{(1-p_1-\dots-p_{k-1})^{n}}_{p(\theta)}
+\exp\Big\{\sum_{j=1}^{k-1}\underbrace{\log\frac{p_j}{1-p_1-\dots-p_{k-1}}}_{c_j(\theta)}\ \underbrace{y_j}_{T_j}\Big\},
+\]
+so $S=(Y_1,\dots,Y_{k-1})$ is complete sufficient (the natural parameter space is all of
+$\R^{k-1}$, which contains a rectangle).
+
+\paragraph{Beta model (Lec 3, Ex 6).} For $X_1,\dots,X_n\iid\mathrm{Beta}(\theta,\phi)$,
+factorisation gives the sufficient statistic
+$S=\big(\prod_iX_i,\ \prod_i(1-X_i)\big)$ --- note it is a pair of \emph{products}, not sums,
+because the exponential-family statistic here is $(\log x,\log(1-x))$.
+
+\paragraph{Zero functions (Lec 4).} $g$ is a \emph{zero function} for the family
+$\{P_\theta\}$ if $\E_\theta g(X)=0$ for every $\theta\in\Theta$. Completeness is exactly the
+statement that the only zero function is $g\equiv0$; exhibiting a non-trivial zero function is
+therefore the standard way to \emph{disprove} completeness.
+
+\paragraph{Conjugate families in general (Lec 7).} The class of \emph{all} densities on
+$\Theta$ is trivially conjugate for any model, and is useless --- a conjugate family earns its
+keep only by being \emph{small}, so that updating is arithmetic on a few hyperparameters. The
+general construction $\pi(\theta)\propto\pi_0(\theta)\prod_{j=1}^k f(y_j\mid\theta)$ (``prior
+$=$ base measure plus $k$ imaginary observations'') is conjugate for every $f$; it collapses to
+a two-parameter family precisely when $f$ is an exponential family, which is why the Cauchy has
+no useful conjugate family.
+
+\paragraph{Simulating a Cauchy (Lec 7).} If $U\sim U[0,1]$ then
+$X=\tan\{\pi(U-\tfrac12)\}+\theta\sim\mathrm{Cauchy}(\theta)$ --- inverse-cdf sampling, since
+the Cauchy cdf is $F(x)=\tfrac12+\tfrac1\pi\arctan(x-\theta)$.
 
 \section{Distribution cheat sheet}
 
