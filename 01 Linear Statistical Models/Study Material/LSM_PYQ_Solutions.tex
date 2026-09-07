@@ -1,0 +1,734 @@
+\documentclass[11pt]{article}
+\input{lsmstyle}
+\lhead{\small Previous-Year Papers --- Full Solutions}
+
+\newcommand{\wh}[1]{\widehat{#1}}
+\newcommand{\Pj}{\mathbf{P}}
+\newcommand{\Nsp}{\mathcal{N}}
+\newcommand{\SSE}{\mathrm{SSE}}
+\newcommand{\MSE}{\mathrm{MSE}}
+\newcommand{\Bt}{\mathrm{Beta}}
+\newcommand{\ind}{\perp\!\!\!\perp}
+
+\newcounter{qq}[section]
+\newcommand{\qhead}[2]{\medskip\refstepcounter{qq}%
+  \noindent\textbf{\color{Blue}Question \thesection.\theqq.}\hfill\textnormal{[\textbf{#1} marks]}%
+  \ifx\relax#2\relax\else\par\smallskip\fi}
+\newcommand{\sol}{\smallskip\noindent\textbf{\color{ForestGreen}Solution.}\ }
+\newcommand{\pt}[1]{\smallskip\noindent\textbf{(#1)}\ }
+\newtcolorbox{stmt}{colback=black!3,colframe=black!35,breakable,boxrule=0.4pt,
+  left=4pt,right=4pt,top=3pt,bottom=3pt}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Previous-Year Mid-Semester Papers}\\[4pt]
+{\large Complete Worked Solutions}\\[3pt]
+{\small Linear Statistical Models, B.Stat.\ 3rd year --- 2024--25 and 2025--26}
+\end{center}
+\vspace{2pt}\hrule\vspace{10pt}
+
+\noindent Both papers are worth 40 marks. Every part is solved in full, with the
+alternative route given wherever the professor's phrasing admits one. Section~3 is a
+coverage audit: which crash course contains the machinery for each question, and which
+four results appear \emph{nowhere} except the formula sheet.
+
+\tableofcontents
+\vspace{6pt}\hrule\vspace{8pt}
+
+%==================================================================
+\section{Mid-Semester Examination, 13 September 2024}
+
+\qhead{10}{}
+\begin{stmt}
+$\mathbf{P}$ and $\mathbf{Q}$ are $n\times n$ symmetric orthogonal projection matrices.
+Show that $\mathbf{P}+\mathbf{Q}$ is an orthogonal projection matrix if and only if
+$\mathbf{PQ}=\mathbf{O}_n$. In that case show also that
+$\rank(\mathbf{P})+\rank(\mathbf{Q})=\rank(\mathbf{P}+\mathbf{Q})$.
+\end{stmt}
+
+\sol Recall the characterisation: $M$ is an orthogonal projection matrix iff $M^T=M$ and
+$M^2=M$. Since $\mathbf{P},\mathbf{Q}$ are symmetric, $\mathbf{P}+\mathbf{Q}$ is symmetric
+automatically, so the whole question is about idempotence. Expand:
+\[
+  (\mathbf{P}+\mathbf{Q})^2=\mathbf{P}^2+\mathbf{PQ}+\mathbf{QP}+\mathbf{Q}^2
+  =\mathbf{P}+\mathbf{Q}+(\mathbf{PQ}+\mathbf{QP}),
+\]
+so
+\begin{equation}\label{eq:pq}
+  (\mathbf{P}+\mathbf{Q})^2=\mathbf{P}+\mathbf{Q}
+  \iff \mathbf{PQ}+\mathbf{QP}=\mathbf{O}.
+\end{equation}
+
+\pt{$\Leftarrow$} Suppose $\mathbf{PQ}=\mathbf{O}$. Since $\mathbf{P},\mathbf{Q}$ are
+symmetric, $\mathbf{QP}=\mathbf{Q}^T\mathbf{P}^T=(\mathbf{PQ})^T=\mathbf{O}$ as well.
+Hence $\mathbf{PQ}+\mathbf{QP}=\mathbf{O}$ and \eqref{eq:pq} gives idempotence.
+
+\pt{$\Rightarrow$} Suppose $\mathbf{P}+\mathbf{Q}$ is an orthogonal projector, so by
+\eqref{eq:pq}, $\mathbf{PQ}+\mathbf{QP}=\mathbf{O}$. Multiply this on the \emph{left} by
+$\mathbf{P}$ and use $\mathbf{P}^2=\mathbf{P}$:
+\[
+  \mathbf{PQ}+\mathbf{PQP}=\mathbf{O}. \tag{i}
+\]
+Multiply it on the \emph{right} by $\mathbf{P}$:
+\[
+  \mathbf{PQP}+\mathbf{QP}=\mathbf{O}. \tag{ii}
+\]
+Subtracting (ii) from (i) gives $\mathbf{PQ}-\mathbf{QP}=\mathbf{O}$, i.e.\
+$\mathbf{PQ}=\mathbf{QP}$. Substituting back into $\mathbf{PQ}+\mathbf{QP}=\mathbf{O}$
+gives $2\mathbf{PQ}=\mathbf{O}$, hence $\mathbf{PQ}=\mathbf{O}$. \qed
+
+\pt{Rank} Now assume $\mathbf{PQ}=\mathbf{O}$, so $\mathbf{P}+\mathbf{Q}$ is idempotent.
+For an idempotent matrix all eigenvalues are $0$ or $1$, so the trace (the sum of the
+eigenvalues) counts the eigenvalues equal to $1$, i.e.\ $\tr(M)=\rank(M)$. Applying this to
+all three idempotent matrices and using linearity of the trace:
+\[
+  \rank(\mathbf{P}+\mathbf{Q})=\tr(\mathbf{P}+\mathbf{Q})=\tr(\mathbf{P})+\tr(\mathbf{Q})
+  =\rank(\mathbf{P})+\rank(\mathbf{Q}). \qquad\square
+\]
+
+\begin{idea}{Alternative rank argument (no trace)}
+Show $\Cs(\mathbf{P}+\mathbf{Q})=\Cs(\mathbf{P})\oplus\Cs(\mathbf{Q})$.
+\begin{itemize}
+  \item \emph{Orthogonality.} For $u=\mathbf{P}a$ and $v=\mathbf{Q}b$,
+        $u^Tv=a^T\mathbf{PQ}b=0$. So $\Cs(\mathbf{P})\perp\Cs(\mathbf{Q})$, and in
+        particular the sum is direct.
+  \item ``$\subseteq$'': $(\mathbf{P}+\mathbf{Q})x=\mathbf{P}x+\mathbf{Q}x$.
+  \item ``$\supseteq$'': $(\mathbf{P}+\mathbf{Q})\mathbf{P}a
+        =\mathbf{P}^2a+\mathbf{QP}a=\mathbf{P}a$, so $\Cs(\mathbf{P})\subseteq\Cs(\mathbf{P}+\mathbf{Q})$;
+        similarly for $\mathbf{Q}$.
+\end{itemize}
+Dimensions of a direct sum add, giving the result.
+\end{idea}
+
+%------------------------------------------------------------------
+\qhead{12}{}
+\begin{stmt}
+Data $\bY=\{Y_{ij}: 1\le j\le m,\ i=1,2,3,4\}$, $m\ge2$, index $i$ the treatment and $j$ the
+replicate, with
+\[
+  Y_{1j}=\beta_1+\varepsilon_{1j},\quad
+  Y_{2j}=\beta_1+\beta_2+\varepsilon_{2j},\quad
+  Y_{3j}=\beta_2+\beta_3+\varepsilon_{3j},\quad
+  Y_{4j}=\beta_3+\beta_4+\varepsilon_{4j},
+\]
+$\varepsilon_{ij}\iid \N(0,\sigma^2)$.
+\textbf{(a)} Write the model in matrix form.
+\textbf{(b)} Are (i) $\beta_2$; (ii) $\beta_1-\beta_2$; (iii) $\beta_4$ estimable? For each
+estimable one find the BLUE.
+\textbf{(c)} Propose a test of $H_0:\beta_1=\beta_2$ against $H_A:\beta_1\ne\beta_2$.
+\end{stmt}
+
+\pt{a} Stack $\bY$ treatment-major,
+$\bY=(Y_{11},\dots,Y_{1m},Y_{21},\dots,Y_{2m},Y_{31},\dots,Y_{4m})^T$, and put
+$\bb=(\beta_1,\beta_2,\beta_3,\beta_4)^T$. Then $\bY=\bX\bb+\bep$ with
+$\bep\sim\N_{4m}(\zero,\sigma^2I_{4m})$ and
+\[
+  \underset{4m\times4}{\bX}=
+  \begin{pmatrix}
+    \one_m & \zero & \zero & \zero\\
+    \one_m & \one_m & \zero & \zero\\
+    \zero & \one_m & \one_m & \zero\\
+    \zero & \zero & \one_m & \one_m
+  \end{pmatrix}
+  = A\otimes\one_m,
+  \qquad
+  A=\begin{pmatrix}1&0&0&0\\1&1&0&0\\0&1&1&0\\0&0&1&1\end{pmatrix}.
+\]
+
+\pt{b} \textbf{First compute the rank --- do not assume it is deficient.} $A$ is lower
+triangular with all diagonal entries equal to $1$, so $\det A=1$ and $A$ is invertible.
+Hence $\rank(\bX)=\rank(A)=4=p$: the model has \textbf{full column rank}, so
+$\bX^T\bX=m\,A^TA$ is non-singular, the model is identifiable, and
+
+\begin{idea}{Every linear function of $\bb$ is estimable}
+All three of $\beta_2$, $\beta_1-\beta_2$ and $\beta_4$ are estimable. This is the trap in
+the question: the model \emph{looks} like an over-parametrised ANOVA, but it is not.
+\end{idea}
+
+Write $\mu_i:=\E(Y_{ij})$, so $\mu_1=\beta_1$, $\mu_2=\beta_1+\beta_2$,
+$\mu_3=\beta_2+\beta_3$, $\mu_4=\beta_3+\beta_4$, i.e.\ $\bmu=A\bb$. Since
+$\Cs(\bX)$ is exactly the span of the four treatment indicators (because $A$ is
+invertible), the LSE of $\bmu$ is the vector of group means and, by forward substitution in
+$A\bb=\bmu$,
+\[
+  \wh\bb=A^{-1}\begin{pmatrix}\Ybar_{1\cdot}\\ \Ybar_{2\cdot}\\ \Ybar_{3\cdot}\\ \Ybar_{4\cdot}\end{pmatrix}:
+  \qquad
+  \begin{aligned}
+    \wh\beta_1&=\Ybar_{1\cdot}, &\qquad \wh\beta_3&=\Ybar_{3\cdot}-\Ybar_{2\cdot}+\Ybar_{1\cdot},\\
+    \wh\beta_2&=\Ybar_{2\cdot}-\Ybar_{1\cdot}, &\qquad \wh\beta_4&=\Ybar_{4\cdot}-\Ybar_{3\cdot}+\Ybar_{2\cdot}-\Ybar_{1\cdot}.
+  \end{aligned}
+\]
+(Check directly: $\hat\bb=(\bX^T\bX)^{-1}\bX^T\bY=(mA^TA)^{-1}(A^T\otimes\one_m^T)\bY
+=(A^TA)^{-1}A^T\bar{\bY}=A^{-1}\bar{\bY}$, where $\bar\bY$ is the vector of group means.)
+
+The $\Ybar_{i\cdot}$ are independent with variance $\sigma^2/m$, so for a coefficient vector
+$c$ the variance is $\tfrac{\sigma^2}{m}\sum_ic_i^2$. By Gauss--Markov each of these is the
+unique BLUE:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+& Parameter & BLUE & Variance\\
+\midrule
+(i) & $\beta_2$ & $\Ybar_{2\cdot}-\Ybar_{1\cdot}$ & $2\sigma^2/m$\\
+(ii) & $\beta_1-\beta_2=2\mu_1-\mu_2$ & $2\Ybar_{1\cdot}-\Ybar_{2\cdot}$ & $5\sigma^2/m$\\
+(iii) & $\beta_4$ & $\Ybar_{4\cdot}-\Ybar_{3\cdot}+\Ybar_{2\cdot}-\Ybar_{1\cdot}$ & $4\sigma^2/m$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pt{c} Write the hypothesis as $L^T\bb=\theta_0$ with $L^T=(1,-1,0,0)$, $\theta_0=0$,
+so $r=\rank(L)=1$. Then
+\[
+  \wh\theta=\wh\beta_1-\wh\beta_2=2\Ybar_{1\cdot}-\Ybar_{2\cdot},
+  \qquad
+  \Var(\wh\theta)=\frac{5\sigma^2}{m}.
+\]
+Because $\Cs(\bX)$ is the span of the group indicators, the fitted values are
+$\wh Y_{ij}=\Ybar_{i\cdot}$ and
+\[
+  \SSE=\sum_{i=1}^4\sum_{j=1}^m(Y_{ij}-\Ybar_{i\cdot})^2,
+  \qquad
+  \wh\sigma^2=\MSE=\frac{\SSE}{4m-4},
+  \qquad \SSE\sim\sigma^2\chi^2_{4m-4}\ \text{independently of }\wh\bb.
+\]
+Hence the test statistic
+\[
+  \boxed{\ T=\frac{2\Ybar_{1\cdot}-\Ybar_{2\cdot}}{\wh\sigma\sqrt{5/m}}
+  \ \overset{H_0}{\sim}\ t_{4m-4}\ },
+  \qquad\text{reject }H_0\text{ if } |T|>t^{1-\alpha/2}_{4m-4}.
+\]
+Equivalently (and this is the ``alternative form of the likelihood ratio test'' the note
+permits) use
+\[
+  F=T^2=\frac{W}{r}=\frac{(\SSE_{red}-\SSE_{full})/1}{\MSE}\ \overset{H_0}{\sim}\ F_{1,\,4m-4},
+\]
+where $\SSE_{red}$ is the residual sum of squares after fitting under the constraint
+$\beta_1=\beta_2$.
+
+%------------------------------------------------------------------
+\qhead{6}{}
+\begin{stmt}
+$A$ is $m\times m$ of the form $A=\begin{bsmallmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{bsmallmatrix}$
+with $A_{11}$ of size $r\times r$, $r<m$, and $\rank(A)=\rank(A_{11})=r$. Show that
+$G=\begin{bsmallmatrix}A_{11}^{-1}&0\\0&0\end{bsmallmatrix}$ is a generalised inverse of $A$.
+\end{stmt}
+
+\sol $A_{11}$ is $r\times r$ with $\rank(A_{11})=r$, so $A_{11}^{-1}$ exists and $G$ is well
+defined. We must verify $AGA=A$. First,
+\[
+  AG=\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}
+     \begin{pmatrix}A_{11}^{-1}&0\\0&0\end{pmatrix}
+   =\begin{pmatrix}I_r&0\\A_{21}A_{11}^{-1}&0\end{pmatrix},
+\]
+and therefore
+\begin{equation}\label{eq:aga}
+  AGA=\begin{pmatrix}I_r&0\\A_{21}A_{11}^{-1}&0\end{pmatrix}
+      \begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}
+    =\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{21}A_{11}^{-1}A_{12}\end{pmatrix}.
+\end{equation}
+Comparing with $A$, it remains \emph{only} to show
+\begin{equation}\label{eq:schur}
+  A_{22}=A_{21}A_{11}^{-1}A_{12},
+\end{equation}
+i.e.\ that the Schur complement $A_{22}-A_{21}A_{11}^{-1}A_{12}$ vanishes.
+
+\textbf{This is exactly what the rank hypothesis gives.} Write $A$ in terms of its two row
+blocks, $A=\begin{bsmallmatrix}[A_{11}\ A_{12}]\\ [A_{21}\ A_{22}]\end{bsmallmatrix}$. The
+top block $[A_{11}\ A_{12}]$ has $r$ rows and already has rank $r$ (since $A_{11}$ does), and
+$\rank(A)=r$ by hypothesis. So the row space of $A$ is spanned by the first $r$ rows, and
+every row of the bottom block is a linear combination of them: there is an
+$(m-r)\times r$ matrix $M$ with
+\[
+  [A_{21}\ \ A_{22}]=M[A_{11}\ \ A_{12}]
+  \quad\Longrightarrow\quad
+  A_{21}=MA_{11}\ \ \text{and}\ \ A_{22}=MA_{12}.
+\]
+Since $A_{11}$ is invertible, the first equation gives $M=A_{21}A_{11}^{-1}$, and
+substituting into the second gives \eqref{eq:schur}. With \eqref{eq:schur},
+\eqref{eq:aga} reads $AGA=A$. \qed
+
+\begin{confusion}{where the hypothesis $\rank(A)=r$ is used}
+Only in \eqref{eq:schur}. If you drop it, $G$ still satisfies $AG$ idempotent, but $AGA$
+differs from $A$ in the bottom-right block --- so $G$ would \emph{not} be a g-inverse. Say
+explicitly where you use the rank condition; that is where the marks are.
+\end{confusion}
+
+%------------------------------------------------------------------
+\qhead{12}{}
+\begin{stmt}
+$\bY=\bX\bb+\bep$, $\bX$ is $n\times p$ with $\rank(\bX)=p$, $\bep\sim\N_n(\zero,\sigma^2I_n)$.
+$\wh\bb=(\wh\beta_1,\dots,\wh\beta_p)^T$ is the LSE and $\wh\sigma^2=\MSE$. Let
+$\bX_{\cdot j}$ be the $j$-th column and $\bX_{-j}$ the $n\times(p-1)$ submatrix with the
+$j$-th column removed.
+\textbf{(a)} Show $\Var(\wh\beta_j)=\sigma^2/\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}$.
+\textbf{(b)} Show the $t$-statistic for $H_0:\beta_j=0$ can be written
+$T_j=\frac{1}{\wh\sigma/\sigma}\big(\frac{\beta_j}{\sigma}\sqrt{\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}}+W_j\big)$
+with $W_j\sim\N(0,1)$ independent of $\wh\sigma^2$.
+\textbf{(c)} If $\E(\bY)=\beta_{j_0}\bX_{\cdot j_0}$ and $\bX_{\cdot j_0}$ is nearly collinear
+with the other columns, argue that the $t$-test in the full model is much less significant
+than in the true model.
+\end{stmt}
+
+Throughout write $d_j:=\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}=\|(I-\Pj_{-j})\bX_{\cdot j}\|^2$.
+
+\pt{a} Apply Frisch--Waugh with $\bZ=\bX_{-j}$ (the other $p-1$ columns) and
+$\bW=\bX_{\cdot j}$ (one column, coefficient $\beta_j$):
+\[
+  \wh\beta_j=\big(\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}\big)^{-1}\bX_{\cdot j}^T(I-\Pj_{-j})\bY
+  =\frac{1}{d_j}\,\bX_{\cdot j}^T(I-\Pj_{-j})\bY .
+\]
+So $\wh\beta_j=a^T\bY$ with $a=(I-\Pj_{-j})\bX_{\cdot j}/d_j$, and since
+$\Var(\bY)=\sigma^2I$ and $I-\Pj_{-j}$ is symmetric idempotent,
+\[
+  \Var(\wh\beta_j)=\sigma^2a^Ta
+  =\frac{\sigma^2}{d_j^2}\,\bX_{\cdot j}^T(I-\Pj_{-j})(I-\Pj_{-j})\bX_{\cdot j}
+  =\frac{\sigma^2}{d_j^2}\cdot d_j=\frac{\sigma^2}{d_j}. \qquad\square
+\]
+
+\begin{idea}{Second route: Schur complement}
+$\Var(\wh\bb)=\sigma^2(\bX^T\bX)^{-1}$, so $\Var(\wh\beta_j)=\sigma^2[(\bX^T\bX)^{-1}]_{jj}$.
+Permute the $j$-th column to the end and use the partitioned inverse: the bottom-right entry
+of $\begin{bsmallmatrix}\bX_{-j}^T\bX_{-j}&\bX_{-j}^T\bX_{\cdot j}\\
+\bX_{\cdot j}^T\bX_{-j}&\bX_{\cdot j}^T\bX_{\cdot j}\end{bsmallmatrix}^{-1}$ is the
+reciprocal of the Schur complement
+$\bX_{\cdot j}^T\bX_{\cdot j}-\bX_{\cdot j}^T\bX_{-j}(\bX_{-j}^T\bX_{-j})^{-1}\bX_{-j}^T\bX_{\cdot j}
+=\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}=d_j$.
+\end{idea}
+
+\pt{b} From (a), $\wh\beta_j\sim\N(\beta_j,\sigma^2/d_j)$. Standardising,
+\[
+  W_j:=\frac{(\wh\beta_j-\beta_j)\sqrt{d_j}}{\sigma}\sim\N(0,1)
+  \qquad\Longrightarrow\qquad
+  \frac{\wh\beta_j\sqrt{d_j}}{\sigma}=\frac{\beta_j\sqrt{d_j}}{\sigma}+W_j .
+\]
+The $t$-statistic is $T_j=\wh\beta_j/s(\wh\beta_j)$ with $s(\wh\beta_j)=\wh\sigma/\sqrt{d_j}$,
+so, inserting $\sigma/\sigma$,
+\[
+  T_j=\frac{\wh\beta_j\sqrt{d_j}}{\wh\sigma}
+     =\frac{\sigma}{\wh\sigma}\cdot\frac{\wh\beta_j\sqrt{d_j}}{\sigma}
+     =\frac{1}{\wh\sigma/\sigma}\left(\frac{\beta_j}{\sigma}\sqrt{d_j}+W_j\right).
+\]
+Finally $W_j$ is a function of $\wh\bb$ alone, and $\wh\bb\ind\SSE$ (shown by
+$\E[(I-\Pj_\bX)\bep\,\bep^T\bX(\bX^T\bX)^{-1}]=\sigma^2(I-\Pj_\bX)\bX(\bX^T\bX)^{-1}=0$
+plus joint normality), so $W_j\ind\wh\sigma^2$. \qed
+
+Note that under $H_0:\beta_j=0$ this is $T_j=W_j/\sqrt{\wh\sigma^2/\sigma^2}$ with
+$(n-p)\wh\sigma^2/\sigma^2\sim\chi^2_{n-p}$, i.e.\ exactly $t_{n-p}$.
+
+\pt{c} Part (b) shows the whole signal in $T_{j_0}$ sits in the \textbf{non-centrality}
+\[
+  \frac{\beta_{j_0}}{\sigma}\sqrt{d_{j_0}},
+  \qquad d_{j_0}=\|(I-\Pj_{-j_0})\bX_{\cdot j_0}\|^2 .
+\]
+\begin{itemize}
+  \item \textbf{Full model.} ``$\bX_{\cdot j_0}$ nearly collinear with the other columns''
+        means $\bX_{\cdot j_0}$ is close to $\Cs(\bX_{-j_0})$, so
+        $(I-\Pj_{-j_0})\bX_{\cdot j_0}\approx\zero$ and $d_{j_0}\approx0$. Then the
+        non-centrality is $\approx0$ and
+        $T_{j_0}\approx W_{j_0}/(\wh\sigma/\sigma)$, which is (approximately) a
+        \emph{central} $t_{n-p}$ --- the same distribution as under $H_0$. The test
+        therefore has power close to its level: it will typically fail to reject even though
+        $\beta_{j_0}\ne0$.
+  \item \textbf{True model} $\bY\sim\N_n(\beta_{j_0}\bX_{\cdot j_0},\sigma^2I)$. Here there
+        are no other columns to project out, so $d=\|\bX_{\cdot j_0}\|^2$, which is large.
+        The non-centrality $\beta_{j_0}\|\bX_{\cdot j_0}\|/\sigma$ is large and the test is
+        highly significant. (The error variance also gets $n-1$ degrees of freedom instead
+        of $n-p$.)
+\end{itemize}
+Equivalently, $\Var(\wh\beta_{j_0})=\sigma^2/d_{j_0}$ is inflated by collinearity. Note
+carefully that $\wh\beta_{j_0}$ remains \textbf{unbiased} in the full model --- collinearity
+destroys precision and hence power, it does not introduce bias.
+
+%==================================================================
+\section{Mid-Semester Examination, 9 September 2025}
+
+\qhead{5}{}
+\begin{stmt}
+$\bY\sim\N_n(\bX\bb,\sigma^2I_n)$, $\bb\in\R^p$, $\rank(\bX)=p$, $\bX=[\bZ:\bW]$ with $\bZ$
+an $n\times q$ matrix, $1\le q<p$. Define
+$S_1=\min_{\bb\in\R^p}\|\bY-\bX\bb\|_2^2$ and $S_0=\min_{\gamma\in\R^q}\|\bY-\bZ\gamma\|_2^2$.
+Show $S_1/S_0\sim\Bt(k_1,k_2)$ with $k_1=(n-p)/2$ and $k_2=(p-q)/2$, provided
+$\E(\bY)\in\Cs(\bZ)$.
+\end{stmt}
+
+\sol Both minima are squared lengths of residual vectors, i.e.\ quadratic forms in
+orthogonal projections:
+\[
+  S_1=\|(I-\Pj_\bX)\bY\|^2=\bY^T(I-\Pj_\bX)\bY,
+  \qquad
+  S_0=\|(I-\Pj_\bZ)\bY\|^2=\bY^T(I-\Pj_\bZ)\bY.
+\]
+Write $S_0=S_1+(S_0-S_1)$ where, since $\Cs(\bZ)\subseteq\Cs(\bX)$,
+\[
+  S_0-S_1=\bY^T\big(\Pj_\bX-\Pj_\bZ\big)\bY=\bY^T\Pj_{\bW\mid\bZ}\bY .
+\]
+Put $A_1=I-\Pj_\bX$ and $A_2=\Pj_\bX-\Pj_\bZ$. Both are symmetric and idempotent
+($A_2$ by the decomposition lemma $\Pj_\bX=\Pj_\bZ+\Pj_{\bW\mid\bZ}$), with
+\[
+  \rank(A_1)=n-\rank(\bX)=n-p,
+  \qquad
+  \rank(A_2)=\rank(\bX)-\rank(\bZ)=p-q.
+\]
+
+\textbf{Independence.} Using $\Pj_\bX\Pj_\bZ=\Pj_\bZ\Pj_\bX=\Pj_\bZ$,
+\[
+  A_1A_2=(I-\Pj_\bX)(\Pj_\bX-\Pj_\bZ)=\Pj_\bX-\Pj_\bZ-\Pj_\bX+\Pj_\bZ=O .
+\]
+Two quadratic forms in a normal vector with $A_1\Sigma A_2=\sigma^2A_1A_2=O$ are
+independent.
+
+\textbf{Both are central.} By hypothesis $\bmu:=\E(\bY)=\bX\bb\in\Cs(\bZ)$, so
+$\Pj_\bZ\bmu=\bmu$ and also $\Pj_\bX\bmu=\bmu$. Hence
+\[
+  A_1\bmu=\bmu-\bmu=\zero, \qquad A_2\bmu=\bmu-\bmu=\zero,
+\]
+so both non-centrality parameters vanish and, by the quadratic-form theorem,
+\[
+  \frac{S_1}{\sigma^2}\sim\chi^2_{n-p},
+  \qquad
+  \frac{S_0-S_1}{\sigma^2}\sim\chi^2_{p-q},
+  \qquad\text{independently.}
+\]
+
+\textbf{Beta step.} Write $A=S_1/\sigma^2$ and $B=(S_0-S_1)/\sigma^2$. Then
+\[
+  \frac{S_1}{S_0}=\frac{S_1}{S_1+(S_0-S_1)}=\frac{A}{A+B}.
+\]
+If $A\sim\chi^2_a=\text{Gamma}(a/2,2)$ and $B\sim\chi^2_b=\text{Gamma}(b/2,2)$ are
+independent, the change of variables $(U,V)=\big(\tfrac{A}{A+B},A+B\big)$ has Jacobian $v$
+and factorises the joint density into $u^{a/2-1}(1-u)^{b/2-1}$ times a
+$\text{Gamma}(\tfrac{a+b}{2},2)$ density; hence $U\sim\Bt(a/2,b/2)$ independently of $V$.
+With $a=n-p$ and $b=p-q$,
+\[
+  \boxed{\ \frac{S_1}{S_0}\sim\Bt\Big(\frac{n-p}{2},\ \frac{p-q}{2}\Big).\ }\qquad\square
+\]
+
+\begin{confusion}{which way up?}
+$S_1\le S_0$ always (the bigger model fits at least as well), so the ratio $S_1/S_0$ lies in
+$[0,1]$ --- as a Beta variate must. If you accidentally write $S_0/S_1$ you get a quantity
+$\ge1$, which cannot be Beta. This is the fastest sanity check on the orientation, and it is
+also why the first parameter is $(n-p)/2$ (the \emph{numerator's} degrees of freedom).
+\end{confusion}
+
+%------------------------------------------------------------------
+\qhead{15}{}
+\begin{stmt}
+$Y_{ijk}=\alpha_i+\beta_j+\varepsilon_{ijk}$, $1\le i,j\le2$, $k=1,\dots,m$,
+$\varepsilon_{ijk}\iid\N(0,\sigma^2)$, $m\ge2$.
+\textbf{(a)} [3] Show the design matrix $\bX$ has rank 3.
+\textbf{(b)} [4] Find the BLUE of $\theta=\bX^T\bmu$, where $\bmu=\E(\bY)$ has entries
+$\mu_{ij}=\E(Y_{ijk})$.
+\textbf{(c)} [8] For each of (i) $\alpha_1$; (ii) $\alpha_1-\alpha_2$;
+(iii) $\alpha_1+\alpha_2+\beta_1+\beta_2$; (iv) $\alpha_1-\alpha_2+\beta_1-\beta_2$, check
+estimability and, if estimable, find the BLUE. Justify.
+\end{stmt}
+
+Order the parameters as $\bb=(\alpha_1,\alpha_2,\beta_1,\beta_2)^T$ and the observations by
+cell $(1,1),(1,2),(2,1),(2,2)$, each cell contributing $m$ identical rows. The four distinct
+rows of $\bX$ are
+\[
+  (1,0,1,0),\quad (1,0,0,1),\quad (0,1,1,0),\quad (0,1,0,1),
+\]
+so $\bX=A\otimes\one_m$ with $A$ the $4\times4$ matrix of those rows.
+
+\pt{a} \textbf{Upper bound.} Writing $c_1,\dots,c_4$ for the columns of $\bX$, both
+$c_1+c_2$ and $c_3+c_4$ equal $\one_{4m}$ (every observation has exactly one $\alpha$ and
+exactly one $\beta$). Hence
+\[
+  c_1+c_2-c_3-c_4=\zero \quad\Longrightarrow\quad \rank(\bX)\le3 .
+\]
+\textbf{Lower bound.} The rows $(1,0,1,0)$, $(1,0,0,1)$, $(0,1,1,0)$ are linearly
+independent: if $a(1,0,1,0)+b(1,0,0,1)+c(0,1,1,0)=\zero$ then the second coordinate gives
+$c=0$, the fourth gives $b=0$, and the first then gives $a=0$. Hence $\rank(\bX)\ge3$.
+Therefore $\rank(\bX)=3$. \qed
+
+Consequently $\dim\Nsp(\bX)=4-3=1$ and, from the dependency above,
+\begin{equation}\label{eq:null}
+  \Nsp(\bX)=\text{span}\{z\},\qquad z=(1,1,-1,-1)^T .
+\end{equation}
+(The model is not identifiable: replacing $\alpha_i\mapsto\alpha_i+c$,
+$\beta_j\mapsto\beta_j-c$ leaves every $\mu_{ij}$ unchanged.)
+
+\pt{b} Since $\bmu=\bX\bb$, we have $\theta=\bX^T\bmu=\bX^T\bX\bb$. Each coordinate of
+$\theta$ is $a^T\bb$ with $a=\bX^T\bX e_k\in\Cs(\bX^T\bX)$, so
+\textbf{$\theta$ is estimable without any condition}. Its BLUE is $a^T\wh\bb$ evaluated at
+any solution of the normal equations, i.e.\ $\bX^T\bX\wh\bb=\bX^T\bY$, giving
+\[
+  \boxed{\ \wh\theta=\bX^T\bY\ }
+  \qquad\text{(equivalently } \bX^T\wh\bmu=\bX^T\Pj_\bX\bY=(\Pj_\bX\bX)^T\bY=\bX^T\bY).
+\]
+Explicitly, $\bX^T\bY$ collects the row and column totals:
+\[
+  \wh\theta=\big(T_{1\cdot\cdot},\ T_{2\cdot\cdot},\ T_{\cdot1\cdot},\ T_{\cdot2\cdot}\big)^T,
+  \qquad
+  T_{i\cdot\cdot}=\sum_{j,k}Y_{ijk},\quad T_{\cdot j\cdot}=\sum_{i,k}Y_{ijk},
+\]
+with $\Var(\wh\theta)=\sigma^2\bX^T\bX
+=\sigma^2m\begin{bsmallmatrix}2&0&1&1\\0&2&1&1\\1&1&2&0\\1&1&0&2\end{bsmallmatrix}$.
+
+\pt{c} By \eqref{eq:null} and the criterion $a\in\Cs(\bX^T)=\Nsp(\bX)^\perp$,
+\begin{equation}\label{eq:crit}
+  a^T\bb \text{ is estimable} \iff a^Tz=0 \iff a_1+a_2=a_3+a_4 .
+\end{equation}
+For the BLUEs, note that in this balanced additive design the LS fitted cell means are
+\[
+  \wh\mu_{ij}=\Ybar_{i\cdot\cdot}+\Ybar_{\cdot j\cdot}-\Ybar_{\cdots},
+\]
+and any estimable function is a linear combination of the $\mu_{ij}$, whose BLUE is the same
+combination of the $\wh\mu_{ij}$. Write $M_{ij}:=\Ybar_{ij\cdot}$ for the four cell means;
+they are independent with variance $\sigma^2/m$.
+
+\pt{i} $\alpha_1$: $a=(1,0,0,0)$, $a^Tz=1\ne0$. \textbf{Not estimable.} \\
+Justification in words: for any $c$, the parameter vectors $\bb$ and
+$\bb+cz$ give identical distributions for $\bY$, but different values of $\alpha_1$; so no
+statistic can have expectation $\alpha_1$ for all $\bb$.
+
+\pt{ii} $\alpha_1-\alpha_2$: $a=(1,-1,0,0)$, $a^Tz=1-1=0$. \textbf{Estimable.}
+It equals $\mu_{1j}-\mu_{2j}$ for either $j$, so
+\[
+  \widehat{\alpha_1-\alpha_2}=\wh\mu_{11}-\wh\mu_{21}
+  =\big(\Ybar_{1\cdot\cdot}+\Ybar_{\cdot1\cdot}-\Ybar_{\cdots}\big)-\big(\Ybar_{2\cdot\cdot}+\Ybar_{\cdot1\cdot}-\Ybar_{\cdots}\big)
+  =\boxed{\Ybar_{1\cdot\cdot}-\Ybar_{2\cdot\cdot}} .
+\]
+$\Ybar_{1\cdot\cdot}$ and $\Ybar_{2\cdot\cdot}$ are means of $2m$ observations each, over
+disjoint sets, hence independent with variance $\sigma^2/(2m)$; so
+$\Var=\sigma^2/m$.
+
+\pt{iii} $\alpha_1+\alpha_2+\beta_1+\beta_2$: $a=(1,1,1,1)$, $a^Tz=1+1-1-1=0$.
+\textbf{Estimable.} It equals $(\alpha_1+\beta_1)+(\alpha_2+\beta_2)=\mu_{11}+\mu_{22}$
+(and also $\mu_{12}+\mu_{21}$). Then
+\[
+  \wh\mu_{11}+\wh\mu_{22}
+  =\big(\Ybar_{1\cdot\cdot}+\Ybar_{2\cdot\cdot}\big)+\big(\Ybar_{\cdot1\cdot}+\Ybar_{\cdot2\cdot}\big)-2\Ybar_{\cdots}
+  =2\Ybar_{\cdots}+2\Ybar_{\cdots}-2\Ybar_{\cdots}
+  =\boxed{2\Ybar_{\cdots}},
+\]
+using $\Ybar_{1\cdot\cdot}+\Ybar_{2\cdot\cdot}=\Ybar_{\cdot1\cdot}+\Ybar_{\cdot2\cdot}=2\Ybar_{\cdots}$
+in the balanced design. $\Var=4\cdot\sigma^2/(4m)=\sigma^2/m$.
+
+\pt{iv} $\alpha_1-\alpha_2+\beta_1-\beta_2$: $a=(1,-1,1,-1)$, $a^Tz=1-1-1+1=0$.
+\textbf{Estimable.} It equals $(\alpha_1+\beta_1)-(\alpha_2+\beta_2)=\mu_{11}-\mu_{22}$, so
+\[
+  \wh\mu_{11}-\wh\mu_{22}
+  =\big(\Ybar_{1\cdot\cdot}-\Ybar_{2\cdot\cdot}\big)+\big(\Ybar_{\cdot1\cdot}-\Ybar_{\cdot2\cdot}\big)
+  =\boxed{\text{(row contrast)}+\text{(column contrast)}} .
+\]
+In terms of the cell means, the row contrast is $R=\tfrac12(M_{11}+M_{12}-M_{21}-M_{22})$ and
+the column contrast is $C=\tfrac12(M_{11}-M_{12}+M_{21}-M_{22})$; each has variance
+$\tfrac14\cdot4\cdot\tfrac{\sigma^2}{m}=\tfrac{\sigma^2}{m}$, and
+\[
+  \Cov(R,C)=\tfrac14\cdot\tfrac{\sigma^2}{m}\big[(1)(1)+(1)(-1)+(-1)(1)+(-1)(-1)\big]=0 ,
+\]
+so row and column contrasts are uncorrelated (orthogonality of the balanced design) and
+$\Var=2\sigma^2/m$.
+
+%------------------------------------------------------------------
+\qhead{12}{}
+\begin{stmt}
+$Y_{ij}=\mu_i+\beta_1z_{ij}+\beta_2w_{ij}+\varepsilon_{ij}$, $j=1,\dots,n_i$, $i=1,\dots,r$,
+$\varepsilon_{ij}\iid\N(0,\sigma^2)$, $n=\sum_in_i$. With
+$\bar z_{i\cdot}=\tfrac1{n_i}\sum_jz_{ij}$ etc.,
+\[
+  S_{zz}=\sum_i\sum_j(z_{ij}-\bar z_{i\cdot})^2,\quad
+  S_{zw}=\sum_i\sum_j(z_{ij}-\bar z_{i\cdot})(w_{ij}-\bar w_{i\cdot}),\quad
+  S_{ww}=\sum_i\sum_j(w_{ij}-\bar w_{i\cdot})^2,
+\]
+\[
+  S_{zy}=\sum_i\sum_j(z_{ij}-\bar z_{i\cdot})(Y_{ij}-\Ybar_{i\cdot}),\qquad
+  S_{wy}=\sum_i\sum_j(w_{ij}-\bar w_{i\cdot})(Y_{ij}-\Ybar_{i\cdot}),
+\]
+and $\wh\sigma^2=\MSE$.
+\textbf{(a)} [4] Show $\wh\bb=\begin{bsmallmatrix}S_{zz}&S_{zw}\\S_{zw}&S_{ww}\end{bsmallmatrix}^{-1}\begin{bsmallmatrix}S_{zy}\\S_{wy}\end{bsmallmatrix}$ for $\bb=(\beta_1,\beta_2)^T$.
+\textbf{(b)} [4] Show the LRT of $H_0:\beta_2=0$ rejects for large
+$U=\big(S_{ww}-S_{zw}^2/S_{zz}\big)\wh\beta_2^{\,2}/\wh\sigma^2$.
+\textbf{(c)} [4] Show the LRT of $H_0:\beta_1=\beta_2=0$ rejects for large
+$V=\tfrac1{\wh\sigma^2}\wh\bb^T\begin{bsmallmatrix}S_{zz}&S_{zw}\\S_{zw}&S_{ww}\end{bsmallmatrix}\wh\bb$.
+\end{stmt}
+
+Write the model as $\bY=\bZ\gamma+\bW\bb+\bep$, where $\bZ$ is the $n\times r$ matrix of
+treatment indicators, $\gamma=(\mu_1,\dots,\mu_r)^T$, and $\bW=[\,z:w\,]$ is $n\times2$. The
+full model has $p=r+2$ parameters, so $\MSE$ has $n-r-2$ degrees of freedom.
+
+\begin{idea}{The one observation that makes all three parts easy}
+$\Pj_\bZ$ replaces each observation by its \emph{treatment mean}, so $I-\Pj_\bZ$
+\textbf{centres within treatment}:
+\[
+  \big[(I-\Pj_\bZ)v\big]_{ij}=v_{ij}-\bar v_{i\cdot}.
+\]
+Every $S$ in the question is therefore an inner product of two such centred vectors, and
+since $I-\Pj_\bZ$ is symmetric idempotent,
+\[
+  u^T(I-\Pj_\bZ)v=\big((I-\Pj_\bZ)u\big)^T\big((I-\Pj_\bZ)v\big)
+  =\sum_i\sum_j(u_{ij}-\bar u_{i\cdot})(v_{ij}-\bar v_{i\cdot}).
+\]
+\end{idea}
+
+\pt{a} By Frisch--Waugh applied with $\bZ$ partialled out,
+\[
+  \wh\bb=\big(\bW^T(I-\Pj_\bZ)\bW\big)^{-1}\bW^T(I-\Pj_\bZ)\bY .
+\]
+By the boxed identity,
+\[
+  \bW^T(I-\Pj_\bZ)\bW
+  =\begin{pmatrix}z^T(I-\Pj_\bZ)z & z^T(I-\Pj_\bZ)w\\ w^T(I-\Pj_\bZ)z & w^T(I-\Pj_\bZ)w\end{pmatrix}
+  =\begin{pmatrix}S_{zz}&S_{zw}\\S_{zw}&S_{ww}\end{pmatrix}=:M,
+\]
+\[
+  \bW^T(I-\Pj_\bZ)\bY=\begin{pmatrix}z^T(I-\Pj_\bZ)\bY\\ w^T(I-\Pj_\bZ)\bY\end{pmatrix}
+  =\begin{pmatrix}S_{zy}\\S_{wy}\end{pmatrix},
+\]
+which gives $\wh\bb=M^{-1}(S_{zy},S_{wy})^T$. \qed \ \ Also $\Var(\wh\bb)=\sigma^2M^{-1}$.
+
+\pt{b} This is $H_0:L^T\bb_{\text{full}}=0$ with a single constraint ($r=1$) picking out
+$\beta_2$. The likelihood ratio test is equivalent to the $F$/Wald test (reject for small
+$\Lambda=(\SSE_{full}/\SSE_{red})^{n/2}$ $\iff$ reject for large
+$(\SSE_{red}-\SSE_{full})/\SSE_{full}$ $\iff$ reject for large $F$), and with one constraint
+\[
+  F=W=\frac{\wh\beta_2^{\,2}}{\wh\sigma^2\,[M^{-1}]_{22}} .
+\]
+Now invert the $2\times2$ matrix:
+\[
+  M^{-1}=\frac{1}{S_{zz}S_{ww}-S_{zw}^2}\begin{pmatrix}S_{ww}&-S_{zw}\\-S_{zw}&S_{zz}\end{pmatrix}
+  \quad\Longrightarrow\quad
+  [M^{-1}]_{22}=\frac{S_{zz}}{S_{zz}S_{ww}-S_{zw}^2}=\frac{1}{S_{ww}-\dfrac{S_{zw}^2}{S_{zz}}} .
+\]
+Therefore
+\[
+  \boxed{\ F=\Big(S_{ww}-\frac{S_{zw}^2}{S_{zz}}\Big)\frac{\wh\beta_2^{\,2}}{\wh\sigma^2}=U
+  \ \overset{H_0}{\sim}\ F_{1,\,n-r-2}\ }
+\]
+and the LRT rejects $H_0$ for large $U$. \qed
+
+\begin{idea}{Reading the coefficient}
+$S_{ww}-S_{zw}^2/S_{zz}=w^T(I-\Pj_{[\bZ:z]})w$ is the residual sum of squares of $w$ after
+removing \emph{both} the treatment means and $z$. So $U$ is exactly
+$\wh\beta_2^{\,2}\times(\text{information about }\beta_2)/\wh\sigma^2$: the more of $w$ that
+survives adjustment for $z$, the more powerful the test --- the same collinearity phenomenon
+as 2024 Q4(c).
+\end{idea}
+
+\pt{c} Now $r=2$ constraints, $L^T\bb_{\text{full}}=\bb=(\beta_1,\beta_2)^T=\zero$. The Wald
+statistic is
+\[
+  W=(\wh\bb-\zero)^T\big(\widehat{\Var}(\wh\bb)\big)^{-1}(\wh\bb-\zero)
+   =\wh\bb^T\big(\wh\sigma^2M^{-1}\big)^{-1}\wh\bb
+   =\frac{1}{\wh\sigma^2}\,\wh\bb^TM\,\wh\bb=V,
+\]
+and the LRT rejects for large $V$, with
+\[
+  \boxed{\ \frac{V}{2}\ \overset{H_0}{\sim}\ F_{2,\,n-r-2}. }
+\]
+Equivalently $V=(\SSE_{red}-\SSE_{full})/\wh\sigma^2$, where $\SSE_{red}$ is the residual sum
+of squares of the pure one-way ANOVA model $Y_{ij}=\mu_i+\varepsilon_{ij}$. \qed
+
+%------------------------------------------------------------------
+\qhead{8}{}
+\begin{stmt}
+$\mathbf{A}$ and $\mathbf{B}$ are symmetric $n\times n$ matrices, $\mathbf{B}$ is idempotent,
+and $\mathbf{A}$ and $I_n-\mathbf{A}-\mathbf{B}$ are non-negative definite. Show
+$\mathbf{AB}=\mathbf{BA}=\mathbf{O}_n$.
+\emph{[Hint: show $y^T\mathbf{A}y=0$ for all $y\in\Cs(\mathbf{B})$.]}
+\end{stmt}
+
+\sol \textbf{Step 1: $\mathbf{B}$ acts as the identity on its own column space.}
+$\mathbf{B}$ is symmetric and idempotent, hence the orthogonal projector onto
+$\Cs(\mathbf{B})$. So for every $y\in\Cs(\mathbf{B})$, writing $y=\mathbf{B}u$,
+\[
+  \mathbf{B}y=\mathbf{B}^2u=\mathbf{B}u=y
+  \qquad\Longrightarrow\qquad y^T\mathbf{B}y=y^Ty .
+\]
+
+\textbf{Step 2: squeeze $y^T\mathbf{A}y$ between $0$ and $0$.} Let $y\in\Cs(\mathbf{B})$.
+Non-negative definiteness of $I-\mathbf{A}-\mathbf{B}$ gives
+\[
+  0\ \le\ y^T(I-\mathbf{A}-\mathbf{B})y
+   \ =\ y^Ty-y^T\mathbf{A}y-\underbrace{y^T\mathbf{B}y}_{=\,y^Ty}
+   \ =\ -\,y^T\mathbf{A}y,
+\]
+so $y^T\mathbf{A}y\le0$. But $\mathbf{A}\succeq0$ gives $y^T\mathbf{A}y\ge0$. Hence
+\[
+  y^T\mathbf{A}y=0\qquad\text{for every } y\in\Cs(\mathbf{B}).
+\]
+
+\textbf{Step 3: from the quadratic form to the matrix.} Since $\mathbf{A}$ is symmetric and
+non-negative definite it has a square root: $\mathbf{A}=L^TL$ (take
+$L=\mathbf{A}^{1/2}=P\Lambda^{1/2}P^T$ from the spectral decomposition). Then for
+$y\in\Cs(\mathbf{B})$,
+\[
+  0=y^T\mathbf{A}y=y^TL^TLy=\|Ly\|^2
+  \quad\Longrightarrow\quad Ly=\zero
+  \quad\Longrightarrow\quad \mathbf{A}y=L^TLy=\zero .
+\]
+
+\textbf{Step 4: conclude.} Every column of $\mathbf{B}$ lies in $\Cs(\mathbf{B})$, so
+$\mathbf{A}$ annihilates each of them:
+\[
+  \mathbf{AB}=\mathbf{O}.
+\]
+Transposing and using symmetry of both matrices,
+$\mathbf{O}=(\mathbf{AB})^T=\mathbf{B}^T\mathbf{A}^T=\mathbf{BA}$. \qed
+
+\begin{confusion}{``$y^T\mathbf{A}y=0$'' does not by itself give $\mathbf{A}y=\zero$}
+For a general symmetric $\mathbf{A}$ it does not --- e.g.\
+$\mathbf{A}=\begin{bsmallmatrix}0&1\\1&0\end{bsmallmatrix}$ and $y=e_1$ give
+$y^T\mathbf{A}y=0$ but $\mathbf{A}y=e_2\ne\zero$. Step 3 needs
+$\mathbf{A}\succeq0$, which is exactly why that hypothesis is in the question. State this.
+\end{confusion}
+
+%==================================================================
+\section{Coverage audit: do the crash courses cover all of this?}
+
+\textbf{Short answer: the \emph{machinery} for every question is in the crash courses, but
+four specific results that were actually asked are not.} They appear only on the formula
+sheet (added after reading these papers) and now here.
+
+\begin{center}
+\begin{tabular}{@{}llp{6.4cm}l@{}}
+\toprule
+Paper & Q & Where the method is & Status \\
+\midrule
+2024 & 1 & CC2 \S2.2--2.3 (projection TFAE, $\tr=\rank$) & \textbf{Result missing} \\
+2024 & 2 & CC2 \S4--5 (estimability, G--M); CC3 \S6 (test) & Fully covered \\
+2024 & 3 & CC2 \S2.4--2.5 (g-inverses) & \textbf{Result missing} \\
+2024 & 4 & CC3 \S2.3 (Frisch--Waugh) & Formula not stated \\
+2025 & 1 & CC3 \S7 (3rd fundamental theorem) & Covered (orientation hedged) \\
+2025 & 2 & CC2 \S4.2 (the $2\times2$ $\alpha_i+\gamma_j$ example) & Fully covered \\
+2025 & 3 & CC3 \S2.3 (Frisch--Waugh) & Worked instance missing \\
+2025 & 4 & CC2 \S2.3 (orthogonal projectors) & \textbf{Result missing} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{recipe}{The four gaps, all now closed above}
+\begin{enumerate}
+  \item \textbf{$\Pj+\mathbf{Q}$ is a projector $\iff\Pj\mathbf{Q}=\mathbf{O}$} (2024 Q1).
+        Not in any crash course. Solved in \S1.1.
+  \item \textbf{The block g-inverse} $G=\begin{bsmallmatrix}A_{11}^{-1}&0\\0&0\end{bsmallmatrix}$
+        (2024 Q3). The crash course defines g-inverses and proves invariance, but never this
+        construction. Solved in \S1.3.
+  \item \textbf{$\mathbf{A}\succeq0$, $I-\mathbf{A}-\mathbf{B}\succeq0$,
+        $\mathbf{B}^2=\mathbf{B}$ $\Rightarrow\mathbf{AB}=\mathbf{BA}=\mathbf{O}$}
+        (2025 Q4). Not in any crash course. Solved in \S2.4.
+  \item \textbf{$\Var(\wh\beta_j)=\sigma^2/d_j$ and the $T_j$ decomposition} (2024 Q4), and
+        the \textbf{ANCOVA instance} of Frisch--Waugh with the $S_{zz},S_{zw},\dots$ notation
+        (2025 Q3). The general lemma is in CC3 \S2.3, but neither worked case is.
+        Solved in \S1.4 and \S2.3.
+\end{enumerate}
+\textbf{Everything else the two papers asked is fully developed in the crash courses.}
+\end{recipe}
+
+\begin{idea}{What the two papers never asked}
+No numerical ANOVA table, no calculator, no confidence intervals, no prediction, no $R^2$.
+Both papers were pure theory. \textbf{This year's guide breaks that pattern} --- it promises
+a numerical problem and three hours instead of two --- so Crash Course 4 (one-way ANOVA) and
+\S10 of the formula sheet cover ground the past papers do not test. Prepare both.
+\end{idea}
+
+\vfill
+\begin{center}\small\itshape
+Companions: the four crash courses, and the two-page formula sheet.
+\end{center}
+
+\end{document}
