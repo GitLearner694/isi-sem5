@@ -1,0 +1,646 @@
+\documentclass[11pt]{article}
+\input{lsmstyle}
+\lhead{\small Simple Linear Regression --- Crash Course}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Simple Linear Regression}\\[4pt]
+{\large A Crash Course from First Principles}\\[3pt]
+{\small Linear Statistical Models --- Lectures 1--4 (20 Jul -- 29 Jul)}
+\end{center}
+\vspace{2pt}\hrule\vspace{10pt}
+
+\noindent This is the first of four crash courses. It assumes you know only basic linear
+algebra: vectors, matrices, transpose, inverse, and what a subspace is. Everything
+statistical is built from scratch. The companions are
+\textit{Matrix Algebra and the Gauss--Markov Framework},
+\textit{Quadratic Forms, Nested Models and Testing}, and
+\textit{One-Way ANOVA}.
+
+\tableofcontents
+\vspace{8pt}\hrule\vspace{10pt}
+
+\section{Why this exists}
+
+You have pairs $(x_1,Y_1),\dots,(x_n,Y_n)$. The $x_i$ are known numbers you chose or
+observed; the $Y_i$ are random. You want to say something about how $Y$ depends on $x$.
+
+The honest object of interest is the whole conditional distribution of $Y$ given $X=x$.
+That is far too much to estimate from $n$ points. So we make a decision that governs
+this entire course:
+
+\begin{idea}{The one modelling decision}
+We model only the \emph{conditional mean}, and we assume it is a straight line:
+\[
+  \E(Y \mid X = x) \;=\; \beta_0 + \beta_1 x .
+\]
+Everything else about the distribution is dumped into an error term.
+\end{idea}
+
+A full regression model actually specifies three things:
+\begin{enumerate}[label=(\alph*)]
+  \item the conditional \emph{mean} of $Y$ given $X$ --- this is the line;
+  \item the conditional \emph{variability} --- we will take it constant, $\sigma^2$;
+  \item the conditional \emph{distribution} --- we will take it normal, but only when we
+        need it.
+\end{enumerate}
+
+Writing $\varepsilon_i := Y_i - (\beta_0+\beta_1 x_i)$ turns this into
+
+\begin{equation}\label{eq:slr}
+  Y_i \;=\; \beta_0 + \beta_1 x_i + \varepsilon_i, \qquad i=1,\dots,n .
+\end{equation}
+
+\subsection{The three assumptions, and what each one buys}
+
+\begin{center}
+\begin{tabular}{@{}llp{7.2cm}@{}}
+\toprule
+ & Assumption & What it is for \\
+\midrule
+(1) & $\E(\varepsilon_i \mid x_i) = 0$ & \textbf{Identifiability.} Without it, $\beta_0$ and
+     a constant shift in $\varepsilon$ are indistinguishable. Makes the LS estimates unbiased. \\
+(2) & $\Var(\varepsilon_i \mid x_i) = \sigma^2$ & \textbf{Homoscedasticity.} Gives the clean
+     variance formulas and makes $\hat\sigma^2$ unbiased. \\
+(3) & $\Cov(\varepsilon_i,\varepsilon_j)=0$, $i\neq j$ & \textbf{Uncorrelatedness.} Also needed for the
+     variance formulas. \\
+$\star$ & $\varepsilon_i \iid \N(0,\sigma^2)$ & \textbf{Normality.} Only needed for
+     $t$-tests, $F$-tests and confidence intervals. \emph{Not} needed for unbiasedness or
+     for Gauss--Markov. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{confusion}{``do I need normality here?''}
+This is worth being clear about because it is a cheap mark in the exam. Unbiasedness of
+$\hat\beta$ and $\hat\sigma^2$, the variance formulas, and the whole Gauss--Markov theorem
+need only (1)--(3). Normality enters \emph{only} when you want a distribution --- the
+moment you write $t_{n-2}$ or $\chi^2_{n-2}$ or $F$, you have used $\star$.
+\end{confusion}
+
+\subsection{Why squares? (three fitting criteria)}
+
+The professor listed three ways to fit a line:
+\[
+  \textstyle\sum (Y_i-\beta_0-\beta_1x_i)^2, \qquad
+  \textstyle\sum |Y_i-\beta_0-\beta_1x_i|, \qquad
+  \textstyle\sum |Y_i-\beta_0-\beta_1x_i|^\alpha,\ \alpha\ge 1 .
+\]
+Least squares wins not because it is more ``correct'' but because it is the only one with a
+closed-form solution, a clean geometry (orthogonal projection), and an exact distribution
+theory. The other two require numerical optimisation.
+
+\begin{idea}{Poisson regression: a model where the three parts are linked}
+The notes give the contrast: $Y \mid X=x \sim \text{Poisson}(\beta_0+\beta_1 x)$. Here
+\[
+  \E(Y\mid X=x) = \Var(Y\mid X=x) = \beta_0+\beta_1 x .
+\]
+The mean is still linear, but assumption (2) fails --- the variance changes with $x$. This
+is the standard example that the three ingredients (mean / variance / distribution) really
+are separate choices.
+\end{idea}
+
+\section{The least squares estimates}
+
+Minimise $Q(\beta_0,\beta_1)=\sum_{i=1}^n (Y_i-\beta_0-\beta_1x_i)^2$. Set the two partial
+derivatives to zero:
+\[
+  \frac{\partial Q}{\partial \beta_0} = -2\sum (Y_i-\beta_0-\beta_1x_i)=0,
+  \qquad
+  \frac{\partial Q}{\partial \beta_1} = -2\sum x_i(Y_i-\beta_0-\beta_1x_i)=0 .
+\]
+These are the \textbf{normal equations}. The first gives $\hat\beta_0=\Ybar-\hat\beta_1\xbar$
+immediately. Substituting into the second and simplifying:
+
+\begin{idea}{The formulas}
+\[
+  \boxed{\ \hat\beta_1 = \frac{\sum_{i}(x_i-\xbar)(Y_i-\Ybar)}{\sum_i (x_i-\xbar)^2}
+  = \frac{S_{xY}}{S_x^2} = r_{xY}\cdot \frac{s_Y}{s_x}, \qquad
+  \hat\beta_0 = \Ybar-\hat\beta_1\xbar\ }
+\]
+\end{idea}
+
+\subsection{$\hat\beta_1$ is a weighted sum of the $Y_i$ --- the key observation}
+
+Because $\sum(x_i-\xbar)\Ybar = \Ybar\sum(x_i-\xbar)=0$, the $\Ybar$ in the numerator does
+nothing, so
+\begin{equation}\label{eq:linear}
+  \hat\beta_1 = \sum_{i=1}^n c_i Y_i, \qquad c_i = \frac{x_i-\xbar}{\sum_j (x_j-\xbar)^2} .
+\end{equation}
+
+This is the single most useful fact in the whole topic. It says $\hat\beta_1$ is a
+\textbf{linear} function of the data with \emph{non-random} coefficients. Consequences,
+all immediate:
+\begin{itemize}
+  \item $\E\hat\beta_1 = \sum c_i \E Y_i = \sum c_i(\beta_0+\beta_1x_i)
+        = \beta_0\sum c_i + \beta_1 \sum c_i x_i = 0 + \beta_1$. (Check:
+        $\sum c_i = 0$ and $\sum c_i x_i = \sum c_i(x_i-\xbar)=1$.) So it is unbiased.
+  \item $\Var\hat\beta_1 = \sigma^2\sum c_i^2 = \sigma^2 / \sum(x_i-\xbar)^2 = \sigma^2/S_x^2$,
+        using uncorrelatedness.
+  \item If the $Y_i$ are normal, then $\hat\beta_1$ is normal, being a linear combination of
+        independent normals.
+\end{itemize}
+
+\begin{recipe}{The variance formulas you must be able to write down cold}
+With $S_x^2 := \sum_i (x_i-\xbar)^2$ (note: \emph{not} divided by $n$):
+\[
+  \Var(\hat\beta_1)=\frac{\sigma^2}{S_x^2},\qquad
+  \Var(\hat\beta_0)=\sigma^2\left(\frac1n+\frac{\xbar^2}{S_x^2}\right),\qquad
+  \Cov(\hat\beta_0,\hat\beta_1)=-\frac{\sigma^2\,\xbar}{S_x^2}.
+\]
+All three come out of one matrix computation, done in \S\ref{sec:matrix}.
+\end{recipe}
+
+\subsection{Fitted values, residuals, and the estimate of $\sigma^2$}
+\[
+  \hat Y_i = \hat\beta_0+\hat\beta_1 x_i \quad(\text{estimates } \E(Y\mid X=x_i)),
+  \qquad
+  e_i = Y_i - \hat Y_i \quad(\text{estimates } \varepsilon_i).
+\]
+The two normal equations say exactly
+\[
+  \sum_i e_i = 0 \qquad\text{and}\qquad \sum_i e_i x_i = 0 .
+\]
+That is \emph{two} linear constraints on the $n$ residuals, so the residual vector lives in an
+$(n-2)$-dimensional space. Hence
+
+\begin{idea}{Why $n-2$}
+\[
+  \hat\sigma^2 = \frac{\sum_{i=1}^n e_i^2}{n-2} = \frac{\mathrm{SSE}}{n-2} =: \mathrm{MSE},
+\]
+and under (1)--(3), $\E\hat\sigma^2=\sigma^2$. The $n-2$ is the \emph{degrees of freedom of
+the residual vector} --- $n$ coordinates minus $2$ estimated parameters. In the general
+model with $p$ parameters it becomes $n-p$; in one-way ANOVA with $r$ groups it becomes
+$n-r$.
+\end{idea}
+
+\subsection{Least squares versus maximum likelihood}
+
+Add normality: $Y_i \mid x_i \indep \N(\beta_0+\beta_1x_i,\ \sigma^2)$. The log-likelihood is
+\[
+  \ell(\beta_0,\beta_1,\sigma^2) = c_n - \frac{n}{2}\log\sigma^2
+  - \frac{1}{2\sigma^2}\sum_i (Y_i-\beta_0-\beta_1x_i)^2 .
+\]
+For any fixed $\sigma^2$, maximising over $(\beta_0,\beta_1)$ means \emph{minimising the sum
+of squares}. So
+
+\begin{idea}{LS = MLE for the slope and intercept, but not for $\sigma^2$}
+\[
+  (\hat\beta_0^{ML},\hat\beta_1^{ML}) = (\hat\beta_0^{LS},\hat\beta_1^{LS}),
+  \qquad
+  \hat\sigma^2_{ML}=\frac1n\sum e_i^2 = \frac{n-2}{n}\,\hat\sigma^2 .
+\]
+The MLE of $\sigma^2$ divides by $n$, so it is \textbf{biased downwards}. This is a
+one-line exam question.
+\end{idea}
+
+\section{The ANOVA decomposition, and why it is Pythagoras}
+
+Define
+\[
+  \mathrm{SST}=\sum(Y_i-\Ybar)^2,\qquad
+  \mathrm{SSR}=\sum(\hat Y_i-\Ybar)^2,\qquad
+  \mathrm{SSE}=\sum(Y_i-\hat Y_i)^2 .
+\]
+(SST = total variability; SSR = variability explained by the regression; SSE = leftover.)
+
+\begin{idea}{ANOVA identity}
+\[
+  \boxed{\ \mathrm{SST}=\mathrm{SSR}+\mathrm{SSE}\ }
+\]
+\end{idea}
+
+\prf (the algebraic version from the notes) Start from $\hat\beta_1^2 S_x^2$:
+\[
+  \hat\beta_1^2\sum_i (x_i-\xbar)^2 = \sum_i \{\hat\beta_1(x_i-\xbar)\}^2
+  = \sum_i \{(\hat\beta_0+\hat\beta_1x_i)-(\hat\beta_0+\hat\beta_1\xbar)\}^2
+  = \sum_i (\hat Y_i - \overline{\hat Y})^2 = \mathrm{SSR},
+\]
+using $\overline{\hat Y}=\hat\beta_0+\hat\beta_1\xbar=\Ybar$. Then the direct expansion
+$\sum e_i^2 = \sum(Y_i-\Ybar)^2 - \hat\beta_1^2\sum(x_i-\xbar)^2$ (which you get by writing
+$e_i=(Y_i-\Ybar)-\hat\beta_1(x_i-\xbar)$ and squaring, the cross term being
+$-2\hat\beta_1 S_{xY}=-2\hat\beta_1^2 S_x^2$) gives $\mathrm{SSE}=\mathrm{SST}-\mathrm{SSR}$. \qed
+
+\subsection{The geometry --- learn this picture, it runs the whole course}
+
+Think of $\bY=(Y_1,\dots,Y_n)^T$ as one point in $\R^n$. The model says
+$\E\bY = \beta_0\one + \beta_1 \mathbf{x}$, i.e.\ $\E\bY$ lies in the two-dimensional
+subspace
+\[
+  \Cs([\one : \mathbf{x}]) = \{a\one + b\mathbf{x} : a,b\in\R\} \subset \R^n .
+\]
+
+\begin{idea}{Least squares = orthogonal projection}
+Minimising $\|\bY - a\one - b\mathbf{x}\|^2$ over $(a,b)$ is precisely asking for the
+\emph{closest point} in that plane to $\bY$. The answer is the orthogonal projection
+$\hat\bY$, and the residual $\mathbf{e}=\bY-\hat\bY$ is perpendicular to the plane:
+\[
+  \mathbf{e}^T\one = 0,\qquad \mathbf{e}^T\mathbf{x}=0 .
+\]
+These \emph{are} the normal equations. Least squares is not a formula; it is a right angle.
+\end{idea}
+
+Pythagoras in the right triangle with legs $\hat\bY$ and $\mathbf{e}$:
+\[
+  \|\bY\|^2 = \|\hat\bY\|^2 + \|\mathbf{e}\|^2 .
+\]
+Subtract $n\Ybar^2$ from both sides (legitimate, since $\overline{\hat Y}=\Ybar$):
+\[
+  \underbrace{\|\bY\|^2-n\Ybar^2}_{\mathrm{SST}}
+  = \underbrace{\|\hat\bY\|^2-n\Ybar^2}_{\mathrm{SSR}} + \underbrace{\|\mathbf{e}\|^2}_{\mathrm{SSE}} .
+\]
+
+\section{The hat matrix}\label{sec:matrix}
+
+Stack the model: let $\bX$ be the $n\times 2$ matrix $[\one : \mathbf{x}]$ and
+$\bb=(\beta_0,\beta_1)^T$. Then \eqref{eq:slr} is $\bY = \bX\bb+\bep$, and the normal
+equations $\bX^T(\bY-\bX\bb)=0$ give
+\[
+  \hat\bb = (\bX^T\bX)^{-1}\bX^T\bY, \qquad
+  \hat\bY = \bX\hat\bb = H\bY, \qquad H := \bX(\bX^T\bX)^{-1}\bX^T .
+\]
+
+$H$ is the \textbf{hat matrix} (it puts the hat on $\bY$). It is the matrix of the
+orthogonal projection onto $\Cs(\bX)$.
+
+\begin{recipe}{Properties of $H$ --- all one-liners, all examinable}
+\begin{itemize}
+  \item $H^T=H$ (symmetric): clear from the formula, since $(\bX^T\bX)^{-1}$ is symmetric.
+  \item $H^2=H$ (idempotent): $\bX(\bX^T\bX)^{-1}\bX^T\bX(\bX^T\bX)^{-1}\bX^T = \bX(\bX^T\bX)^{-1}\bX^T$.
+        Projecting twice is the same as projecting once.
+  \item $H\bX=\bX$; in particular $H\one=\one$, since $\one$ is a column of $\bX$.
+        (Vectors already in the plane are left alone.)
+  \item $\tr(H)=\rank(H)=2$ (in general $p$). Because $H$ is idempotent, its eigenvalues are
+        $0$ and $1$, so trace $=$ rank $=$ dimension of the space projected onto.
+  \item $I-H$ is the projection onto the orthogonal complement, so
+        $(I-H)\bX=0$ and $\mathbf{e}=(I-H)\bY=(I-H)\bep$.
+  \item With $P_{\one}:=\tfrac1n\one\one^T$ (projection onto the constant vector),
+        $HP_{\one}=P_{\one}$, since $P_\one$ projects into a subspace of $\Cs(\bX)$.
+\end{itemize}
+\end{recipe}
+
+\subsection{Unbiasedness and variance, done in matrix form}
+
+\textbf{$\hat\bb$ is unbiased:}
+\[
+  \E\hat\bb = (\bX^T\bX)^{-1}\bX^T\E\bY = (\bX^T\bX)^{-1}\bX^T\bX\bb = \bb .
+\]
+
+\textbf{Variance:} writing $C=(\bX^T\bX)^{-1}\bX^T$, and using $\Var(\bY)=\sigma^2 I$,
+\[
+  \Var(\hat\bb)= C\Var(\bY)C^T = \sigma^2 CC^T = \sigma^2(\bX^T\bX)^{-1}.
+\]
+For simple linear regression,
+\[
+  \bX^T\bX = \begin{pmatrix} n & \sum x_i\\ \sum x_i & \sum x_i^2\end{pmatrix},
+  \qquad
+  (\bX^T\bX)^{-1}=\frac{1}{n\sum(x_i-\xbar)^2}
+  \begin{pmatrix} \sum x_i^2 & -\sum x_i\\ -\sum x_i & n\end{pmatrix},
+\]
+because $n\sum x_i^2 - (\sum x_i)^2 = n\sum(x_i-\xbar)^2 = nS_x^2$. Reading off the
+diagonal recovers exactly the boxed variance formulas of \S2.
+
+\textbf{$\hat\sigma^2$ is unbiased --- the trace trick.} This proof is worth memorising
+because the same three lines appear again for ANOVA.
+\begin{align*}
+  \E(\mathrm{SSE}) &= \E\|(I-H)\bY\|^2 = \E\|(I-H)\bep\|^2 && \text{since } (I-H)\bX=0\\
+  &= \E[\bep^T(I-H)\bep] = \E\big[\tr\big(\bep^T(I-H)\bep\big)\big] && \text{a scalar equals its trace}\\
+  &= \E\big[\tr\big((I-H)\bep\bep^T\big)\big] = \tr\big((I-H)\,\E[\bep\bep^T]\big) && \tr(AB)=\tr(BA)\\
+  &= \sigma^2\tr(I-H) = \sigma^2\rank(I-H) = \sigma^2(n-2).
+\end{align*}
+Hence $\E[\mathrm{SSE}/(n-2)]=\sigma^2$. \qed
+
+\begin{confusion}{$\sum(x_i-\xbar)^2$ versus $s_x^2$}
+The notes write $S_x^2=\sum(x_i-\xbar)^2$ --- the raw sum, no division. Some books write
+$s_x^2 = \frac1{n-1}\sum(x_i-\xbar)^2$. If you plug the wrong one into
+$\Var(\hat\beta_1)=\sigma^2/S_x^2$ you get an answer off by a factor of $n-1$. Whenever you
+see $S_x^2$ in this course, it is the \emph{un-normalised} sum of squares.
+\end{confusion}
+
+\section{Distribution theory (now we need normality)}
+
+Assume $\star$: $Y_i \indep \N(\beta_0+\beta_1x_i,\sigma^2)$.
+
+\begin{idea}{The three facts everything is built from}
+\begin{enumerate}
+  \item $\hat\bb \sim \N_2\!\big(\bb,\ \sigma^2(\bX^T\bX)^{-1}\big)$. \\
+        (Linear function of a normal vector.)
+  \item $\mathrm{SSE}=(n-2)\hat\sigma^2 \sim \sigma^2\chi^2_{n-2}$.
+  \item $\hat\bb$ and $\mathrm{SSE}$ are \textbf{independent}.
+\end{enumerate}
+\end{idea}
+
+\textbf{Why (2).} $\mathrm{SSE}=\bep^T(I-H)\bep$. Spectrally decompose the symmetric
+idempotent matrix, $I-H=P\Lambda P^T$ with $PP^T=P^TP=I$ and $\Lambda$ diagonal with
+$n-2$ ones and $2$ zeros (eigenvalues of an idempotent matrix are $0/1$; the number of ones
+is the rank). Put $U=P^T\bep$. Since $\bep\sim\N(\zero,\sigma^2 I)$ and $P$ is orthogonal,
+$U\sim\N(\zero,\sigma^2 I)$ too. Then
+\[
+  \mathrm{SSE}= U^T\Lambda U = \sum_{i=1}^{n-2} U_i^2
+  = \sigma^2\sum_{i=1}^{n-2}\Big(\frac{U_i}{\sigma}\Big)^2 \sim \sigma^2\chi^2_{n-2}.
+\]
+
+\textbf{Why (3).} $\hat\bb = \bb + (\bX^T\bX)^{-1}\bX^T\bep$ and $\mathbf{e}=(I-H)\bep$ are
+jointly normal, so it suffices to show they are uncorrelated:
+\[
+  \E\big[(I-H)\bep\,\bep^T\bX(\bX^T\bX)^{-1}\big]
+  = \sigma^2 \underbrace{(I-H)\bX}_{=\,0}(\bX^T\bX)^{-1} = 0 .
+\]
+Since SSE is a function of $\mathbf{e}$ alone, it is independent of $\hat\bb$. \qed
+
+\begin{idea}{The general lemma behind all of this}
+If $Z\sim \N_n(\zero,I)$ and $A$ is symmetric idempotent, then
+$Z^TAZ\sim \chi^2_{\rank(A)}$. This is the engine; it is proved properly in Crash Course 3.
+\end{idea}
+
+\section{Tests for the regression coefficients}
+
+\subsection{The idea of a pivot}
+
+To test $H_0:\theta=\bar\theta$ we want a statistic whose distribution, \emph{under $H_0$},
+does not depend on any unknown parameter. The natural candidate is
+\[
+  \frac{\hat\theta-\bar\theta}{s(\hat\theta)} ,
+\]
+where $s(\hat\theta)$ is the estimated standard error --- the true standard deviation with
+$\sigma$ replaced by $\hat\sigma$. Such a quantity is called \textbf{pivotal}.
+
+\subsection{Test for the slope (test for regression effect)}
+
+$H_0:\beta_1=\bar\beta_1$ versus $H_1:\beta_1\neq\bar\beta_1$. Take
+\[
+  T_1 = \frac{\hat\beta_1-\bar\beta_1}{s(\hat\beta_1)},
+  \qquad s(\hat\beta_1)=\sqrt{\frac{\hat\sigma^2}{S_x^2}} = \sqrt{\frac{\mathrm{MSE}}{S_x^2}} .
+\]
+\textbf{Why it is $t_{n-2}$.} Under $H_0$,
+\[
+  V_1 := \frac{\hat\beta_1-\bar\beta_1}{\sigma/\sqrt{S_x^2}} \sim \N(0,1),
+  \qquad
+  \frac{(n-2)\hat\sigma^2}{\sigma^2}\sim\chi^2_{n-2}\ \text{ independently},
+\]
+and
+\[
+  T_1 = \frac{V_1}{\sqrt{\hat\sigma^2/\sigma^2}}
+      = \frac{\N(0,1)}{\sqrt{\chi^2_{n-2}/(n-2)}} \sim t_{n-2},
+\]
+which is the definition of a $t$ distribution. \textbf{Reject $H_0$ if
+$|T_1| > t^{1-\alpha/2}_{n-2}$.}
+
+The case $\bar\beta_1 = 0$ is the \emph{test for lack of dependence on $x$}; the case
+$\bar\beta_0=0$ (with the same construction using $s(\hat\beta_0)=\hat\sigma\sqrt{\frac1n+\frac{\xbar^2}{S_x^2}}$)
+is the \emph{test for no intercept}.
+
+\subsection{Test for a general linear combination}
+
+$H_0:c_0\beta_0+c_1\beta_1=v$. Since $c_0\hat\beta_0+c_1\hat\beta_1$ is again a linear
+function of a normal vector,
+\[
+  \Var(c_0\hat\beta_0+c_1\hat\beta_1)=\sigma^2\,(c_0\ c_1)(\bX^T\bX)^{-1}\binom{c_0}{c_1},
+\]
+and
+\[
+  T=\frac{(c_0\hat\beta_0+c_1\hat\beta_1)-v}{s(c_0\hat\beta_0+c_1\hat\beta_1)}
+  \ \overset{H_0}{\sim}\ t_{n-2}.
+\]
+The important special case is $c_0=1$, $c_1=x_h$: this tests a hypothesis about the value of
+the regression line at $x=x_h$.
+
+\subsection{Joint test for both parameters at once}
+
+$H_0:\bb=\bar\bb$ (a statement about \emph{both} coordinates). Under $H_0$,
+$\hat\bb-\bar\bb \sim \N_2(\zero,\sigma^2(\bX^T\bX)^{-1})$, so
+\[
+  \frac{(\hat\bb-\bar\bb)^T(\bX^T\bX)(\hat\bb-\bar\bb)}{\sigma^2}\sim\chi^2_2 ,
+\]
+independently of $\hat\sigma^2/\sigma^2 \sim \chi^2_{n-2}/(n-2)$. Dividing,
+\[
+  W := (\hat\bb-\bar\bb)^T\big(s^2(\hat\bb)\big)^{-1}(\hat\bb-\bar\bb)
+  = \frac{(\hat\bb-\bar\bb)^T(\bX^T\bX)(\hat\bb-\bar\bb)}{\hat\sigma^2}
+  \ \overset{H_0}{\sim}\ 2\,F_{2,n-2}.
+\]
+
+\begin{confusion}{the factor of 2 in $2F_{2,n-2}$}
+$F_{r,m}$ is defined as $\frac{\chi^2_r/r}{\chi^2_m/m}$ --- both chi-squares divided by
+their degrees of freedom. The statistic $W$ above has the numerator $\chi^2_2$
+\emph{undivided}. So $W/2 \sim F_{2,n-2}$, i.e.\ $W\sim 2F_{2,n-2}$. In general with $r$
+constraints you get $W \sim r\,F_{r,n-p}$. Losing this factor is a classic slip.
+\end{confusion}
+
+\subsection{Bonferroni: simultaneous testing done crudely but safely}
+
+Suppose you want a procedure that controls the error rate for \emph{both} coefficients
+simultaneously. Let
+\[
+  A_0=\Big\{\Big|\tfrac{\hat\beta_0-\bar\beta_0}{s(\hat\beta_0)}\Big|>t^{1-\alpha_0/2}_{n-2}\Big\},
+  \qquad
+  A_1=\Big\{\Big|\tfrac{\hat\beta_1-\bar\beta_1}{s(\hat\beta_1)}\Big|>t^{1-\alpha_1/2}_{n-2}\Big\},
+\]
+so $\Prob_{H_0}(A_j)=\alpha_j$. Then by the union bound (no independence needed!)
+\[
+  \Prob_{H_0}(A_0\cup A_1)\le \alpha_0+\alpha_1 .
+\]
+Choosing $\alpha_0=\alpha_1=\alpha/2$ gives overall level $\le\alpha$. That is the
+\textbf{Bonferroni method}. It is conservative --- the true level is usually below $\alpha$
+--- but it needs no assumption about the dependence between the two tests.
+
+\section{Confidence intervals, and the duality with testing}
+
+\begin{idea}{Duality --- one idea, two languages}
+Let $A_\alpha(\bar\theta)$ be a level-$\alpha$ \emph{acceptance region} for testing
+$H_0:\theta=\bar\theta$, i.e.\ $\Prob_{\bar\theta}(\bY\in A_\alpha(\bar\theta))\ge 1-\alpha$
+for every $\bar\theta$. Define
+\[
+  C_\alpha(\bY) := \{\theta:\ \bY\in A_\alpha(\theta)\} .
+\]
+Then $\Prob_\theta(\theta\in C_\alpha(\bY))\ge 1-\alpha$ for every $\theta$ --- so
+$C_\alpha(\bY)$ is a $(1-\alpha)$-level confidence set. And conversely.
+
+\textbf{In words: a confidence set is exactly the set of null values you would not reject.}
+\end{idea}
+
+\textbf{The prototype.} $X_1,\dots,X_n\iid\N(\theta,1)$, testing $H_0:\theta=\bar\theta$:
+\[
+  A_\alpha(\bar\theta)=\{\mathbf{x}: |\sqrt n(\Xbar-\bar\theta)|\le z_{1-\alpha/2}\}
+  \ \longleftrightarrow\
+  C_\alpha(\mathbf{X})=\{\theta: |\sqrt n(\Xbar-\theta)|\le z_{1-\alpha/2}\}.
+\]
+Same inequality, read as a statement about $\mathbf{x}$ or about $\theta$.
+
+\subsection{The intervals you need}
+
+Inverting each $t$-test of \S6 gives, at level $1-\alpha$ with $t^\ast := t^{1-\alpha/2}_{n-2}$:
+\[
+  \beta_0:\ \hat\beta_0 \pm t^\ast s(\hat\beta_0),\qquad
+  \beta_1:\ \hat\beta_1 \pm t^\ast s(\hat\beta_1),\qquad
+  \beta_0+\beta_1x_h:\ \hat\beta_0+\hat\beta_1x_h \pm t^\ast s(\hat\beta_0+\hat\beta_1x_h).
+\]
+
+\subsection{Confidence \emph{sets} for the pair $\bb$: ellipse versus rectangle}
+
+\textbf{Approach I (exact, $F$-based).} Invert the joint $W$-test:
+\[
+  C_\alpha(\bY)=\Big\{\bb\in\R^2:\ (\bb-\hat\bb)^T(\bX^T\bX)(\bb-\hat\bb)
+   \le 2\hat\sigma^2 F^{1-\alpha}_{2,n-2}\Big\}.
+\]
+This is an \textbf{ellipse} centred at $\hat\bb$. It is exact and has the smallest area,
+but it is tilted (because $\hat\beta_0$ and $\hat\beta_1$ are correlated).
+
+\textbf{Approach II (Bonferroni).} Invert the two separate $t$-tests, each at level $\alpha/2$:
+\[
+  C_\alpha(\bY)=\big[\hat\beta_0\pm t^{1-\alpha/4}_{n-2}s(\hat\beta_0)\big]
+  \times \big[\hat\beta_1\pm t^{1-\alpha/4}_{n-2}s(\hat\beta_1)\big].
+\]
+This is a \textbf{rectangle}. It is conservative (coverage $\ge 1-\alpha$), but it is easy
+to compute and easy to report coordinate by coordinate.
+
+\begin{confusion}{$\alpha/4$, not $\alpha/2$}
+Each of the two tests gets level $\alpha/2$; a two-sided test at level $\alpha/2$ uses the
+$1-\alpha/4$ quantile. So the correct quantile in the Bonferroni rectangle is
+$t^{1-\alpha/4}_{n-2}$.
+\end{confusion}
+
+\section{Prediction: the interval that is wider than you expect}
+
+Two genuinely different questions at a new point $x_h$:
+\begin{enumerate}
+  \item \textbf{Estimation.} What is $\E(Y\mid X=x_h)=\beta_0+\beta_1x_h$? --- a fixed number.
+  \item \textbf{Prediction.} What will $Y_{\text{new}}=\beta_0+\beta_1x_h+\varepsilon_{\text{new}}$
+        actually be? --- a random variable not yet observed.
+\end{enumerate}
+The point estimate is the same, $\hat Y_h = \hat\beta_0+\hat\beta_1x_h$, but the uncertainty
+is not.
+
+\begin{idea}{Why $\hat Y_h$ answers both}
+$\E(Y\mid X)$ is characterised as the minimiser of $\E[(Y-g(X))^2]$ over all functions $g$
+with $\E[g(X)^2]<\infty$. So the best mean-squared predictor of a new $Y$ \emph{is} the
+conditional mean --- the same target. What differs is the error you make.
+\end{idea}
+
+\textbf{Variance of the fitted value.} Rewrite $\hat Y_h$ in the decoupled form
+\[
+  \hat Y_h = \hat\beta_0+\hat\beta_1x_h = (\hat\beta_0+\hat\beta_1\xbar)+\hat\beta_1(x_h-\xbar)
+  = \Ybar + \hat\beta_1(x_h-\xbar).
+\]
+Now $\Ybar$ and $\hat\beta_1$ are \emph{uncorrelated}: $\Cov(\Ybar,\hat\beta_1)=\sigma^2\sum c_i/n = 0$
+by \eqref{eq:linear}. Hence there is no cross term and
+\[
+  \boxed{\ \Var(\hat Y_h)=\frac{\sigma^2}{n}+\frac{\sigma^2 (x_h-\xbar)^2}{S_x^2}
+  = \sigma^2\left(\frac1n+\frac{(x_h-\xbar)^2}{S_x^2}\right).}
+\]
+This is the tidy derivation the notes mark with ``\# How''. Note it is smallest at
+$x_h=\xbar$ and grows quadratically as you move away --- the fitted line pivots about
+$(\xbar,\Ybar)$.
+
+\textbf{Prediction error.} $Y_{\text{new}}-\hat Y_h
+= \varepsilon_{\text{new}} + \{(\beta_0+\beta_1x_h)-(\hat\beta_0+\hat\beta_1x_h)\}$, and the
+two pieces are \emph{independent} ($\varepsilon_{\text{new}}$ is a new observation, not used
+in fitting). So the variances add:
+\[
+  \Var(Y_{\text{new}}-\hat Y_h)= \sigma^2 + \Var(\hat Y_h)
+  = \sigma^2\left(1+\frac1n+\frac{(x_h-\xbar)^2}{S_x^2}\right).
+\]
+
+\begin{recipe}{Confidence interval versus prediction interval --- the one-symbol difference}
+\[
+  \text{CI for }\E(Y\mid x_h):\quad
+  \hat Y_h \pm t^{1-\alpha/2}_{n-2}\ \hat\sigma\sqrt{\phantom{1+{}}\tfrac1n+\tfrac{(x_h-\xbar)^2}{S_x^2}}
+\]
+\[
+  \text{PI for }Y_{\text{new}}:\quad
+  \hat Y_h \pm t^{1-\alpha/2}_{n-2}\ \hat\sigma\sqrt{1+\tfrac1n+\tfrac{(x_h-\xbar)^2}{S_x^2}}
+\]
+The prediction interval has an extra ``$1+$'' and is therefore always wider. As
+$n\to\infty$ the CI shrinks to zero width but the PI does \emph{not} --- it converges to
+$\pm z_{1-\alpha/2}\sigma$, because you can never predict a fresh coin toss exactly.
+\end{recipe}
+
+Validity: $Y_{\text{new}}-\hat Y_h$ is normal with mean $0$, and is independent of SSE
+(because $\varepsilon_{\text{new}}$ is new and $\hat\bb\perp$ SSE), so the standardised
+prediction error is again $t_{n-2}$.
+
+\section{Influence of a single observation (leave-one-out)}
+
+Let $(\hat\beta_0,\hat\beta_1)$ use all $n$ points and $(\hat\beta_0^{(-n)},\hat\beta_1^{(-n)})$
+use the first $n-1$. The notes record the update formula
+\[
+  \hat\beta_1 = \hat\beta_1^{(-n)} + \frac{x_n-\xbar}{\sum_{i=1}^n(x_i-\xbar)^2}\ e_n^{(-n)},
+  \qquad e_n^{(-n)} = Y_n - \big(\hat\beta_0^{(-n)}+\hat\beta_1^{(-n)}x_n\big).
+\]
+Read it as: \emph{the $n$-th point moves the slope by an amount proportional to (how
+surprising it was) $\times$ (how far its $x$ is from the centre)}. A point with $x_n=\xbar$
+has no influence on the slope no matter how odd its $Y$; a point far out in $x$ has
+leverage. Also useful for the algebra:
+\[
+  \Ybar = \tfrac{n-1}{n}\Ybar^{(-n)}+\tfrac1n Y_n, \qquad
+  \xbar = \tfrac{n-1}{n}\xbar^{(-n)}+\tfrac1n x_n .
+\]
+
+\begin{exam}{This is Homework 1, Question 3}
+HW1 Q3 is exactly this, in the ``add an observation'' direction, in matrix form:
+\[
+  \hat\bb^{(n+1)}-\hat\bb^{(n)} = c_{n+1}\big(Y_{n+1}-\hat Y^{(n)}_{n+1}\big)(\bX^T\bX)^{-1}\mathbf{x}_{n+1},
+  \qquad c_{n+1}=\big(1+\mathbf{x}_{n+1}^T(\bX^T\bX)^{-1}\mathbf{x}_{n+1}\big)^{-1}.
+\]
+The tool is the Sherman--Morrison identity
+$(A+uv^T)^{-1}=A^{-1}-\frac{A^{-1}uv^TA^{-1}}{1+v^TA^{-1}u}$ applied to
+$\bX_{n+1}^T\bX_{n+1}=\bX^T\bX+\mathbf{x}_{n+1}\mathbf{x}_{n+1}^T$. Worth a re-read
+tonight if you have time.
+\end{exam}
+
+\section{Practice, with answers}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item Show that $\sum_i e_i = 0$ and $\sum_i e_ix_i=0$, and deduce that
+      $\overline{\hat Y}=\Ybar$ and that $\mathbf{e}$ is orthogonal to $\hat\bY$.
+
+\item Prove $\Cov(\Ybar,\hat\beta_1)=0$ under (1)--(3), and explain in one sentence why this
+      makes the derivation of $\Var(\hat Y_h)$ short.
+
+\item For the model with \emph{no} intercept, $Y_i=\beta_1x_i+\varepsilon_i$, derive the LS
+      estimate of $\beta_1$ and its variance, and say what the residual degrees of freedom is.
+
+\item You are told $n=20$, $\hat\beta_1=2.4$, $S_x^2=50$, $\mathrm{SSE}=72$. Test
+      $H_0:\beta_1=0$ at level $5\%$ ($t^{0.975}_{18}=2.101$).
+
+\item Explain, in terms of $\Var(\hat Y_h)$, why extrapolating far outside the range of the
+      observed $x$'s is dangerous \emph{even if the linear model is exactly true}.
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} The two normal equations are $\sum(Y_i-\hat\beta_0-\hat\beta_1x_i)=0$
+and $\sum x_i(Y_i-\hat\beta_0-\hat\beta_1x_i)=0$, which are literally $\sum e_i=0$ and
+$\sum e_ix_i=0$. Then $\overline{\hat Y}=\Ybar-\frac1n\sum e_i=\Ybar$. And
+$\mathbf{e}^T\hat\bY=\sum e_i(\hat\beta_0+\hat\beta_1x_i)=\hat\beta_0\sum e_i+\hat\beta_1\sum e_ix_i=0$.
+
+\smallskip\noindent\textbf{P2.} $\Ybar=\frac1n\sum Y_i$ and $\hat\beta_1=\sum c_iY_i$ with
+$c_i=(x_i-\xbar)/S_x^2$. By uncorrelatedness,
+$\Cov(\Ybar,\hat\beta_1)=\frac{\sigma^2}{n}\sum c_i = \frac{\sigma^2}{nS_x^2}\sum(x_i-\xbar)=0$.
+Because $\hat Y_h=\Ybar+\hat\beta_1(x_h-\xbar)$ is a sum of two \emph{uncorrelated} terms,
+the variance is just the sum of the two variances --- no cross term to compute.
+
+\smallskip\noindent\textbf{P3.} Minimising $\sum(Y_i-\beta_1x_i)^2$ gives
+$\hat\beta_1=\sum x_iY_i/\sum x_i^2$, so $\Var(\hat\beta_1)=\sigma^2/\sum x_i^2$. Only one
+parameter is estimated, so there is one normal equation ($\sum e_ix_i=0$, but \emph{not}
+$\sum e_i=0$), and the residual d.f.\ is $n-1$; the unbiased estimate is
+$\hat\sigma^2=\mathrm{SSE}/(n-1)$.
+
+\smallskip\noindent\textbf{P4.} $\hat\sigma^2=72/18=4$, so
+$s(\hat\beta_1)=\sqrt{4/50}=\sqrt{0.08}=0.2828$. Then $T_1=2.4/0.2828=8.49$. Since
+$8.49>2.101$, reject $H_0$ decisively: there is a significant regression effect.
+
+\smallskip\noindent\textbf{P5.} $\Var(\hat Y_h)=\sigma^2\{\frac1n+(x_h-\xbar)^2/S_x^2\}$
+grows \emph{quadratically} in the distance of $x_h$ from $\xbar$, and the prediction
+interval grows with it. Even with a perfectly correct model, the uncertainty in the
+estimated slope is levered up by the long moment arm: a small error in $\hat\beta_1$
+translates into a large error far from the centre of the data. (And in practice the linear
+model is only trusted where you have data, which compounds the problem.)
+
+\vfill
+\begin{center}\small\itshape
+Companions: Matrix Algebra and the Gauss--Markov Framework;
+Quadratic Forms, Nested Models and Testing; One-Way ANOVA.
+\end{center}
+
+\end{document}

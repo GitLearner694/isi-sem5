@@ -1,0 +1,532 @@
+\documentclass[11pt]{article}
+\input{lsmstyle}
+\lhead{\small Quadratic Forms and Testing --- Crash Course}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Quadratic Forms, Nested Models\\ and Hypothesis Testing}\\[4pt]
+{\large A Crash Course from First Principles}\\[3pt]
+{\small Linear Statistical Models --- Lectures 7--10 (10 Aug -- 24 Aug)}
+\end{center}
+\vspace{2pt}\hrule\vspace{10pt}
+
+\noindent The third of four crash courses. Crash Course 2 told you \emph{what} to estimate
+and that $a^T\hat\bb$ is best. This one tells you how to \emph{test} whether a smaller model
+would do, which needs the distribution theory of quadratic forms $\bY^TA\bY$. The
+$F$-statistic of ANOVA is the destination.
+
+\tableofcontents
+\vspace{8pt}\hrule\vspace{10pt}
+
+\section{Why this exists}
+
+Every test in this course is the same question in different clothes:
+
+\begin{idea}{The one question}
+You have a big model $\bY=\bX\bb+\bep$. Someone proposes a smaller model --- drop some
+predictors, or impose $L^T\bb=\theta_0$. \textbf{Is the small model good enough?}
+
+Fitting the small model must give a larger residual sum of squares (fewer directions to
+project onto). The test asks whether that increase is \emph{more than noise would explain}:
+\[
+  F \;=\; \frac{(\mathrm{SSE}_{\text{reduced}}-\mathrm{SSE}_{\text{full}})/(\text{d.f.\ lost})}
+              {\mathrm{SSE}_{\text{full}}/(n-\rho(\bX))} .
+\]
+Everything below is the machinery that makes this exact.
+\end{idea}
+
+\section{Nested models and the projection lemma}
+
+\subsection{Setup}
+
+Full model $\bY=\bX\bb+\bep$, sub-model $\bY=\bZ\boldsymbol{\gamma}+\bep$, where $\bZ$ is a
+subset of the columns of $\bX$:
+\[
+  \underset{n\times p}{\bX}=[\underset{n\times q}{\bZ}:\underset{n\times s}{\bW}],\qquad
+  \bb=\binom{\boldsymbol{\gamma}}{\boldsymbol{\delta}},\qquad p=q+s .
+\]
+Then $\Cs(\bZ)\subseteq\Cs(\bX)$: the sub-model is \textbf{nested} in the full model, and
+$\bY=\bZ\boldsymbol{\gamma}+\bW\boldsymbol{\delta}+\bep$ with the sub-model being
+$\boldsymbol{\delta}=0$.
+
+\subsection{The lemma that runs everything}
+
+\begin{idea}{Projection decomposition lemma}
+\[
+  \boxed{\ P_{\bX}=P_{\bZ}+P_{\bW\mid\bZ}\ }
+\]
+where $P_{\bW\mid\bZ}$ is the orthogonal projector onto $\Cs\big((I-P_{\bZ})\bW\big)$ ---
+the part of $\bW$ left after removing everything explainable by $\bZ$.
+\end{idea}
+
+\prf Let $u\in\Cs(\bX)$, so $u=\bZ v_1+\bW v_2$. Then $(I-P_\bZ)u=(I-P_\bZ)\bW v_2$, since
+$(I-P_\bZ)\bZ v_1=0$. Also $u=P_\bZ u+(I-P_\bZ)u$. It remains to check
+$(I-P_\bZ)\bW v_2 = P_{\bW\mid\bZ}u$. Writing $M=(I-P_\bZ)\bW$ and using $(I-P_\bZ)^2=I-P_\bZ$:
+\[
+  P_{\bW\mid\bZ}u = M(M^TM)^{-1}M^T u
+   = (I-P_\bZ)\bW\big(\bW^T(I-P_\bZ)\bW\big)^{-1}\bW^T(I-P_\bZ)\bW v_2
+   = (I-P_\bZ)\bW v_2 .
+\]
+So $u=P_\bZ u+P_{\bW\mid\bZ}u$ for every $u\in\Cs(\bX)$, and both sides kill
+$\Cs(\bX)^\perp$. \qed
+
+\begin{idea}{What the lemma is saying}
+$\Cs(\bX)$ splits into two \emph{orthogonal} pieces: the part $\bZ$ already explains, and the
+extra part $\bW$ contributes on top of $\bZ$. Every sum-of-squares decomposition in this
+course is this one sentence.
+\end{idea}
+
+\subsection{The orthogonal special case, and the general formula}
+
+\textbf{If $\bZ^T\bW=0$}, the columns of $\bZ$ and $\bW$ are already orthogonal and the
+criterion splits cleanly:
+\begin{align*}
+  \|\bY-\bX\bb\|^2 &= \|(I-P_\bX)\bY\|^2+\|P_\bZ\bY-\bZ\boldsymbol{\gamma}\|^2
+     +\|P_\bW\bY-\bW\boldsymbol{\delta}\|^2 .
+\end{align*}
+Minimising each term separately shows $\hat{\boldsymbol\gamma}$ from the full model
+\emph{equals} the estimate from the sub-model alone. Fitting the pieces separately is
+legitimate.
+
+\textbf{In general $\bZ^T\bW\neq0$}, and the full-model estimates are
+
+\begin{recipe}{The partial-out formulas}
+\[
+  \hat{\boldsymbol\gamma}=\big(\bZ^T(I-P_\bW)\bZ\big)^{-1}\bZ^T(I-P_\bW)\bY,
+  \qquad
+  \hat{\boldsymbol\delta}=\big(\bW^T(I-P_\bZ)\bW\big)^{-1}\bW^T(I-P_\bZ)\bY .
+\]
+Compare the \emph{sub-model} estimates
+$\tilde{\boldsymbol\gamma}=(\bZ^T\bZ)^{-1}\bZ^T\bY$ and
+$\tilde{\boldsymbol\delta}=(\bW^T\bW)^{-1}\bW^T\bY$: in general
+$\hat{\boldsymbol\gamma}\ne\tilde{\boldsymbol\gamma}$.
+\end{recipe}
+
+\textbf{Derivation of $\hat{\boldsymbol\delta}$.} From $\bX\hat\bb=P_\bX\bY=P_\bZ\bY+P_{\bW\mid\bZ}\bY$
+and $\bX\hat\bb=\bZ\hat{\boldsymbol\gamma}+\bW\hat{\boldsymbol\delta}$, multiply by $(I-P_\bZ)$:
+\[
+  (I-P_\bZ)\bW\hat{\boldsymbol\delta}=(I-P_\bZ)P_{\bW\mid\bZ}\bY = P_{\bW\mid\bZ}\bY .
+\]
+Multiply by $\bW^T$ and use $(I-P_\bZ)^2=I-P_\bZ$:
+\[
+  \bW^T(I-P_\bZ)\bW\hat{\boldsymbol\delta}=\bW^T(I-P_\bZ)\bY
+  \ \Longrightarrow\
+  \hat{\boldsymbol\delta}=\big(\bW^T(I-P_\bZ)\bW\big)^{-1}\bW^T(I-P_\bZ)\bY . \qquad\square
+\]
+
+\begin{idea}{The Frisch--Waugh reading: ``regress out, then regress''}
+$\hat{\boldsymbol\delta}$ is exactly the LS estimate from the \emph{transformed} model
+\[
+  (I-P_\bZ)\bY = (I-P_\bZ)\bW\boldsymbol\delta+\bep'' .
+\]
+That is: strip $\bZ$'s influence out of \emph{both} the response and the predictors $\bW$,
+then run an ordinary regression of the leftovers. This is the meaning of ``the effect of
+$\bW$ \emph{adjusted for} $\bZ$''.
+\end{idea}
+
+\section{$R^2$ and partial correlation}
+
+\subsection{$R^2$ as a ratio of projections}
+
+Total variability about the mean:
+\[
+  \mathrm{SST}=\sum_i(Y_i-\Ybar)^2=\|\bY\|^2-n\Ybar^2
+  =\bY^T\bY-\bY^T\!\Big(\tfrac1n\one\one^T\Big)\bY=\bY^T(I-P_{\one})\bY .
+\]
+And $\mathrm{SSE}=\bY^T(I-P_\bX)\bY$, so $\mathrm{SSR}=\bY^T(P_\bX-P_{\one})\bY$. Hence
+\[
+  \boxed{\ R^2=\frac{\mathrm{SSR}}{\mathrm{SST}}=\frac{\bY^T(P_\bX-P_{\one})\bY}{\bY^T(I-P_{\one})\bY}\ }
+\]
+--- the proportion of variability in the response explained by the predictors. For $p=2$
+(simple linear regression) this reduces to $R^2=\big(\text{corr}(x,Y)\big)^2$:
+\[
+  R^2=\frac{\big(\sum(x_i-\xbar)(Y_i-\Ybar)\big)^2}{\sum(x_i-\xbar)^2\sum(Y_i-\Ybar)^2}
+     =\frac{\hat\beta_1^2\sum(x_i-\xbar)^2}{\sum(Y_i-\Ybar)^2}=\frac{\mathrm{SSR}}{\mathrm{SST}} .
+\]
+
+\subsection{Why $R^2$ never decreases when you add a predictor}
+
+\begin{idea}{$R^2_{\text{full}}\ \ge\ R^2_{\text{sub}}$, always}
+The denominators are identical, so compare numerators:
+\[
+  \bY^T(P_\bX-P_{\one})\bY-\bY^T(P_\bZ-P_{\one})\bY=\bY^T(P_\bX-P_\bZ)\bY
+  =\bY^TP_{\bW\mid\bZ}\bY\ \ge\ 0
+\]
+by the lemma, because $P_{\bW\mid\bZ}$ is a projection matrix and hence non-negative
+definite ($\bY^TP\bY=\|P\bY\|^2$).
+\end{idea}
+
+\textbf{Moral:} $R^2$ is useless for choosing between nested models --- it always favours the
+bigger one. That is precisely why you need the $F$-test, which penalises the extra
+parameters through the degrees of freedom.
+
+\subsection{Partial correlation}
+
+The partial correlation between $Y$ and $X^{(j)}$ given the other predictors is the ordinary
+correlation between the two sets of leftovers:
+\[
+  e^{(-j)}=(I-H_{(-j)})\bY \quad\text{(residuals of $Y$ on the others)},\qquad
+  r^{(-j),j}=(I-H_{(-j)})X^{(j)} \quad\text{(residuals of $X^{(j)}$ on the others)},
+\]
+where $H_{(-j)}$ projects onto $\Cs([\one:X^{(1)}:\cdots\widehat{X^{(j)}}\cdots:X^{(p-1)}])$. Then
+\[
+  \rho_{Y X^{(j)}\mid \{X^{(k)}\}_{k\ne j}}
+  =\frac{(X^{(j)})^T(I-H_{(-j)})\bY}
+        {\sqrt{\bY^T(I-H_{(-j)})\bY}\cdot\sqrt{(X^{(j)})^T(I-H_{(-j)})X^{(j)}}} .
+\]
+Same idea as Frisch--Waugh: remove the common part first, then correlate.
+
+\section{Distribution theory of quadratic forms}
+
+This is the technical core. Everything reduces to one theorem.
+
+\subsection{MGFs identify distributions}
+
+$X\dequal Y$ iff their characteristic functions agree. If the MGF
+$\psi_X(t)=\E e^{tX}$ is finite in an open neighbourhood of $0$, then
+$\phi_X(t)=\psi_X(it)$ there and the MGF determines the law. So computing an MGF and
+recognising it is a legitimate proof technique.
+
+\subsection{The chi-square MGF}
+
+$\chi^2_n = Z_1^2+\cdots+Z_n^2$ with $Z_i\iid\N(0,1)$. Since $\chi^2_2\sim\text{Exp}(1/2)$
+with density $\tfrac12 e^{-x/2}$,
+\[
+  \psi_2(t)=\int_0^\infty e^{tx}\tfrac12e^{-x/2}dx=\frac{1}{1-2t}\quad (t<\tfrac12).
+\]
+By independence $\psi_2=\psi_1^2$, so $\psi_1(t)=(1-2t)^{-1/2}$ and
+\[
+  \boxed{\ \psi_{\chi^2_n}(t)=(1-2t)^{-n/2},\quad t<\tfrac12 .}
+\]
+
+\subsection{The MGF of a general quadratic form}
+
+\begin{idea}{Master formula}
+If $\bY\sim\N_n(\bmu,I_n)$ and $A$ is symmetric non-negative definite, then for $t$ such that
+$(I-2tA)^{-1}$ exists,
+\[
+  \E\big[e^{t\bY^TA\bY}\big]
+  =|\det(I-2tA)|^{-1/2}\exp\Big(-\tfrac12\bmu^T\bmu+\tfrac12\bmu^T(I-2tA)^{-1}\bmu\Big) .
+\]
+\end{idea}
+(Obtained by writing out the $\N(\bmu,I)$ density and completing the square in the
+exponent; the $\det$ is the Jacobian of the resulting Gaussian integral.)
+
+\subsection{The key theorem}
+
+\begin{idea}{Theorem (quadratic forms and idempotence)}
+Let $\bY\sim\N_n(\bmu,I)$ and $A$ symmetric. Then
+\[
+  \bY^TA\bY \sim \chi^2_{\rho(A)}\big(\tfrac12\bmu^TA\bmu\big)
+  \qquad\Longleftrightarrow\qquad A \text{ is idempotent}.
+\]
+(The argument in parentheses is the \emph{non-centrality parameter}; it is $0$ --- giving a
+central $\chi^2$ --- exactly when $A\bmu=0$.)
+\end{idea}
+
+\prf (central case $\bmu=\zero$, both directions). Spectrally decompose $A$: eigenvalues
+$\lambda_1,\dots,\lambda_r$ non-zero and the rest $0$, where $r=\rho(A)$. Then
+\[
+  \psi(t)=|\det(I-2tA)|^{-1/2}=\Big(\prod_{j=1}^r(1-2t\lambda_j)\Big)^{-1/2} .
+\]
+This equals the $\chi^2_r$ MGF $(1-2t)^{-r/2}$ for all $t$ near $0$ iff
+\[
+  (1-2t)^r=\prod_{j=1}^r(1-2t\lambda_j)\quad\forall t
+  \iff \lambda_j=1 \ \forall j
+  \iff A \text{ has only eigenvalues } 0,1
+  \iff A^2=A. \qquad\square
+\]
+
+\begin{recipe}{The corollary you actually use}
+$\bY\sim\N_n(\bmu,\sigma^2I)$ and $A$ symmetric idempotent with $A\bmu=0$
+$\Longrightarrow$ $\dfrac{\bY^TA\bY}{\sigma^2}\sim\chi^2_{\rho(A)}$.
+
+Applied with $A=I-P_\bX$ and $\bmu=\bX\bb$ (so $A\bmu=0$): $\mathrm{SSE}\sim\sigma^2\chi^2_{n-\rho(\bX)}$.
+\end{recipe}
+
+\subsection{Fisher--Cochran theorem}
+
+\begin{idea}{Fisher--Cochran}
+Let $\bY\sim\N_n(\bmu,I)$ and $A_1,\dots,A_r$ be symmetric non-negative definite with
+\[
+  \bY^T\bY=\sum_{j=1}^r \bY^TA_j\bY .
+\]
+Then $\bY^TA_j\bY\sim\chi^2_{\rho(A_j)}(\lambda_j/2)$ for each $j$ \textbf{and these forms are
+mutually independent} $\iff$
+\[
+  \sum_{j=1}^r\rho(A_j)=n .
+\]
+In that case $\lambda_j=\bmu^TA_j\bmu$ and $\sum_j\lambda_j=\bmu^T\bmu$. Moreover each $A_j$
+is idempotent and $A_jA_k=0$ for $j\ne k$.
+\end{idea}
+
+\prf ($\Leftarrow$, the direction you use) Rank-factorise $A_j=C_jC_j^T$ with $C_j$ of full
+column rank $\rho(A_j)$. Then
+\[
+  \bY^T\bY=\sum_j\bY^TC_jC_j^T\bY=\bY^TBB^T\bY,\qquad B=[C_1:\cdots:C_r] .
+\]
+By assumption $B$ is $n\times n$. Since $\bY^TBB^T\bY=\bY^T\bY$ for all $\bY$, spectral
+decomposition forces every eigenvalue of $BB^T$ to be $1$, so $BB^T=I_n$ and hence
+$B^TB=I_n$ --- $B$ is orthogonal. Reading off the blocks of $B^TB=I_n$:
+\[
+  C_j^TC_j=I_{\rho(A_j)}, \qquad C_j^TC_k=0\ (j\ne k) .
+\]
+So $A_j^2=C_jC_j^TC_jC_j^T=C_jI C_j^T=A_j$ (idempotent, hence each form is $\chi^2$ by the
+previous theorem), and $A_jA_k=C_j(C_j^TC_k)C_k^T=0$. Independence follows because
+$U:=B^T\bY\sim\N_n(B^T\bmu,I)$ has independent coordinates and $\bY^TA_j\bY$ is the sum of
+squares of the block of $U$ belonging to $C_j$ --- disjoint blocks, hence independent. \qed
+
+\begin{idea}{What Fisher--Cochran is for}
+It is the theorem that legitimises the \textbf{ANOVA table}. It says: if you split
+$\|\bY\|^2$ (or $\mathrm{SST}$) into pieces whose degrees of freedom add up correctly, then
+those pieces are automatically independent chi-squares --- so their ratio is an $F$. The
+d.f.\ column of the ANOVA table adding up is not bookkeeping, it is the \textbf{hypothesis}
+of the theorem.
+\end{idea}
+
+\section{Constrained least squares}
+
+\subsection{The general null hypothesis}
+
+Any hypothesis specifying a sub-model can be written
+\[
+  H_0:\ \underset{r\times p}{L^T}\ \bb=\underset{r\times1}{\theta_0},
+  \qquad \rho(\bX)=p,\quad \rho(L)=r\le p .
+\]
+\textbf{Examples.} With $p=4$ and $\bb=(\beta_0,\dots,\beta_3)$:
+\[
+  H_0:\begin{cases}\beta_1=\beta_2\\ \beta_2+\beta_3=0\end{cases}
+  \iff
+  L^T=\begin{pmatrix}0&1&-1&0\\0&0&1&1\end{pmatrix},\ \theta_0=\binom00 ,
+\]
+and under it the mean becomes $\beta_0+\beta_1(X^{(1)}+X^{(2)}-X^{(3)})$ --- a model with
+one predictor instead of three. If instead $\beta_2+\beta_3=1$, the mean is
+$\beta_0+\beta_1(X^{(1)}+X^{(2)}-X^{(3)})+X^{(3)}$, with a known \emph{offset}.
+
+\subsection{Solving the constrained problem}
+
+\[
+  \min_{\bb}\ \|\bY-\bX\bb\|^2 \quad\text{subject to}\quad L^T\bb=\theta_0 .
+\]
+Lagrangian $\mathcal{L}(\bb,\lambda)=\tfrac12\|\bY-\bX\bb\|^2+\lambda^T(L^T\bb-\theta_0)$.
+
+\textbf{Trick: whiten first.} Put $\bX_0=\bX(\bX^T\bX)^{-1/2}$ so that $\bX_0^T\bX_0=I_p$,
+and $\boldsymbol\gamma=(\bX^T\bX)^{1/2}\bb$, $L_0=(\bX^T\bX)^{-1/2}L$. Then
+$\bX\bb=\bX_0\boldsymbol\gamma$ and $L^T\bb=L_0^T\boldsymbol\gamma$, so the problem becomes
+$\min\tfrac12\|\bY-\bX_0\boldsymbol\gamma\|^2$ s.t.\ $L_0^T\boldsymbol\gamma=\theta_0$.
+Stationarity:
+\[
+  -\bX_0^T(\bY-\bX_0\boldsymbol\gamma)+L_0\lambda=0
+  \ \Longrightarrow\ \boldsymbol\gamma+L_0\lambda=\bX_0^T\bY \tag{i}
+\]
+\[
+  L_0^T\boldsymbol\gamma=\theta_0 \tag{ii}
+\]
+Multiply (i) by $L_0^T$ and use (ii): $\theta_0+L_0^TL_0\lambda=L_0^T\bX_0^T\bY$, so
+$\lambda=(L_0^TL_0)^{-1}(L_0^T\bX_0^T\bY-\theta_0)$. Substituting back and noting that the
+unconstrained estimate is $\hat{\boldsymbol\gamma}=\bX_0^T\bY$:
+\[
+  \tilde{\boldsymbol\gamma}=\hat{\boldsymbol\gamma}-L_0(L_0^TL_0)^{-1}(\hat\theta-\theta_0),
+  \qquad \hat\theta:=L^T\hat\bb .
+\]
+Translating back:
+
+\begin{recipe}{Constrained LSE}
+\[
+  \boxed{\ \tilde\bb=\hat\bb-(\bX^T\bX)^{-1}L\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(\hat\theta-\theta_0),
+  \qquad \hat\theta=L^T\hat\bb .}
+\]
+Read it as: \emph{start at the unconstrained estimate, then step back by exactly the amount
+needed to satisfy the constraint}, in the metric $(\bX^T\bX)^{-1}$.
+\end{recipe}
+
+\subsection{The reduction in SSE}
+
+\begin{idea}{The identity that makes the $F$-test work}
+\[
+  \boxed{\ \mathrm{SSE}_{\text{red}}-\mathrm{SSE}_{\text{full}}
+  =\|\bX\hat\bb-\bX\tilde\bb\|^2
+  =(\hat\theta-\theta_0)^T\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(\hat\theta-\theta_0) . }
+\]
+\end{idea}
+\prf $\|\bY-\bX\tilde\bb\|^2=\|(\bY-P_\bX\bY)+(P_\bX\bY-\bX\tilde\bb)\|^2$; the two terms are
+orthogonal ($P_\bX\bY-\bX\tilde\bb\in\Cs(\bX)$, the other in $\Cs(\bX)^\perp$), so
+$\mathrm{SSE}_{\text{red}}=\mathrm{SSE}_{\text{full}}+\|\bX\hat\bb-\bX\tilde\bb\|^2$. Then
+substitute the boxed formula for $\tilde\bb$ and simplify. \qed
+
+\section{The three equivalent tests}
+
+Model: $\bY=\bX\bb+\bep$, $\bep\sim\N_n(\zero,\sigma^2I)$, $\rho(\bX)=p$;
+$H_0:L^T\bb=\theta_0$ vs $H_1:L^T\bb\ne\theta_0$, with $\rho(L)=r$.
+
+\subsection{Wald's test (based on the BLUE)}
+
+$\hat\theta=L^T\hat\bb\sim\N_r\big(L^T\bb,\ \sigma^2L^T(\bX^T\bX)^{-1}L\big)$, and
+$\hat\sigma^2=\mathrm{MSE}=\bY^T(I-P_\bX)\bY/(n-p)$ independently. Define
+\[
+  W=(\hat\theta-\theta_0)^T\big(\widehat{\Var}(\hat\theta)\big)^{-1}(\hat\theta-\theta_0)
+   =\frac{1}{\hat\sigma^2}(L^T\hat\bb-\theta_0)^T\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(L^T\hat\bb-\theta_0).
+\]
+
+\begin{idea}{Distribution}
+\[
+  \frac{W}{r}\ \sim\ F_{r,\,n-p}\Big(\frac{\lambda}{2}\Big),\qquad
+  \lambda=\frac{1}{\sigma^2}(L^T\bb-\theta_0)^T\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(L^T\bb-\theta_0).
+\]
+Under $H_0$, $\lambda=0$ and $W/r\sim F_{r,n-p}$ exactly. The power increases to $1$ as
+$\lambda\to\infty$ --- i.e.\ the further the truth is from $H_0$ (measured in the right
+metric), the more surely you reject.
+\end{idea}
+
+\subsection{The $F$-test (based on the drop in SSE)}
+
+By \S5.3 the numerator of $W$ is exactly $\mathrm{SSE}_{\text{red}}-\mathrm{SSE}_{\text{full}}$, and
+the reduced model has $p-r$ free parameters, so it has $n-(p-r)$ residual d.f. Hence
+
+\begin{recipe}{The $F$-statistic --- the form you will actually compute}
+\[
+  \boxed{\
+  F=\frac{\big(\mathrm{SSE}_{\text{red}}-\mathrm{SSE}_{\text{full}}\big)\big/\big[\mathrm{df}_{\text{red}}-\mathrm{df}_{\text{full}}\big]}
+        {\mathrm{MSE}_{\text{full}}}
+   =\frac{W}{(n-(p-r))-(n-p)}=\frac{W}{r}\ \sim\ F_{r,\,n-p}\ \text{ under } H_0 .}
+\]
+\textbf{Wald's test and the $F$-test are literally the same number.} Reject if
+$F>F^{1-\alpha}_{r,\,n-p}$.
+\end{recipe}
+
+In the sub-model language of \S2, testing $H_0:\boldsymbol\delta=0$ uses
+\[
+  F=\frac{\bY^TP_{\bW\mid\bZ}\bY/s}{\bY^T(I-P_\bX)\bY/(n-p)}=\frac{\bY^TP_{\bW\mid\bZ}\bY/s}{\mathrm{MSE}},
+\]
+with the ANOVA decomposition
+\[
+  \bY^T\bY=\underbrace{\bY^TP_\bZ\bY}_{\text{explained by }\bZ}
+          +\underbrace{\bY^TP_{\bW\mid\bZ}\bY}_{\text{extra from }\bW}
+          +\underbrace{\bY^T(I-P_\bX)\bY}_{\mathrm{SSE}} ,
+\]
+whose three ranks are $q$, $s$, $n-p$ and sum to $n$ --- Fisher--Cochran applies, giving
+independence and the $F$.
+
+\subsection{The likelihood ratio test}
+
+$\Theta=\R^p\times\R_+$, $\Theta_0=\{\bb:L^T\bb=\theta_0\}\times\R_+$, and
+\[
+  \Lambda=\frac{\sup_{\Theta_0}\ \ell(\theta\mid\text{data})}{\sup_{\Theta}\ \ell(\theta\mid\text{data})} .
+\]
+Denominator: for fixed $\sigma^2$ the maximiser over $\bb$ is $\hat\bb$; then maximising over
+$\sigma^2$ gives $\hat{\hat\sigma}^2=\tfrac1n\|\bY-\bX\hat\bb\|^2$, and the maximum equals
+$(\hat{\hat\sigma}^2)^{-n/2}e^{-n/2}$ up to the constant. Numerator: the same with $\hat\bb$
+replaced by $\tilde\bb$ and $\tilde\sigma^2=\tfrac1n\|\bY-\bX\tilde\bb\|^2$. Therefore
+\[
+  \Lambda=\left(\frac{\|\bY-\bX\hat\bb\|^2}{\|\bY-\bX\tilde\bb\|^2}\right)^{n/2}
+        =\left(\frac{\mathrm{SSE}_{\text{full}}}{\mathrm{SSE}_{\text{red}}}\right)^{n/2}.
+\]
+
+\begin{idea}{The LRT is the $F$-test in disguise}
+Reject for small $\Lambda$, i.e.\ for large
+\[
+  \frac{\mathrm{SSE}_{\text{red}}}{\mathrm{SSE}_{\text{full}}}-1
+  =\frac{\mathrm{SSE}_{\text{red}}-\mathrm{SSE}_{\text{full}}}{\mathrm{SSE}_{\text{full}}} ,
+\]
+which is a strictly increasing function of $F$. So the LRT, Wald's test and the $F$-test give
+\emph{identical} rejection regions. (Asymptotically, $-2\log\Lambda\dto\chi^2_r$; here we
+have the exact finite-sample $F$ instead, which is better.)
+\end{idea}
+
+\section{The fundamental theorems of least squares}
+
+Model $\bY\sim\N_n(\bX\bb,\sigma^2I)$, $\rho(\bX)=r\le p$, $\hat\bb$ any solution of
+$\bX^T\bX\bb=\bX^T\bY$, and $\mathrm{SSE}=\bY^T(I-P_\bX)\bY$.
+
+\begin{idea}{First fundamental theorem}
+\[
+  \mathrm{SSE}=\min_{\bb\in\R^p}\|\bY-\bX\bb\|^2, \qquad \mathrm{SSE}\sim\sigma^2\chi^2_{n-r} .
+\]
+\end{idea}
+
+\begin{idea}{Second fundamental theorem}
+Let $L$ be $p\times m$ with $\Cs(L)\subseteq\Cs(\bX^T)$ (i.e.\ every component of $L^T\bb$ is
+estimable), and $\mathrm{SSE}_{\text{red}}=\min_{\bb:L^T\bb=\theta_0}\|\bY-\bX\bb\|^2$. Then
+\begin{enumerate}[label=(\roman*)]
+  \item $\mathrm{SSE}$ and $\mathrm{SSE}_{\text{red}}-\mathrm{SSE}$ are \textbf{independent};
+  \item $\mathrm{SSE}_{\text{red}}-\mathrm{SSE}\sim\sigma^2\chi^2_m(\delta)$ for some non-centrality
+        $\delta$, with $\delta=0$ precisely when $L^T\bb=\theta_0$.
+\end{enumerate}
+\end{idea}
+
+This theorem \emph{is} the justification of the $F$-test: (i) gives independence of numerator
+and denominator, (ii) gives the null distribution and shows the test has power against every
+alternative.
+
+\begin{idea}{Third fundamental theorem}
+Let $\bX=[\bX_1:\bX_2]$ with $\bX_1$ of $q$ columns and $r_1=\rho(\bX_1)$. Define
+\[
+  U=\frac{\min_{\bb\in\R^p}\|\bY-\bX\bb\|^2}{\min_{\boldsymbol\gamma\in\R^q}\|\bY-\bX_1\boldsymbol\gamma\|^2}
+   =\frac{\mathrm{SSE}_{\text{full}}}{\mathrm{SSE}_{\text{red}}} .
+\]
+Then $U\sim \mathrm{Beta}\Big(\dfrac{n-r}{2},\ \dfrac{r-r_1}{2}\Big)$.
+\end{idea}
+(This is the Beta form of the $F$: if $A\sim\chi^2_a$, $B\sim\chi^2_b$ independent, then
+$A/(A+B)\sim\mathrm{Beta}(a/2,b/2)$, and $U=\mathrm{SSE}/(\mathrm{SSE}+(\mathrm{SSE}_{\text{red}}-\mathrm{SSE}))$.
+Note that $U$ and $R^2$-type quantities are monotone functions of $F$; the notes' statement
+uses the reciprocal orientation, so check which way round the question defines it.)
+
+\section{Practice, with answers}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item Show that if $A$ is symmetric idempotent of rank $k$ then $\tr(A)=k$, and use it to
+      write down $\E[\bY^TA\bY]$ when $\bY\sim\N_n(\bmu,\sigma^2I)$.
+
+\item In the sub-model setup, verify directly that
+      $\rho(P_\bZ)+\rho(P_{\bW\mid\bZ})+\rho(I-P_\bX)=n$, and say why this matters.
+
+\item Testing $H_0:\beta_1=0$ in simple linear regression, show that the $F$-statistic equals
+      $T_1^2$ where $T_1$ is the $t$-statistic of Crash Course 1.
+
+\item $n=20$, $p=5$. $\mathrm{SSE}_{\text{full}}=45$, and imposing $2$ linear constraints gives
+      $\mathrm{SSE}_{\text{red}}=63$. Carry out the $F$-test at $5\%$ given
+      $F^{0.95}_{2,15}=3.68$.
+
+\item Explain why $R^2$ increasing when you add a predictor is \emph{not} evidence that the
+      predictor is useful, and state what the $F$-test adds.
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} Idempotence forces eigenvalues in $\{0,1\}$; the number of $1$s is the
+rank $k$; trace = sum of eigenvalues = $k$. Then
+$\E[\bY^TA\bY]=\tr(A\Var\bY)+\bmu^TA\bmu=\sigma^2 k+\bmu^TA\bmu$. (This is HW1 Q1(a).)
+
+\smallskip\noindent\textbf{P2.} $\rho(P_\bZ)=q$, $\rho(I-P_\bX)=n-p$, and by the lemma
+$P_{\bW\mid\bZ}=P_\bX-P_\bZ$ so $\rho(P_{\bW\mid\bZ})=p-q=s$. Sum $=q+s+(n-p)=n$. It matters
+because that sum being $n$ is precisely the hypothesis of Fisher--Cochran, which is what
+delivers the independence of the three sums of squares --- and without independence the
+ratio is not an $F$.
+
+\smallskip\noindent\textbf{P3.} Here $r=1$, $L^T=(0,1)$, $\theta_0=0$, $p=2$. Then
+$L^T(\bX^T\bX)^{-1}L$ is the $(2,2)$ entry of $(\bX^T\bX)^{-1}$, namely $1/S_x^2$. So
+\[
+  F=W=\frac{\hat\beta_1^2}{\hat\sigma^2/S_x^2}=\left(\frac{\hat\beta_1}{s(\hat\beta_1)}\right)^2=T_1^2 .
+\]
+Consistently, $t^2_{n-2}=F_{1,n-2}$ as distributions.
+
+\smallskip\noindent\textbf{P4.} $\mathrm{df}_{\text{full}}=n-p=15$,
+$\mathrm{MSE}_{\text{full}}=45/15=3$. Numerator $=(63-45)/2=9$. So $F=9/3=3.0$. Since
+$3.0<3.68$, \textbf{do not reject} $H_0$: the two constraints are consistent with the data at
+the $5\%$ level.
+
+\smallskip\noindent\textbf{P5.} $R^2_{\text{full}}\ge R^2_{\text{sub}}$ is an algebraic
+identity ($\bY^TP_{\bW\mid\bZ}\bY\ge0$) that holds for \emph{every} dataset, including pure
+noise --- adding a column of random numbers always raises $R^2$. It therefore carries no
+evidential content. The $F$-test measures the same increase but divides it by the number of
+extra parameters and calibrates against $\mathrm{MSE}$, so it asks the right question: is the
+increase larger than chance alone would produce?
+
+\vfill
+\begin{center}\small\itshape
+Companions: Simple Linear Regression;
+Matrix Algebra and the Gauss--Markov Framework; One-Way ANOVA.
+\end{center}
+
+\end{document}

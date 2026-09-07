@@ -1,0 +1,657 @@
+\documentclass[11pt]{article}
+\input{lsmstyle}
+\lhead{\small One-Way ANOVA --- Crash Course}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries One-Way Analysis of Variance}\\[4pt]
+{\large A Crash Course from First Principles}\\[3pt]
+{\small Linear Statistical Models --- Lectures 11--12 (27 Aug -- 31 Aug)}\\[3pt]
+{\small\bfseries\color{BrickRed} This is the topic the mid-semester guide is written around.}
+\end{center}
+\vspace{2pt}\hrule\vspace{10pt}
+
+\noindent The fourth and most important of the four crash courses. Everything in Crash
+Courses 1--3 was preparation for this. Read \S\ref{sec:numeric} (the fully worked numerical
+problem) even if you read nothing else --- the exam guide says one question \textbf{will}
+require a calculator.
+
+\tableofcontents
+\vspace{8pt}\hrule\vspace{10pt}
+
+\section{Why this exists}
+
+You have $r$ groups --- $r$ drugs, $r$ fertilisers, $r$ machines --- and a numerical response.
+The question is whether the groups differ.
+
+\begin{idea}{The concrete setting from the notes}
+$r$ different drugs for reducing cholesterol. $Y_{ij}$ is the reduction in cholesterol after
+one month for the $j$-th subject receiving the $i$-th drug:
+\[
+  i=1,\dots,r \ (\text{treatment index}),\qquad j=1,\dots,n_i\ (\text{replicate index}),
+  \qquad n=\sum_i n_i .
+\]
+The design is \textbf{balanced} if all $n_i$ are equal; in general they need not be.
+Subjects are assigned to treatments \emph{at random} --- the randomisation principle --- which
+is what lets us attribute a difference in outcome to the treatment.
+\end{idea}
+
+With $r=2$ this is just the two-sample $t$-test. The whole point of ANOVA is to handle
+$r>2$ \emph{without} doing $\binom{r}{2}$ separate $t$-tests (which would inflate the error
+rate badly). It answers one global question first: \textbf{is there any difference at all?}
+
+\section{The model, and the identifiability problem}
+
+\subsection{Three equivalent ways to write it}
+
+\begin{idea}{Cell-means form (the honest one)}
+\[
+  Y_{ij}=\mu_i+\varepsilon_{ij},\qquad \varepsilon_{ij}\iid \N(0,\sigma^2),
+  \qquad i=1,\dots,r,\ \ j=1,\dots,n_i .
+\]
+Parameters: $\mu_1,\dots,\mu_r,\sigma^2$. This model is perfectly identifiable.
+\end{idea}
+
+But we want to talk about \emph{differential effects}: how much better is drug $i$ than
+average? So define an overall mean $\mu$ and write $\alpha_i=\mu_i-\mu$:
+
+\begin{idea}{Effects form (the useful one)}
+\[
+  \boxed{\ Y_{ij}=\mu+\alpha_i+\varepsilon_{ij}\ }
+\]
+Parameters: $\mu,\alpha_1,\dots,\alpha_r,\sigma^2$ --- that is $r+1$ parameters for only $r$
+group means. \textbf{One too many.}
+\end{idea}
+
+\subsection{Why a constraint is forced on you}
+
+Replace $\mu$ by $\mu-c$ and every $\alpha_i$ by $\alpha_i+c$:
+\[
+  Y_{ij}=(\mu-c)+(\alpha_i+c)+\varepsilon_{ij}
+\]
+is the \emph{same model}. The data can never distinguish the two parameter vectors. In the
+language of Crash Course 2: the design matrix
+\[
+  \bX_{n\times(r+1)}=\begin{pmatrix}
+    \one_{n_1} & \one_{n_1} & 0 & \cdots & 0\\
+    \one_{n_2} & 0 & \one_{n_2} & \cdots & 0\\
+    \vdots & & &\ddots& \\
+    \one_{n_r} & 0&0&\cdots&\one_{n_r}
+  \end{pmatrix}
+  \quad\text{has}\quad \rho(\bX)=r,\ \text{not } r+1,
+\]
+because column $0$ is the sum of the other $r$. So $\bX^T\bX$ is singular, the model is
+\textbf{not identifiable}, and $\mu$ and the $\alpha_i$ are \textbf{not estimable}
+individually.
+
+\subsection{The general form of the constraint}
+
+Define the overall mean as a weighted average, $\mu=\sum_i w_i\mu_i$ with $\sum_i w_i=1$,
+$0\le w_i\le 1$. Substituting $\mu_i=\mu+\alpha_i$:
+\[
+  \mu=\sum_i w_i(\mu+\alpha_i)=\mu\sum_i w_i+\sum_i w_i\alpha_i=\mu+\sum_i w_i\alpha_i
+  \quad\Longrightarrow\quad \boxed{\ \sum_{i=1}^r w_i\alpha_i=0 .}
+\]
+
+\begin{recipe}{The two natural choices}
+\[
+  \textbf{(A)}\quad w_i=\frac1r \ \Rightarrow\ \sum_i \alpha_i = 0,
+  \qquad\qquad
+  \textbf{(B)}\quad w_i=\frac{n_i}{n}\ \Rightarrow\ \sum_i n_i\alpha_i = 0 .
+\]
+\textbf{(B) is the ``natural'' constraint and the one used in the exam guide.} It corresponds
+to $\mu=\E(\Ybar_{\cdot\cdot})=\frac1n\sum_i n_i\mu_i$, the mean of the whole experiment. In a
+balanced design ($n_i\equiv m$) the two coincide.
+\end{recipe}
+
+\begin{confusion}{``the constraint changes the model''}
+It does not. The constraint is a \emph{labelling convention} you impose to pin down one
+representative from a family of equivalent parameter vectors. Fitted values, SSE, the
+$F$-statistic and every estimable quantity are completely unaffected by which constraint you
+choose. Only the numerical values of $\hat\mu$ and $\hat\alpha_i$ change --- and those are
+not estimable anyway.
+\end{confusion}
+
+\subsection{What \emph{is} estimable}
+
+By the criterion of Crash Course 2, $\mathcal{N}(\bX)$ is spanned by $z=(1,-1,\dots,-1)^T$, so
+$a^T\bb$ is estimable iff $a_0=\sum_{i\ge1}a_i$.
+
+\begin{idea}{The estimable quantities of one-way ANOVA}
+\begin{itemize}
+  \item $\mu_i=\mu+\alpha_i$ \quad --- each group mean. \textbf{Estimable.}
+  \item $\alpha_i-\alpha_{i'}=\mu_i-\mu_{i'}$ \quad --- pairwise differences. \textbf{Estimable.}
+  \item $\sum_i c_i\alpha_i$ with $\sum_i c_i=0$ \quad --- a \textbf{contrast}. \textbf{Estimable}, and
+        \[
+          \sum_i c_i\alpha_i=\sum_i c_i(\mu_i-\mu)=\sum_i c_i\mu_i .
+        \]
+  \item $\mu$ alone, or $\alpha_i$ alone. \textbf{Not estimable} (without a constraint).
+\end{itemize}
+\end{idea}
+
+\begin{confusion}{contrast vs.\ general linear combination}
+A contrast is a linear combination of the $\mu_i$ (equivalently of the $\alpha_i$) whose
+coefficients \textbf{sum to zero}. That is the whole definition, and it is exactly the
+condition for estimability. $\mu_1-\mu_2$ is a contrast ($1-1=0$); $\mu_1+\mu_2$ is not;
+$\mu_2-\tfrac12(\mu_1+\mu_3)$ is ($-\tfrac12+1-\tfrac12=0$).
+\end{confusion}
+
+\section{Least squares estimates}
+
+\subsection{The direct route (fastest, use this in the exam)}
+
+Because the cell-means form has no constraint, minimise
+\[
+  G(\mu_1,\dots,\mu_r)=\sum_{i=1}^r\sum_{j=1}^{n_i}(Y_{ij}-\mu_i)^2 .
+\]
+The terms separate by $i$, and $\sum_j (Y_{ij}-\mu_i)^2$ is minimised at the group mean. So
+\[
+  \boxed{\ \hat\mu_i=\Ybar_{i\cdot}=\frac1{n_i}\sum_{j=1}^{n_i}Y_{ij}\ }
+\]
+By Gauss--Markov, since each $\mu_i$ is estimable, $\Ybar_{i\cdot}$ is its \textbf{BLUE}.
+Then under constraint (B):
+\[
+  \boxed{\ \hat\mu=\Ybar_{\cdot\cdot}=\frac1n\sum_i\sum_j Y_{ij},
+  \qquad \hat\alpha_i=\Ybar_{i\cdot}-\Ybar_{\cdot\cdot}\ }
+\]
+and indeed $\sum_i n_i\hat\alpha_i=\sum_i n_i\Ybar_{i\cdot}-n\Ybar_{\cdot\cdot}=0$: the
+constraint is automatically satisfied. Under the general constraint $\sum w_i\alpha_i=0$ the
+BLUEs are $\hat\mu=\sum_i w_i\Ybar_{i\cdot}$ and $\hat\alpha_i=\Ybar_{i\cdot}-\hat\mu$.
+
+\subsection{The projection route (this is what the lectures did)}
+
+Write $\bY=\mu\one_n+\bX\bal+\bep$ where $\bX$ has the $r$ group-indicator columns. Let
+$P_{\one}=\tfrac1n\one\one^T$ and $\tilde\bX=(I-P_{\one})\bX$. The constraint
+$\sum n_i\alpha_i=0$ is exactly $\one^T\bX\bal=0$, so $\tilde\bX\bal=\bX\bal$, and
+$P_{\bX_{\text{tot}}}=P_{\one}+P_{\tilde\bX}$ by the lemma of Crash Course 3. Then
+\begin{align*}
+  G(\mu,\bal)&=\|\bY-\mu\one-\tilde\bX\bal\|^2\\
+  &=\underbrace{\|(I-P_{\bX_{\text{tot}}})\bY\|^2}_{\text{constant in }(\mu,\bal)}
+   +\underbrace{\|P_{\one}\bY-\mu\one\|^2}_{\text{involves only }\mu}
+   +\underbrace{\|P_{\tilde\bX}\bY-\bX\bal\|^2}_{\text{involves only }\bal},
+\end{align*}
+the three pieces being mutually orthogonal. Minimising the middle term gives
+$\hat\mu=\Ybar_{\cdot\cdot}$; minimising the last gives
+$\hat{\bal}=(\bX^T\bX)^{-1}\bX^TP_{\tilde\bX}\bY$. Since
+$\bX^T\bX=\text{diag}(n_1,\dots,n_r)$ and
+$\bX^TP_{\tilde\bX}\bY=\bX^T\bY-\Ybar_{\cdot\cdot}\bX^T\one
+=\big(\sum_jY_{1j}-n_1\Ybar_{\cdot\cdot},\ \dots\big)^T$, we recover
+$\hat\alpha_i=\Ybar_{i\cdot}-\Ybar_{\cdot\cdot}$. \qed
+
+\subsection{The estimate of $\sigma^2$}
+
+\[
+  \boxed{\ \hat\sigma^2=\mathrm{MSE}=\frac{\mathrm{SSE}}{n-r}
+  =\frac{\sum_{i=1}^r(n_i-1)s_i^2}{n-r},
+  \qquad s_i^2=\frac1{n_i-1}\sum_{j=1}^{n_i}(Y_{ij}-\Ybar_{i\cdot})^2 . }
+\]
+This is the \textbf{pooled sample variance} --- a weighted average of the $r$ within-group
+variances, with weights equal to their degrees of freedom. It is unbiased for $\sigma^2$.
+Note $\sum_i(n_i-1)=n-r$.
+
+\section{The variance decomposition}
+
+\subsection{Definitions and the identity}
+
+\begin{idea}{Sums of squares}
+\begin{align*}
+  \mathrm{SSTO}&=\sum_{i}\sum_j (Y_{ij}-\Ybar_{\cdot\cdot})^2 && \text{total variability}\\
+  \mathrm{SSTR}&=\sum_{i=1}^r n_i(\Ybar_{i\cdot}-\Ybar_{\cdot\cdot})^2 && \text{\textbf{between} groups (BG)}\\
+  \mathrm{SSE}&=\sum_i\sum_j (Y_{ij}-\Ybar_{i\cdot})^2 && \text{\textbf{within} groups (WG)}
+\end{align*}
+\[
+  \boxed{\ \mathrm{SSTO}=\mathrm{SSTR}+\mathrm{SSE}\ }
+\]
+\end{idea}
+
+\prf (algebraic) Insert and split: $Y_{ij}-\Ybar_{\cdot\cdot}=(Y_{ij}-\Ybar_{i\cdot})+(\Ybar_{i\cdot}-\Ybar_{\cdot\cdot})$.
+Squaring and summing, the cross term is
+\[
+  2\sum_i(\Ybar_{i\cdot}-\Ybar_{\cdot\cdot})\underbrace{\sum_j(Y_{ij}-\Ybar_{i\cdot})}_{=\,0}=0 . \qquad\square
+\]
+
+\prf (geometric --- this is the lecture version) With $P_{\one}$ and $P_\bX$ the projections
+onto the constant vector and onto the group-indicator space,
+\[
+  (I-P_{\one})\bY=\underbrace{(I-P_\bX)\bY}_{\perp}+\underbrace{(P_\bX-P_{\one})\bY}_{\perp} ,
+\]
+the two being orthogonal because $\Cs(\one)\subseteq\Cs(\bX)$. Pythagoras gives
+$\bY^T(I-P_{\one})\bY=\bY^T(I-P_\bX)\bY+\bY^T(P_\bX-P_{\one})\bY$, which is
+$\mathrm{SSTO}=\mathrm{SSE}+\mathrm{SSTR}$. \qed
+
+\begin{idea}{The picture: two scenes}
+\begin{center}
+\begin{tabular}{@{}p{7.2cm}p{7.2cm}@{}}
+\toprule
+\textbf{Scene 1: groups clearly differ} & \textbf{Scene 2: groups indistinguishable}\\
+\midrule
+Points within each group are tightly bunched; the group centres are far apart. &
+Points within each group are spread out; the group centres are close together.\\
+$\mathrm{SSE}\ (\text{WG})\ \lll\ \mathrm{SSTR}\ (\text{BG})$ &
+$\mathrm{SSTR}\ (\text{BG})$ is small relative to $\mathrm{SSE}\ (\text{WG})$\\
+$F$ large $\Rightarrow$ \textbf{reject} $H_0$ & $F$ near $1$ $\Rightarrow$ \textbf{do not reject}\\
+\bottomrule
+\end{tabular}
+\end{center}
+The $F$-statistic is nothing but the formal version of ``how big is the spread
+\emph{between} groups compared to the spread \emph{within} groups?''
+\end{idea}
+
+\subsection{Degrees of freedom}
+
+\[
+  \underbrace{n-1}_{\rho(I-P_{\one})}
+  =\underbrace{r-1}_{\rho(P_\bX-P_{\one})}
+  +\underbrace{n-r}_{\rho(I-P_\bX)} .
+\]
+The ranks add up to $n-1$, so \textbf{Fisher--Cochran} applies (after removing the mean) and
+gives: $\mathrm{SSTR}$ and $\mathrm{SSE}$ are \emph{independent} chi-squares.
+
+\subsection{Expected mean squares}
+
+\begin{idea}{The table that explains why $F$ works}
+\[
+  \E(\mathrm{MSE})=\sigma^2, \qquad
+  \E(\mathrm{MSTR})=\sigma^2+\frac{\sum_{i=1}^r n_i(\mu_i-\mu)^2}{r-1}
+  =\sigma^2+\frac{\sum_i n_i\alpha_i^2}{r-1} .
+\]
+\end{idea}
+
+Under $H_0:\alpha_1=\cdots=\alpha_r=0$ the second term vanishes and \emph{both} mean squares
+estimate $\sigma^2$, so $F=\mathrm{MSTR}/\mathrm{MSE}$ should hover around $1$. Under $H_1$ the
+numerator is inflated by $\sum n_i\alpha_i^2$, so $F$ tends to be large. \textbf{That is why
+you reject for large $F$ and never for small $F$: the test is one-sided in $F$ even though the
+alternative is two-sided in the $\alpha_i$.}
+
+\section{The ANOVA table and the $F$-test}
+
+\begin{idea}{The table --- reproduce this from memory}
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Source of variation & d.f. & SS & MS $=\frac{\text{SS}}{\text{d.f.}}$ & $\E(\text{MS})$ \\
+\midrule
+Between treatments & $r-1$ & SSTR & $\mathrm{MSTR}=\frac{\mathrm{SSTR}}{r-1}$
+  & $\sigma^2+\frac{\sum_i n_i(\mu_i-\mu)^2}{r-1}$ \\[3pt]
+Within (Error) & $n-r$ & SSE & $\mathrm{MSE}=\frac{\mathrm{SSE}}{n-r}$ & $\sigma^2$ \\[3pt]
+\midrule
+Total & $n-1$ & SSTO & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+\[
+  H_0:\alpha_1=\cdots=\alpha_r=0 \quad(\text{equivalently } \mu_1=\cdots=\mu_r),
+  \qquad
+  F=\frac{\mathrm{MSTR}}{\mathrm{MSE}}
+   =\frac{\mathrm{SSTR}/(r-1)}{\mathrm{SSE}/(n-r)}\ \overset{H_0}{\sim}\ F_{r-1,\,n-r}.
+\]
+\textbf{Reject $H_0$ at level $\alpha$ if $F>F^{1-\alpha}_{r-1,\,n-r}$.}
+\end{idea}
+
+\textbf{Under $H_1$}, $F$ has a \textbf{non-central} $F_{r-1,n-r}(\lambda/2)$ distribution
+with $\lambda=\frac1{\sigma^2}\sum_i n_i\alpha_i^2$; the power increases to $1$ as
+$\lambda\to\infty$.
+
+\begin{confusion}{$n-r$, not $n-r-1$}
+The model $\mu+\alpha_i$ has $r+1$ parameters but the design matrix has rank $r$. The error
+d.f.\ is $n-\rho(\bX)=n-r$. Every $t$ and $F$ in the question uses this. Writing $n-r-1$
+poisons the whole answer.
+\end{confusion}
+
+\section{Confidence intervals and contrasts}
+
+Everything here uses one distributional fact: $\Ybar_{i\cdot}\sim\N(\mu_i,\sigma^2/n_i)$
+independently across $i$, independent of $\mathrm{MSE}$, and
+$(n-r)\mathrm{MSE}/\sigma^2\sim\chi^2_{n-r}$. So any (estimable) linear combination,
+standardised by its estimated standard error, is $t_{n-r}$.
+
+\subsection{A single group mean}
+\[
+  \hat\mu_i=\Ybar_{i\cdot},\qquad \Var(\hat\mu_i)=\frac{\sigma^2}{n_i},
+  \qquad
+  \boxed{\ \Ybar_{i\cdot}\ \pm\ t^{1-\alpha/2}_{n-r}\sqrt{\frac{\mathrm{MSE}}{n_i}}\ }
+\]
+
+\subsection{A pairwise difference}
+\[
+  \widehat{\mu_i-\mu_{i'}}=\Ybar_{i\cdot}-\Ybar_{i'\cdot},
+  \qquad
+  \boxed{\ (\Ybar_{i\cdot}-\Ybar_{i'\cdot})\ \pm\ t^{1-\alpha/2}_{n-r}
+  \sqrt{\mathrm{MSE}\Big(\tfrac1{n_i}+\tfrac1{n_{i'}}\Big)}\ }
+\]
+Note this is exactly the two-sample $t$ interval, except that $\sigma^2$ is estimated by
+pooling \emph{all $r$ groups}, giving $n-r$ degrees of freedom instead of $n_i+n_{i'}-2$.
+That extra precision is the payoff of the ANOVA framework.
+
+\subsection{A general contrast --- the master formula}
+
+\begin{recipe}{Contrast: estimate, variance, interval}
+Let $\theta=\sum_{i=1}^r c_i\mu_i$ with $\sum_i c_i=0$ (equivalently $\theta=\sum_i c_i\alpha_i$).
+\[
+  \hat\theta=\sum_{i=1}^r c_i\Ybar_{i\cdot} \quad\text{is the \textbf{BLUE}},
+  \qquad
+  \Var(\hat\theta)=\sigma^2\sum_{i=1}^r\frac{c_i^2}{n_i},
+\]
+\[
+  \boxed{\ \sum_i c_i\Ybar_{i\cdot}\ \pm\ t^{1-\alpha/2}_{n-r}\ \sqrt{\mathrm{MSE}}\ \sqrt{\sum_{i=1}^r\frac{c_i^2}{n_i}}\ }
+\]
+and the test of $H_0:\theta=0$ rejects when $\big|\hat\theta\big/\sqrt{\mathrm{MSE}\sum c_i^2/n_i}\big|>t^{1-\alpha/2}_{n-r}$.
+\end{recipe}
+
+\textbf{Why $\hat\theta$ is the BLUE.} $\theta$ is estimable (the coefficients sum to zero),
+$\Ybar_{i\cdot}=\hat\mu_i$ is the LS estimate, so $\sum c_i\Ybar_{i\cdot}$ is
+``$a^T\hat\bb$'' and the Gauss--Markov theorem applies directly.
+
+\textbf{Why the variance is that.} The $\Ybar_{i\cdot}$ are independent with variances
+$\sigma^2/n_i$, so $\Var(\sum c_i\Ybar_{i\cdot})=\sum c_i^2\sigma^2/n_i$.
+
+\begin{confusion}{$\sqrt{\mathrm{MSE}}\cdot\sqrt{\sum c_i^2/n_i}$ --- one square root or two?}
+It is a single square root of the product: $\sqrt{\mathrm{MSE}\sum c_i^2/n_i}$. The exam guide
+writes it as $\sqrt{\mathrm{MSE}}\sqrt{\sum c_i^2/m_i}$, which is the same thing. What you must
+\emph{not} do is forget the $1/n_i$ weights --- with unequal group sizes that is the most
+common numerical error in the whole topic.
+\end{confusion}
+
+\section{The LS decomposition under the natural constraint}
+
+The exam guide devotes a page to this argument, so here it is in full. We minimise
+$G(\mu,\alpha_1,\dots,\alpha_r)=\sum_i\sum_j(Y_{ij}-\mu-\alpha_i)^2$ subject to
+$\sum_i n_i\alpha_i=0$ $\ (\star)$.
+
+Insert $\hat\mu=\Ybar_{\cdot\cdot}$ and $\hat\alpha_i=\Ybar_{i\cdot}-\Ybar_{\cdot\cdot}$
+(so $\hat\mu+\hat\alpha_i=\Ybar_{i\cdot}$) and split the summand three ways:
+\[
+  Y_{ij}-\mu-\alpha_i=\underbrace{\big(Y_{ij}-(\hat\mu+\hat\alpha_i)\big)}_{=\,Y_{ij}-\Ybar_{i\cdot}}
+  \;-\;\underbrace{(\mu-\hat\mu)}_{\text{constant in }i,j}
+  \;-\;\underbrace{(\alpha_i-\hat\alpha_i)}_{\text{constant in }j} .
+\]
+Squaring and summing, all three cross terms vanish:
+\begin{itemize}
+  \item $\sum_i\sum_j(Y_{ij}-\Ybar_{i\cdot})(\mu-\hat\mu)=(\mu-\hat\mu)\sum_i\sum_j(Y_{ij}-\Ybar_{i\cdot})=0$;
+  \item $\sum_i(\alpha_i-\hat\alpha_i)\sum_j(Y_{ij}-\Ybar_{i\cdot})=0$ likewise;
+  \item $\sum_i n_i(\mu-\hat\mu)(\alpha_i-\hat\alpha_i)=(\mu-\hat\mu)\big(\sum_i n_i\alpha_i-\sum_i n_i\hat\alpha_i\big)=0$
+        --- \textbf{and this is precisely where the constraint $(\star)$ is used}, both for
+        $\alpha$ and for $\hat\alpha$.
+\end{itemize}
+Therefore
+\[
+  G(\mu,\bal)=\underbrace{\sum_i\sum_j(Y_{ij}-\Ybar_{i\cdot})^2}_{=\ \mathrm{SSE},\ \text{free of }\mu,\bal}
+  \;+\;n(\mu-\hat\mu)^2\;+\;\sum_i n_i(\alpha_i-\hat\alpha_i)^2 .
+\]
+Each of the last two terms is a non-negative quadratic minimised at $\mu=\hat\mu$,
+$\alpha_i=\hat\alpha_i$ --- and that choice satisfies $(\star)$, so it is admissible.
+Setting $\mu=\hat\mu$ and all $\alpha_i=0$ instead (also admissible) and comparing gives
+\[
+  \sum_i\sum_j(Y_{ij}-\Ybar_{\cdot\cdot})^2=\sum_i\sum_j(Y_{ij}-\Ybar_{i\cdot})^2+\sum_i n_i\hat\alpha_i^2,
+\]
+i.e.\ $\mathrm{SSTO}=\mathrm{SSE}+\mathrm{SSTR}$ once more. \qed
+
+\begin{idea}{Why this argument is worth knowing}
+It proves \emph{simultaneously} that (a) the LSEs are the sample means, (b) they satisfy the
+constraint automatically, and (c) the ANOVA identity holds --- all from one completed square.
+If the exam asks you to ``derive the LSE under the natural identifiability constraint'', this
+is the expected answer.
+\end{idea}
+
+\section{The fully worked numerical problem}\label{sec:numeric}
+
+The guide is explicit: \emph{one numerical problem, bring a calculator.} It also tells you
+the likely form: \textbf{you are given $\sum_i\sum_j Y_{ij}^2$ and the group totals
+$T_i=\sum_j Y_{ij}$, and asked to find SSTO, SSTR, SSE and everything downstream.} So learn
+the shortcut formulas, not the definitional ones.
+
+\subsection{The shortcut formulas}
+
+\begin{recipe}{The three-line computational recipe}
+Let $T_i=\sum_j Y_{ij}$ (group totals), $G=\sum_i T_i$ (grand total), $n=\sum_i n_i$.
+Compute the \textbf{correction factor} once:
+\[
+  \mathrm{CF}=\frac{G^2}{n} .
+\]
+Then
+\[
+  \boxed{\ \mathrm{SSTO}=\sum_i\sum_j Y_{ij}^2-\mathrm{CF},
+  \qquad
+  \mathrm{SSTR}=\sum_{i=1}^r\frac{T_i^2}{n_i}-\mathrm{CF},
+  \qquad
+  \mathrm{SSE}=\mathrm{SSTO}-\mathrm{SSTR}. }
+\]
+Never compute SSE from its definition --- get it by subtraction. It is faster and it
+double-checks the identity.
+\end{recipe}
+
+\textit{Why:} $\sum\sum(Y_{ij}-\Ybar_{\cdot\cdot})^2=\sum\sum Y_{ij}^2-n\Ybar_{\cdot\cdot}^2$
+and $n\Ybar_{\cdot\cdot}^2=G^2/n$; similarly
+$\sum_i n_i(\Ybar_{i\cdot}-\Ybar_{\cdot\cdot})^2=\sum_i n_i\Ybar_{i\cdot}^2-n\Ybar_{\cdot\cdot}^2
+=\sum_i T_i^2/n_i - G^2/n$.
+
+\subsection{The problem}
+
+\begin{exam}{Worked example}
+Three drugs are compared for cholesterol reduction. The observed reductions (mg/dL) are
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Drug $A$ ($n_1=4$): & $12,\ 15,\ 11,\ 14$ \\
+Drug $B$ ($n_2=5$): & $18,\ 20,\ 17,\ 19,\ 21$ \\
+Drug $C$ ($n_3=3$): & $9,\ 13,\ 11$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label=(\alph*)]
+  \item Construct the ANOVA table and test $H_0:\mu_1=\mu_2=\mu_3$ at the $5\%$ level.
+  \item Give a $95\%$ confidence interval for $\mu_2$.
+  \item Give a $95\%$ confidence interval for $\mu_1-\mu_3$ and interpret.
+  \item Give a $95\%$ confidence interval for the contrast $\mu_2-\tfrac12(\mu_1+\mu_3)$.
+  \item Report $\hat\mu$ and $\hat\alpha_i$ under the constraint $\sum n_i\alpha_i=0$.
+\end{enumerate}
+\emph{Given:} $F^{0.95}_{2,9}=4.26$, \quad $t^{0.975}_{9}=2.262$.
+\end{exam}
+
+\subsection{Step 1 --- the table of totals (do this first, always)}
+
+\begin{center}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Group & $n_i$ & $T_i=\sum_j Y_{ij}$ & $\Ybar_{i\cdot}=T_i/n_i$ & $T_i^2/n_i$ & $\sum_j Y_{ij}^2$\\
+\midrule
+$A$ & $4$ & $52$ & $13$ & $52^2/4=676$ & $144{+}225{+}121{+}196=686$\\
+$B$ & $5$ & $95$ & $19$ & $95^2/5=1805$ & $324{+}400{+}289{+}361{+}441=1815$\\
+$C$ & $3$ & $33$ & $11$ & $33^2/3=363$ & $81{+}169{+}121=371$\\
+\midrule
+\textbf{Total} & $n=12$ & $G=180$ & $\Ybar_{\cdot\cdot}=15$ & $\mathbf{2844}$ & $\mathbf{2872}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Step 2 --- the sums of squares}
+
+\[
+  \mathrm{CF}=\frac{G^2}{n}=\frac{180^2}{12}=\frac{32400}{12}=2700 .
+\]
+\[
+  \mathrm{SSTO}=2872-2700=\mathbf{172},\qquad
+  \mathrm{SSTR}=2844-2700=\mathbf{144},\qquad
+  \mathrm{SSE}=172-144=\mathbf{28}.
+\]
+
+\subsection{Step 3 --- the ANOVA table}
+
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Source & d.f. & SS & MS & $F$\\
+\midrule
+Between treatments & $r-1=2$ & $144$ & $144/2=72$ & $72/3.1111=\mathbf{23.14}$\\
+Error (within) & $n-r=9$ & $28$ & $28/9=3.1111$ & \\
+\midrule
+Total & $11$ & $172$ & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Conclusion (a).} $F=23.14 > F^{0.95}_{2,9}=4.26$, so \textbf{reject $H_0$} at the
+$5\%$ level. There is strong evidence that the three drugs differ in mean cholesterol
+reduction. (In fact $p\approx0.00028$.)
+
+\subsection{Step 4 --- the intervals}
+
+Throughout, $\mathrm{MSE}=3.1111$, $\sqrt{\mathrm{MSE}}=1.7638$, $t^{0.975}_9=2.262$.
+
+\medskip
+\textbf{(b) CI for $\mu_2$.}
+\[
+  \Ybar_{2\cdot}\pm t\sqrt{\frac{\mathrm{MSE}}{n_2}}
+  = 19 \pm 2.262\sqrt{\frac{3.1111}{5}}
+  = 19 \pm 2.262(0.7888)
+  = 19\pm 1.784
+  = \boxed{(17.22,\ 20.78)} .
+\]
+
+\medskip
+\textbf{(c) CI for $\mu_1-\mu_3$.} Here $c=(1,0,-1)$, so
+$\sum c_i^2/n_i=\tfrac14+\tfrac13=0.58333$.
+\[
+  \hat\theta=13-11=2,\qquad
+  \mathrm{se}=\sqrt{3.1111\times0.58333}=\sqrt{1.8148}=1.3472,
+\]
+\[
+  2\pm 2.262(1.3472)=2\pm3.047=\boxed{(-1.05,\ 5.05)} .
+\]
+\textbf{Interpretation:} the interval \emph{contains zero}, so at the $5\%$ level we cannot
+conclude that drugs $A$ and $C$ differ --- even though the overall $F$-test was highly
+significant. The global test says \emph{somebody} differs; it does not say every pair does.
+
+\medskip
+\textbf{(d) CI for $\mu_2-\tfrac12(\mu_1+\mu_3)$.} Coefficients
+$c=(-\tfrac12,\ 1,\ -\tfrac12)$; check $\sum c_i=0$. \checkmark
+\[
+  \sum\frac{c_i^2}{n_i}=\frac{0.25}{4}+\frac{1}{5}+\frac{0.25}{3}
+  =0.0625+0.2+0.08333=0.34583 ,
+\]
+\[
+  \hat\theta=19-\tfrac12(13+11)=19-12=7,\qquad
+  \mathrm{se}=\sqrt{3.1111\times0.34583}=\sqrt{1.0759}=1.0373,
+\]
+\[
+  7\pm2.262(1.0373)=7\pm2.347=\boxed{(4.65,\ 9.35)} .
+\]
+Zero is excluded, and comfortably: drug $B$ is significantly better than the average of $A$
+and $C$.
+
+\medskip
+\textbf{(e) Effects.} $\hat\mu=\Ybar_{\cdot\cdot}=15$ and
+\[
+  \hat\alpha_1=13-15=-2,\qquad \hat\alpha_2=19-15=4,\qquad \hat\alpha_3=11-15=-4 .
+\]
+\textbf{Check the constraint:} $\sum n_i\hat\alpha_i=4(-2)+5(4)+3(-4)=-8+20-12=0$. \checkmark
+
+\begin{recipe}{Calculator discipline --- do these checks, they cost seconds}
+\begin{enumerate}
+  \item $\sum_i T_i = G$. \quad (Here $52+95+33=180$.\ \checkmark)
+  \item $\sum_i n_i = n$, and $\sum_i (\text{group } \sum Y^2) = $ overall $\sum\sum Y^2$.
+  \item $\mathrm{SSTR}+\mathrm{SSE}=\mathrm{SSTO}$ and $(r-1)+(n-r)=n-1$.
+  \item $\sum_i n_i\hat\alpha_i=0$.
+  \item All three SS are \textbf{non-negative}. A negative SS means an arithmetic slip ---
+        usually the correction factor.
+  \item Keep $\mathrm{MSE}$ to $4$ decimals; rounding it to $3.1$ early shifts $F$ by about
+        $1\%$ and can flip a borderline decision.
+\end{enumerate}
+\end{recipe}
+
+\section{Loose ends worth five minutes}
+
+\subsection{The two-sample $t$-test as the $r=2$ case}
+With $r=2$,
+\[
+  T_{12}=\frac{\Ybar_{1\cdot}-\Ybar_{2\cdot}}{\hat\sigma\sqrt{\tfrac1{n_1}+\tfrac1{n_2}}}\sim t_{n-2},
+  \qquad\text{and}\qquad T_{12}^2 = F \sim F_{1,\,n-2}.
+\]
+Under $H_1$ the non-centrality parameter is
+$\dfrac{\mu_1-\mu_2}{\sigma\sqrt{1/n_1+1/n_2}}$.
+
+\subsection{Why not just do all pairwise $t$-tests?}
+With $r=5$ there are $10$ pairs; at level $0.05$ each, the chance of at least one false
+rejection is far above $0.05$. The $F$-test controls one global error rate. If it rejects,
+\emph{then} you look at contrasts --- ideally with a Bonferroni correction (divide $\alpha$ by
+the number of comparisons; see Crash Course 1 \S6.5).
+
+\subsection{The BLUE statement in the guide's language}
+The guide records: \emph{for $\theta=\sum c_i\mu_i$ with $\sum c_i=0$, the BLUE is
+$\sum c_i\Ybar_{i\cdot}$, with $\Var(\hat\theta)=\sigma^2\sum c_i^2/m_i$ and the
+$100(1-\gamma)\%$ interval $\sum c_i\Ybar_{i\cdot}\pm t^{1-\gamma/2}_{n_T-r}\sqrt{\mathrm{MSE}}\sqrt{\sum c_i^2/m_i}$.}
+That is \S6.3 above with $m_i$ for $n_i$ and $n_T$ for $n$. Same formula; be ready for either
+notation.
+
+\section{Practice, with answers}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item Four fertilisers, $n_i=6$ each ($n=24$). You are given $\sum\sum Y_{ij}^2=5120$,
+      $G=336$, and group totals $T=(72,\ 96,\ 84,\ 84)$. Build the ANOVA table and test at
+      $5\%$ given $F^{0.95}_{3,20}=3.10$.
+
+\item In P1, give a $95\%$ CI for $\mu_2-\mu_1$ ($t^{0.975}_{20}=2.086$).
+
+\item Show that $\mathrm{SSE}=\sum_i(n_i-1)s_i^2$, and hence that $\mathrm{MSE}$ is a weighted
+      average of the within-group sample variances.
+
+\item Prove $\E(\mathrm{MSTR})=\sigma^2+\frac{1}{r-1}\sum_i n_i\alpha_i^2$.
+
+\item Why is $\hat\alpha_1=\Ybar_{1\cdot}-\Ybar_{\cdot\cdot}$ \emph{not} the BLUE of
+      $\alpha_1$, strictly speaking? What is the precise correct statement?
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} $\mathrm{CF}=336^2/24=112896/24=4704$. Check
+$\sum T_i=72+96+84+84=336$ \checkmark.
+$\sum T_i^2/n_i=(5184+9216+7056+7056)/6=28512/6=4752$.
+\[
+  \mathrm{SSTO}=5120-4704=416,\quad \mathrm{SSTR}=4752-4704=48,\quad \mathrm{SSE}=416-48=368.
+\]
+d.f.: $3,\ 20,\ 23$. $\mathrm{MSTR}=48/3=16$, $\mathrm{MSE}=368/20=18.4$,
+$F=16/18.4=0.87$. Since $0.87<3.10$, \textbf{do not reject}: no evidence that the fertilisers
+differ. (Note $F<1$ --- perfectly possible, and always a signal that the between-group
+spread is smaller than chance would typically produce.)
+
+\smallskip\noindent\textbf{P2.} $\Ybar_{2\cdot}-\Ybar_{1\cdot}=16-12=4$;
+$\sum c_i^2/n_i=\tfrac16+\tfrac16=\tfrac13$;
+$\mathrm{se}=\sqrt{18.4/3}=\sqrt{6.1333}=2.4766$. Interval
+$4\pm2.086(2.4766)=4\pm5.166=(-1.17,\ 9.17)$ --- contains zero, consistent with the
+non-significant $F$.
+
+\smallskip\noindent\textbf{P3.} By definition
+$s_i^2=\frac{1}{n_i-1}\sum_j(Y_{ij}-\Ybar_{i\cdot})^2$, so
+$(n_i-1)s_i^2=\sum_j(Y_{ij}-\Ybar_{i\cdot})^2$; summing over $i$ gives $\mathrm{SSE}$. Hence
+$\mathrm{MSE}=\sum_i(n_i-1)s_i^2\big/\sum_i(n_i-1)$, a weighted average with weights
+$n_i-1$.
+
+\smallskip\noindent\textbf{P4.} Write $\Ybar_{i\cdot}=\mu+\alpha_i+\bar\varepsilon_{i\cdot}$ and
+$\Ybar_{\cdot\cdot}=\mu+\bar\varepsilon_{\cdot\cdot}$ (using $\sum n_i\alpha_i=0$). Then
+$\Ybar_{i\cdot}-\Ybar_{\cdot\cdot}=\alpha_i+(\bar\varepsilon_{i\cdot}-\bar\varepsilon_{\cdot\cdot})$ and
+\[
+  \E(\mathrm{SSTR})=\sum_i n_i\Big[\alpha_i^2+\E(\bar\varepsilon_{i\cdot}-\bar\varepsilon_{\cdot\cdot})^2\Big]
+  =\sum_i n_i\alpha_i^2+\sigma^2(r-1),
+\]
+because $\sum_i n_i\E(\bar\varepsilon_{i\cdot}-\bar\varepsilon_{\cdot\cdot})^2
+=\sum_i n_i(\tfrac{1}{n_i}-\tfrac1n)\sigma^2=(r-1)\sigma^2$ (the cross terms vanish since
+$\E[\bar\varepsilon_{i\cdot}\bar\varepsilon_{\cdot\cdot}]=\sigma^2/n$). Dividing by $r-1$ gives the result.
+
+\smallskip\noindent\textbf{P5.} $\alpha_1$ is \emph{not estimable} in the unconstrained
+model --- no unbiased estimator of it exists, so it has no BLUE. The correct statement is:
+\emph{under the identifiability constraint $\sum_i n_i\alpha_i=0$}, the parameter
+$\alpha_1=\mu_1-\sum_i (n_i/n)\mu_i$ is a contrast (its coefficients
+$1-n_1/n,\ -n_2/n,\dots$ sum to zero), and \emph{as such} it is estimable with BLUE
+$\Ybar_{1\cdot}-\Ybar_{\cdot\cdot}$. The constraint is what turns $\alpha_1$ into a
+well-defined estimable function.
+
+\vfill
+\begin{center}\small\itshape
+Companions: Simple Linear Regression; Matrix Algebra and the Gauss--Markov Framework;
+Quadratic Forms, Nested Models and Testing.
+\end{center}
+
+\end{document}

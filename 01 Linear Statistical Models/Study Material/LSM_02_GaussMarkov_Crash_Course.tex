@@ -1,0 +1,495 @@
+\documentclass[11pt]{article}
+\input{lsmstyle}
+\lhead{\small Gauss--Markov Framework --- Crash Course}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Matrix Algebra and the Gauss--Markov Framework}\\[4pt]
+{\large A Crash Course from First Principles}\\[3pt]
+{\small Linear Statistical Models --- Lectures 5--6 (3 Aug -- 5 Aug)}
+\end{center}
+\vspace{2pt}\hrule\vspace{10pt}
+
+\noindent The second of four crash courses. Crash Course 1 fitted a line. Here we do the
+general model $\bY=\bX\bb+\bep$ where $\bX$ may be \emph{rank deficient} --- which is
+exactly the situation in ANOVA. All the linear algebra you need is built up first, from a
+starting point of vectors, matrices and subspaces.
+
+\tableofcontents
+\vspace{8pt}\hrule\vspace{10pt}
+
+\section{Why this exists}
+
+In simple linear regression, $\bX^T\bX$ was invertible and $\hat\bb=(\bX^T\bX)^{-1}\bX^T\bY$
+was a formula you could just write down. But consider the very first ANOVA-type model:
+\[
+  Y_{ij}=\mu+\alpha_i+\varepsilon_{ij},\qquad i=1,\dots,r .
+\]
+Add $c$ to $\mu$ and subtract $c$ from every $\alpha_i$: the model is unchanged. The
+parameters are \textbf{not identifiable}, $\bX$ does not have full column rank, and
+$(\bX^T\bX)^{-1}$ \emph{does not exist}. Everything in Crash Course 1 breaks.
+
+\begin{idea}{The two questions this course answers}
+\begin{enumerate}
+  \item If $\bb$ itself cannot be estimated, \emph{what can}? \\
+        Answer: exactly those $a^T\bb$ with $a\in \mathcal{R}(\bX)$ --- the row space.
+  \item Among all unbiased estimators that are linear in $\bY$, which is best? \\
+        Answer: $a^T\hat\bb$, for \emph{any} solution $\hat\bb$ of the normal equations.
+        That is the Gauss--Markov theorem.
+\end{enumerate}
+\end{idea}
+
+\section{The linear algebra toolkit}
+
+\subsection{Column space, row space, rank}
+
+For an $n\times p$ matrix $A$:
+\[
+  \Cs(A) := \{Av : v\in\R^p\}\subseteq\R^n \quad(\text{column space}),\qquad
+  \mathcal{N}(A):=\{v: Av=0\} \quad(\text{null space}).
+\]
+Write $\mathcal{R}(A):=\Cs(A^T)$ for the row space. The rank $\rho(A)$ is
+$\dim\Cs(A)=\dim\mathcal{R}(A)$.
+
+Two facts used constantly:
+\begin{itemize}
+  \item $\Cs(A^T)=\Cs(A^TA)$, hence also $\rho(A)=\rho(A^TA)$.
+  \item $Au=b$ has a solution $\iff b\in\Cs(A)$.
+\end{itemize}
+
+\subsection{Projections}
+
+Let $U_1,U_2$ be subspaces of $\R^n$.
+\[
+  U_1+U_2=\{u_1+u_2\}, \qquad
+  U_1\oplus U_2 = U_1+U_2 \text{ when the representation } u=u_1+u_2 \text{ is unique}.
+\]
+Uniqueness holds iff $U_1\cap U_2=\{0\}$. If $u=u_1+u_2$ uniquely, the map $P(u)=u_2$ is
+the \textbf{projection onto $U_2$ along $U_1$}, and it is linear, so $P(u)=Pu$ for a matrix $P$.
+
+\begin{idea}{Characterisation of a projection matrix (TFAE)}
+\begin{enumerate}[label=(\roman*)]
+  \item $P$ is a projection matrix;
+  \item $P$ is \textbf{idempotent}, $P^2=P$;
+  \item $\mathcal{N}(P)=\Cs(I-P)$;
+  \item $\rho(P)+\rho(I-P)=n$;
+  \item $\Cs(P)+\Cs(I-P)$ is a direct sum.
+\end{enumerate}
+\end{idea}
+
+Two consequences you will use without thinking:
+\begin{itemize}
+  \item Eigenvalues of an idempotent matrix are $0$ and $1$ only (if $Pv=\lambda v$ then
+        $\lambda v=Pv=P^2v=\lambda^2 v$, so $\lambda^2=\lambda$).
+  \item Therefore $\tr(P)=\rho(P)$ --- the trace \emph{counts} the dimension of the image.
+        This is why traces keep turning into degrees of freedom.
+\end{itemize}
+
+\subsection{Orthogonal projections}
+
+Projecting onto $S$ \emph{along $S^\perp$} gives the \textbf{orthogonal} projection.
+
+\begin{idea}{Characterisation of an orthogonal projector (TFAE)}
+\begin{enumerate}[label=(\roman*)]
+  \item $P$ is an orthogonal projector;
+  \item $P=P^TP$;
+  \item $P^T=P$ \textbf{and} $P^2=P$ (symmetric \emph{and} idempotent).
+\end{enumerate}
+\end{idea}
+\prf (iii)$\Rightarrow$(ii) is immediate. For (i)$\Rightarrow$(iii): $\Cs(I-P)=S^\perp$ and
+$\Cs(P)=S$ are orthogonal, so $P^T(I-P)=0$, giving $P^T=P^TP$; the right side is symmetric,
+so $P^T=P$, and then $P=P^2$. \qed
+
+\begin{recipe}{The formula for the orthogonal projector onto $\Cs(\bX)$}
+\[
+  P_{\bX}=\bX(\bX^T\bX)^{-}\bX^T,
+\]
+where $(\bX^T\bX)^{-}$ is any symmetric g-inverse (\S2.4). When $\bX$ has full column rank
+this is the familiar $\bX(\bX^T\bX)^{-1}\bX^T$. \textbf{$P_\bX$ does not depend on which
+g-inverse you pick} --- see \S2.5.
+\end{recipe}
+
+\subsection{Generalised inverses}
+
+\begin{idea}{Definition}
+$G$ is a \textbf{g-inverse} of $A$ (written $A^-$) if
+\[
+  AGA=A .
+\]
+\end{idea}
+
+\textbf{Why the definition is exactly right.} If $b\in\Cs(A)$, so $b=Au$ for some $u$, then
+$x=Gb$ solves $Ax=b$:
+\[
+  A(Gb)=AGAu=Au=b .
+\]
+So a g-inverse is precisely a device for solving consistent linear systems. Nothing more is
+demanded of it, which is why it is not unique.
+
+\textbf{Every matrix has one.} Take a full-rank factorisation $A_{m\times n}=P_{m\times r}Q^T_{r\times n}$
+with $r=\rho(A)$. Then $P$ has a left inverse and $Q^T$ a right inverse, and one assembles
+$G$ with $AGA=A$.
+
+\textbf{For symmetric $A$, build it from the spectrum.} Write $A=P\Lambda P^T$ with
+$PP^T=P^TP=I$, $\Lambda=\text{diag}(\lambda_1,\dots,\lambda_n)$. Try $G=P\Delta P^T$ with
+$\Delta=\text{diag}(\delta_1,\dots,\delta_n)$. Then
+\[
+  AGA=A \iff \Lambda\Delta\Lambda=\Lambda \iff \lambda_i^2\delta_i=\lambda_i\ \ \forall i
+  \iff \delta_i=\begin{cases}1/\lambda_i & \lambda_i\neq 0,\\ \text{anything} & \lambda_i=0.\end{cases}
+\]
+The freedom sits exactly on the null space. Choosing the ``anything'' to be $0$ gives the
+\textbf{Moore--Penrose inverse}
+\[
+  A^{+}=P\Delta P^T,\qquad \delta_i=\begin{cases}1/\lambda_i&\lambda_i\ne0\\ 0&\lambda_i=0\end{cases}
+  \qquad\text{i.e.}\quad
+  \Lambda=\begin{pmatrix}\Lambda_1&0\\0&0\end{pmatrix}\Rightarrow
+  \Delta=\begin{pmatrix}\Lambda_1^{-1}&0\\0&0\end{pmatrix},
+\]
+which yields the solution of \emph{smallest norm}.
+
+\subsection{The g-inverse facts worth memorising}
+
+\begin{center}
+\begin{tabular}{@{}p{7.6cm}p{7.0cm}@{}}
+\toprule
+Statement & Use \\
+\midrule
+General solution of $Ax=y$ ($y\in\Cs(A)$) is $A^-y+(I-A^-A)z$, $z\in\R^n$ arbitrary.
+  & Describes \emph{all} solutions of the normal equations. \\
+$G$ is a g-inverse of $A$ $\iff$ $AG$ is idempotent with $\rho(AG)=\rho(A)$ $\iff$ $GA$ likewise.
+  & Lets you verify a candidate. \\
+$AG$ is the projection onto $\Cs(A)$ along $\mathcal{N}(AG)$.
+  & Connects g-inverses to projections. \\
+$A^T(AA^T)^-$ and $(A^TA)^-A^T$ are always g-inverses of $A$. & Constructive. \\
+If $\mathcal{R}(A)\subseteq\mathcal{R}(B)$ and $\Cs(C)\subseteq\Cs(B)$, then $AB^-C$ is
+  \textbf{invariant} to the choice of $B^-$.
+  & \textbf{This is why $P_\bX$ and $a^T\hat\bb$ are well defined.} \\
+$A^-$ is \emph{reflexive} if $A^-AA^-=A^-$; \emph{minimum-norm} if $(A^-A)^T=A^-A$;
+  \emph{least-squares} if $(AA^-)^T=AA^-$. Moore--Penrose satisfies all three.
+  & Vocabulary. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{The Gauss--Markov model}
+
+\begin{idea}{The setup}
+\[
+  \underset{n\times1}{\bY}=\underset{n\times p}{\bX}\ \underset{p\times1}{\bb}+\underset{n\times1}{\bep},
+  \qquad \bep\sim \N_n(\zero,\sigma^2 I_n),\qquad \bX \text{ non-random}.
+\]
+Unknowns: $\bb$ and $\sigma^2$. No assumption that $\rho(\bX)=p$.
+\end{idea}
+
+\subsection{Least squares and the normal equations}
+
+$\hat\bb = \arg\min_{\bb}\|\bY-\bX\bb\|^2$. Differentiating,
+\[
+  \bX^T(\bY-\bX\bb)=0 \quad\Longleftrightarrow\quad \bX^T\bX\bb=\bX^T\bY
+  \qquad\text{(\textbf{normal equations}).}
+\]
+
+\begin{idea}{The normal equations \emph{always} have a solution}
+A system $Au=b$ is solvable iff $b\in\Cs(A)$. Here $b=\bX^T\bY\in\Cs(\bX^T)=\Cs(\bX^T\bX)=\Cs(A)$.
+So a solution always exists --- but it is unique only when $\bX^T\bX$ is non-singular, i.e.\
+$\rho(\bX)=p$.
+\end{idea}
+
+If $\bX^T\bX$ is singular and $\hat\bb$ is a solution, so is $\hat\bb+z$ for every
+$z\in\mathcal{N}(\bX^T\bX)$. The general solution is $\hat\bb=(\bX^T\bX)^-\bX^T\bY$ for any
+g-inverse.
+
+The fitted values, however, are always unique:
+\[
+  \hat\bY=\bX\hat\bb=P_{\bX}\bY,\qquad
+  \hat\sigma^2=\frac{\|\bY-\hat\bY\|^2}{n-\rho(\bX)} .
+\]
+
+\begin{confusion}{$n-p$ or $n-\rho(\bX)$?}
+The residual degrees of freedom is $n-\rho(\bX)$, the \emph{rank}, not the number of columns.
+In full-rank regression they agree. In ANOVA with $r$ groups written as $\mu+\alpha_i$ there
+are $r+1$ columns but rank $r$, so the d.f.\ is $n-r$ --- not $n-r-1$. Getting this wrong
+corrupts every MSE, every $t$, and every $F$ in the question.
+\end{confusion}
+
+\subsection{Identifiability}
+
+\begin{idea}{Definition and theorem}
+A family $\{P_\theta\}$ is \textbf{identifiable} if $P_{\theta_1}=P_{\theta_2}\Rightarrow\theta_1=\theta_2$.
+
+\textbf{Theorem.} The linear model $\bY\sim\N_n(\bX\bb,\sigma^2 I_n)$ is identifiable
+$\iff$ $\bX^T\bX$ is non-singular.
+\end{idea}
+\prf $\N_n(\bX\bb_1,\sigma_1^2I)=\N_n(\bX\bb_2,\sigma_2^2I)$ iff $\bX\bb_1=\bX\bb_2$ and
+$\sigma_1^2=\sigma_2^2$ (a normal law is determined by its mean and variance). So
+identifiability is exactly the statement ``$\bX\bb_1=\bX\bb_2\Rightarrow\bb_1=\bb_2$'',
+i.e.\ $\mathcal{N}(\bX)=\{0\}$, i.e.\ $\rho(\bX)=p$, i.e.\ $\bX^T\bX$ invertible. \qed
+
+\section{Estimability --- the central idea}
+
+\begin{idea}{Definition}
+\emph{Estimable} means: an unbiased estimator exists. A linear parametric function
+$a^T\bb$ is \textbf{linearly estimable} if there is an $\ell\in\R^n$ with
+$\E(\ell^T\bY)=a^T\bb$ for \textbf{all} $\bb$.
+\end{idea}
+
+\begin{idea}{The estimability criterion}
+\[
+  \boxed{\ a^T\bb \text{ is estimable} \iff a\in\mathcal{R}(\bX)=\Cs(\bX^T)=\Cs(\bX^T\bX). }
+\]
+\end{idea}
+\prf $\ell^T\bY$ is unbiased for $a^T\bb$
+$\iff \ell^T\bX\bb=a^T\bb$ for all $\bb$
+$\iff \ell^T\bX=a^T$
+$\iff a=\bX^T\ell$
+$\iff a\in\Cs(\bX^T)$. \qed
+
+\begin{recipe}{How to check estimability in an exam}
+Two equivalent tests. Pick whichever is easier for the matrix in front of you.
+\begin{enumerate}
+  \item \textbf{Row-space test.} Ask whether $a^T$ is a linear combination of the rows of
+        $\bX$. Write $a^T=c^T\bX$ and try to solve for $c$; if you can, it is estimable.
+  \item \textbf{Null-space test.} $a\in\Cs(\bX^T)=\mathcal{N}(\bX)^\perp$, so
+        \[
+          a^T\bb \text{ estimable} \iff a^Tz=0 \text{ for every } z\in\mathcal{N}(\bX).
+        \]
+        Find a basis of $\mathcal{N}(\bX)$ once, then testing any $a$ is a dot product.
+        \emph{This is usually the faster route.}
+\end{enumerate}
+\end{recipe}
+
+\subsection{The worked example from the notes}
+
+Take $Y_{ij}=\alpha_i+\gamma_j+\varepsilon_{ij}$, $i,j\in\{1,2\}$, with
+$\bb=(\alpha_1,\alpha_2,\gamma_1,\gamma_2)^T$ and rows ordered $Y_{11},Y_{12},Y_{21},Y_{22}$:
+\[
+  \bX=\begin{pmatrix}1&0&1&0\\1&0&0&1\\0&1&1&0\\0&1&0&1\end{pmatrix},\qquad \rho(\bX)=3 .
+\]
+Rank is $3$, not $4$: the model is not identifiable and $\bb$ cannot be estimated. Writing
+$a^T=c^T\bX$ with $c=(c_1,c_2,c_3,c_4)^T$ gives
+\[
+  a^T=(c_1+c_2,\ c_3+c_4,\ c_1+c_3,\ c_2+c_4),
+\]
+so the constraint on $a=(a_1,a_2,a_3,a_4)^T$ is
+\[
+  \boxed{a_1+a_2=a_3+a_4}.
+\]
+Check the null-space route as well: $z=(1,1,-1,-1)^T$ satisfies $\bX z=0$, and
+$a^Tz=a_1+a_2-a_3-a_4=0$ is the same condition.
+
+\begin{center}
+\begin{tabular}{@{}llc@{}}
+\toprule
+Function & $a$ & Estimable? \\
+\midrule
+$\alpha_1$ & $(1,0,0,0)$ & \textbf{No} ($1+0\ne0+0$) \\
+$\gamma_1$ & $(0,0,1,0)$ & \textbf{No} \\
+$\alpha_1+\gamma_1$ & $(1,0,1,0)$ & \textbf{Yes} ($1=1$) \\
+$\gamma_1-\gamma_2$ & $(0,0,1,-1)$ & \textbf{Yes} ($0=0$) \\
+$\alpha_1-\alpha_2$ & $(1,-1,0,0)$ & \textbf{Yes} ($0=0$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}{The moral, which is the moral of ANOVA}
+Individual effects are not estimable; \textbf{differences} of effects and \textbf{contrasts}
+are. This is exactly why in one-way ANOVA you can never estimate $\alpha_i$ on its own but
+you can always estimate $\alpha_i-\alpha_{i'}=\mu_i-\mu_{i'}$, and more generally
+$\sum c_i\alpha_i$ whenever $\sum c_i=0$.
+\end{idea}
+
+\subsection{Uniqueness of the estimate of an estimable function}
+
+Let $\hat\bb_1,\hat\bb_2$ both solve $\bX^T\bX\bb=\bX^T\bY$. Estimability gives $a=\bX^T\bX c$
+for some $c$, so
+\[
+  a^T\hat\bb_1-a^T\hat\bb_2=c^T\bX^T\bX(\hat\bb_1-\hat\bb_2)=c^T(\bX^T\bY-\bX^T\bY)=0 .
+\]
+So although $\hat\bb$ is not unique, the \emph{estimate of an estimable function} is. This
+is what makes the whole rank-deficient theory workable.
+
+Also note the unbiasedness: with $a=\bX^T\bX u$,
+$a^T\hat\bb=u^T\bX^T\bX\hat\bb=u^T\bX^T\bY$, hence
+$\E(a^T\hat\bb)=u^T\bX^T\bX\bb=a^T\bb$.
+
+\section{BLUE, zero functions, and the Gauss--Markov theorem}
+
+\begin{idea}{Definitions}
+\begin{itemize}
+  \item A \textbf{linear unbiased estimator} (LUE) of $a^T\bb$ is any $\ell^T\bY$ with
+        $\E(\ell^T\bY)=a^T\bb$ for all $\bb$.
+  \item A LUE $\ell^T\bY$ is the \textbf{BLUE} if $\Var(\ell^T\bY)\le\Var(m^T\bY)$ for every
+        LUE $m^T\bY$ of the same $a^T\bb$.
+  \item $c^T\bY$ is a \textbf{linear zero function} (LZF) if $\E(c^T\bY)=0$ for all $\bb$,
+        i.e.\ $c^T\bX\bb=0\ \forall\bb$, i.e.\ $\bX^Tc=0$.
+\end{itemize}
+\end{idea}
+
+Geometrically: LZFs are the linear functions of $\bY$ carrying \emph{no information about
+$\bb$} --- they are the residual directions, $c\in\mathcal{N}(\bX^T)=\Cs(\bX)^\perp$.
+
+\subsection{The characterisation of a BLUE}
+
+\begin{idea}{Proposition}
+A LUE $\ell^T\bY$ is a BLUE $\iff$ $\Cov(\ell^T\bY,c^T\bY)=0$ for \emph{every} LZF $c^T\bY$.
+\end{idea}
+
+\prf ($\Leftarrow$) Let $m^T\bY$ be any other LUE. Then $(m-\ell)^T\bY$ has expectation
+$a^T\bb-a^T\bb=0$, so it is an LZF. Hence
+\[
+  \Var(m^T\bY)=\Var(\ell^T\bY+(m-\ell)^T\bY)
+  =\Var(\ell^T\bY)+\Var((m-\ell)^T\bY)+2\underbrace{\Cov(\ell^T\bY,(m-\ell)^T\bY)}_{=0}
+  \ \ge\ \Var(\ell^T\bY).
+\]
+
+($\Rightarrow$) Let $\ell^T\bY$ be BLUE and $c^T\bY$ an LZF. For every $\lambda\in\R$,
+$\ell^T\bY+\lambda c^T\bY$ is still a LUE, so
+\[
+  \Var(\ell^T\bY)\le \Var(\ell^T\bY)+\lambda^2\Var(c^T\bY)+2\lambda\Cov(\ell^T\bY,c^T\bY),
+\]
+i.e.\ $0\le \lambda^2\Var(c^T\bY)+2\lambda\Cov(\ell^T\bY,c^T\bY)$ for \emph{all} $\lambda$.
+If $\Cov\neq0$, choose $\lambda$ small with the opposite sign to the covariance: the linear
+term dominates the quadratic one and the right side is negative --- contradiction. Hence
+$\Cov(\ell^T\bY,c^T\bY)=0$. \qed
+
+\begin{idea}{The picture behind this proof}
+Decompose any LUE as (the BLUE) $+$ (an LZF). The BLUE lies in $\Cs(\bX)$, the LZFs in
+$\Cs(\bX)^\perp$. Being uncorrelated with all LZFs means ``having no wasted component in the
+noise directions''. \textbf{BLUE = orthogonal projection, again.}
+\end{idea}
+
+\subsection{The Gauss--Markov theorem}
+
+\begin{idea}{Gauss--Markov Theorem}
+In the model $\bY=\bX\bb+\bep$ with $\E\bep=\zero$, $\Var(\bep)=\sigma^2I_n$: \\
+if $a^T\bb$ is estimable, then $a^T\hat\bb$ is its \textbf{unique BLUE}, where $\hat\bb$ is
+\emph{any} solution of the normal equations $\bX^T\bX\bb=\bX^T\bY$.
+\end{idea}
+
+\prf Estimability gives $a^T=\ell^T\bX$ for some $\ell$, so $a^T\hat\bb=\ell^T\bX\hat\bb$.
+Any solution has the form $\hat\bb=(\bX^T\bX)^-\bX^T\bY+z$ with $z\in\mathcal{N}(\bX^T\bX)$;
+but $\mathcal{N}(\bX^T\bX)=\mathcal{N}(\bX)$, so $\bX z=0$ and
+\[
+  \bX\hat\bb=\bX(\bX^T\bX)^-\bX^T\bY = P_\bX\bY .
+\]
+Therefore $a^T\hat\bb=\ell^TP_\bX\bY$, which is linear in $\bY$, and
+\[
+  \E(a^T\hat\bb)=\ell^TP_\bX\bX\bb=\ell^T\bX\bb=a^T\bb,
+\]
+so it is a LUE. For optimality, write $a=\bX^T\bX u$ (possible by estimability), so
+$a^T\hat\bb=u^T\bX^T\bX\hat\bb=u^T\bX^T\bY$. Let $h^T\bY$ be any LZF, so $\bX^Th=0$. Then
+\[
+  \Cov(a^T\hat\bb,\ h^T\bY)=\Cov(u^T\bX^T\bY,h^T\bY)
+  =u^T\bX^T\Var(\bY)h=\sigma^2u^T\bX^Th=0 .
+\]
+By the previous proposition, $a^T\hat\bb$ is the BLUE. Uniqueness follows from \S4.3. \qed
+
+\begin{exam}{This is Homework 2, Question 1}
+HW2 Q1 walks exactly this route: (a) $\hat\bmu=P_\bX\bY$; (b) $\theta=\bX^T\bmu$ is
+estimable with BLUE $\hat\theta=\bX^T\bY$; (c) if $a^T\theta$ is estimable, its BLUE is
+$w^T\hat\theta$. For (b) note $\theta=\bX^T\bX\bb$, so $a=\bX^T\bX$-times-something for each
+coordinate --- estimability is automatic --- and the BLUE is
+$\bX^T\hat\bmu=\bX^TP_\bX\bY=\bX^T\bY$ since $\bX^TP_\bX=(P_\bX\bX)^T=\bX^T$.
+\end{exam}
+
+\section{Generalised least squares: correlated errors}
+
+Suppose $\bY=\bX\bb+\bep$ with $\bep\sim\N(\zero,\Sigma)$, $\Sigma$ positive definite. Now
+LSE and MLE part company.
+
+\textbf{LSE} still solves $\bX^T\bX\bb=\bX^T\bY$ --- it does not know about $\Sigma$.
+
+\textbf{MLE} maximises $-\tfrac12(\bY-\bX\bb)^T\Sigma^{-1}(\bY-\bX\bb)-\tfrac12\log|\Sigma|$, so
+\[
+  \hat\bb^{ML}=\arg\min_{\bb} (\bY-\bX\bb)^T\Sigma^{-1}(\bY-\bX\bb)
+  \quad\Longrightarrow\quad
+  \bX^T\Sigma^{-1}\bX\bb=\bX^T\Sigma^{-1}\bY .
+\]
+With $\bX$ of full column rank,
+\[
+  \hat\bb^{LS}=(\bX^T\bX)^{-1}\bX^T\bY,\qquad
+  \hat\bb^{ML}=(\bX^T\Sigma^{-1}\bX)^{-1}\bX^T\Sigma^{-1}\bY .
+\]
+
+\begin{idea}{Both are unbiased, but only one is best}
+\[
+  \Var(a^T\hat\bb^{LS})=a^T(\bX^T\bX)^{-1}(\bX^T\Sigma\bX)(\bX^T\bX)^{-1}a,
+  \qquad
+  \Var(a^T\hat\bb^{ML})=a^T(\bX^T\Sigma^{-1}\bX)^{-1}a,
+\]
+and the second is always $\le$ the first. The right version of Gauss--Markov here is: apply
+the ordinary theorem to the transformed model
+\[
+  \Sigma^{-1/2}\bY=\Sigma^{-1/2}\bX\bb+\Sigma^{-1/2}\bep,
+\]
+whose error has variance $I$. So the BLUE of an estimable $a^T\bb$ is $a^T\hat\bb^{ML}$,
+the \textbf{generalised least squares} estimator. Ordinary least squares is BLUE only when
+$\Sigma=\sigma^2 I$ (or, more precisely, when $\Cs(\Sigma\bX)\subseteq\Cs(\bX)$).
+\end{idea}
+
+\section{Practice, with answers}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item Show $\Cs(\bX^T)=\Cs(\bX^T\bX)$ and hence $\mathcal{N}(\bX)=\mathcal{N}(\bX^T\bX)$.
+
+\item In the one-way model $Y_{ij}=\mu+\alpha_i+\varepsilon_{ij}$ with $r=3$ groups, find a
+      basis for $\mathcal{N}(\bX)$ and use it to decide which of
+      $\mu$, $\alpha_1$, $\alpha_1-\alpha_2$, $\mu+\alpha_1$, $\alpha_1+\alpha_2-2\alpha_3$
+      are estimable.
+
+\item Prove that $P_\bX=\bX(\bX^T\bX)^-\bX^T$ does not depend on the choice of g-inverse.
+
+\item Give an example of an LZF in the simple linear regression model, and verify directly
+      that it is uncorrelated with $\hat\beta_1$.
+
+\item $\bY\sim\N_3\big((\alpha_1,\ \alpha_1+\alpha_2,\ \alpha_1+\alpha_3)^T,\ \sigma^2I_3\big)$.
+      Is $\alpha_2-\alpha_3$ estimable? If so, find its BLUE and its variance.
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} $\Cs(\bX^T\bX)\subseteq\Cs(\bX^T)$ is clear. Conversely if
+$\bX^T\bX v=0$ then $v^T\bX^T\bX v=\|\bX v\|^2=0$, so $\bX v=0$; hence
+$\mathcal{N}(\bX^T\bX)\subseteq\mathcal{N}(\bX)$, and the reverse inclusion is trivial, so the
+two null spaces coincide. Equal null spaces of $p$-column matrices force equal ranks, so
+$\rho(\bX^T\bX)=\rho(\bX)=\rho(\bX^T)$, and the inclusion of column spaces above must be
+equality.
+
+\smallskip\noindent\textbf{P2.} With $\bb=(\mu,\alpha_1,\alpha_2,\alpha_3)^T$, every row of
+$\bX$ has the form $(1,e_i^T)$, so $\bX z=0$ forces $z=c(1,-1,-1,-1)^T$. Then $a^T\bb$ is
+estimable iff $a_0-a_1-a_2-a_3=0$ where $a=(a_0,a_1,a_2,a_3)$:
+$\mu$ (i.e.\ $a=(1,0,0,0)$) gives $1\ne0$, \textbf{not estimable};
+$\alpha_1$ gives $-1\ne0$, \textbf{not estimable};
+$\alpha_1-\alpha_2$ gives $0$, \textbf{estimable};
+$\mu+\alpha_1$ gives $1-1=0$, \textbf{estimable} (it is $\mu_1$);
+$\alpha_1+\alpha_2-2\alpha_3$ gives $-(1+1-2)=0$, \textbf{estimable} (a contrast).
+
+\smallskip\noindent\textbf{P3.} Apply the invariance rule: $AB^-C$ is invariant to $B^-$ when
+$\mathcal{R}(A)\subseteq\mathcal{R}(B)$ and $\Cs(C)\subseteq\Cs(B)$. Take $A=\bX$,
+$B=\bX^T\bX$, $C=\bX^T$. Then $\mathcal{R}(\bX)=\Cs(\bX^T)=\Cs(\bX^T\bX)=\mathcal{R}(B)$
+and $\Cs(\bX^T)=\Cs(\bX^T\bX)=\Cs(B)$, so both conditions hold with equality.
+
+\smallskip\noindent\textbf{P4.} Any $c$ with $\bX^Tc=0$, i.e.\ $\sum c_i=0$ and
+$\sum c_ix_i=0$. For instance with $n=3$ and $x=(1,2,3)$, take $c=(1,-2,1)$. Then
+$\Cov(c^T\bY,\hat\beta_1)=\sigma^2 c^T\mathbf{w}$ where $w_i=(x_i-\xbar)/S_x^2$; since
+$c^T\mathbf{w}=\frac{1}{S_x^2}(\sum c_ix_i-\xbar\sum c_i)=0$, they are uncorrelated. (More
+generally $c^T\bY=c^T\bep$ is a residual direction and $\hat\bb$ lives in the column space.)
+
+\smallskip\noindent\textbf{P5.} Here
+$\bX=\begin{pmatrix}1&0&0\\1&1&0\\1&0&1\end{pmatrix}$, which has rank $3$ --- full rank ---
+so \emph{everything} is estimable and $\hat\bb=\bX^{-1}\bY$. Solving:
+$\hat\alpha_1=Y_1$, $\hat\alpha_2=Y_2-Y_1$, $\hat\alpha_3=Y_3-Y_1$. Hence
+\[
+  \widehat{\alpha_2-\alpha_3}=Y_2-Y_3,\qquad \Var=2\sigma^2 .
+\]
+(Sanity check via $a^T=c^T\bX$ with $a=(0,1,-1)$: $c=(0,1,-1)$ works, and indeed
+$c^T\bY=Y_2-Y_3$.)
+
+\vfill
+\begin{center}\small\itshape
+Companions: Simple Linear Regression;
+Quadratic Forms, Nested Models and Testing; One-Way ANOVA.
+\end{center}
+
+\end{document}

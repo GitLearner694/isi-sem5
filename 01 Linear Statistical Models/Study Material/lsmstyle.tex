@@ -1,0 +1,56 @@
+% Shared preamble for the LSM crash-course series.
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\rhead{\small Linear Statistical Models, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\Cs}{\mathcal{C}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\Ybar}{\overline{Y}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\xbar}{\bar{x}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\indep}{\overset{\text{indep}}{\sim}}
+\newcommand{\dto}{\overset{d}{\longrightarrow}}
+\newcommand{\dequal}{\overset{d}{=}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bW}{\mathbf{W}}
+\newcommand{\bb}{\boldsymbol{\beta}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bep}{\boldsymbol{\varepsilon}}
+\newcommand{\bal}{\boldsymbol{\alpha}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\zero}{\mathbf{0}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\prf}{\smallskip\noindent\textbf{Proof.}\ }
+\renewcommand{\qed}{\hfill$\blacksquare$}
+
+\newtcolorbox{idea}[1]{colback=Blue!4,colframe=Blue!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{confusion}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={Common confusion: #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{recipe}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{exam}[1]{colback=Orange!6,colframe=Orange!70,title={#1},
+  fonttitle=\bfseries,breakable}
