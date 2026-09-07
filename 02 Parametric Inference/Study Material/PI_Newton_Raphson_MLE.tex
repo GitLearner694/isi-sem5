@@ -1,0 +1,442 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Newton--Raphson for the MLE}
+\rhead{\small Parametric Inference, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\I}{\mathbb{I}}
+
+\newtcolorbox{idea}[1]{colback=Blue!4,colframe=Blue!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{warn}[1]{colback=BrickRed!5,colframe=BrickRed!60,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{recipe}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+
+\lstset{basicstyle=\ttfamily\footnotesize,frame=single,breaklines=true,
+  backgroundcolor=\color{black!3},columns=fullflexible}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Newton--Raphson for the MLE}\\[3pt]
+{\large Where it appears in the course, and how to do it}\\[5pt]
+{\small Parametric Inference, B.Stat.\ 3rd Year --- Lectures 7, 8, 10 and Homework 2 Q4}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Where this appears in the course}
+
+Narrower than it looks. Three mentions in the notes, and exactly \textbf{one} place where you
+are actually required to compute anything.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{3.4cm}p{7.8cm}p{4.0cm}@{}}
+\toprule
+\textbf{Where} & \textbf{What it says} & \textbf{Status} \\
+\midrule
+\textbf{Lecture 8} (21 Aug), p.1 &
+``Method of Scoring for computing MLE'': the ML equation, the Newton--Raphson iteration, and
+replacing the second derivative by its expectation (the Fisher information) &
+The only place the \emph{method} is taught \\
+\textbf{Lecture 7} (sheet dated 10 Aug), p.3 &
+Cauchy: ``what is ML eq? We get a poly eq with no closed sol.'' &
+Motivation only \\
+\textbf{Lecture 10} (28 Aug), p.1 &
+``For any problem involving Cauchy distribution, starting with sample median is good'' &
+Starting-value advice \\
+\textbf{Homework 2, Q4} &
+Generate Cauchy$(0)$ data for $n=10,15,20$ and compute the MLE &
+\textbf{The only place you must run it} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}{It is never set as a \# class exercise}
+All 34 of the professor's ``\#'' exercises are catalogued in
+\texttt{PI\_Class\_Exercises\_Solved.pdf}. The Lecture 8 ones are: solve PS1 Q3 with
+$\sigma^2$ unknown; derive the Bayes estimate $\frac{p+X}{p+q+n}$; show
+$\max_\theta R(\theta,X/n)=\frac{1}{4n}$; complete the constant-risk minimax proof; and the
+improper-prior equalizer question. \textbf{None involves Newton--Raphson.}
+
+So: theory in Lecture 8, practice in Homework 2 Q4, nothing else. The full solution to that
+homework question, with code and output, is in \texttt{PI\_Assignment\_Solutions.pdf} \S2.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why the Cauchy needs it, and nothing else does}
+
+Every other family in the syllabus has an MLE you can write down: $\Xbar$ for the Normal,
+Poisson and Exponential; $X/n$ for the Binomial; $X_{(n)}$ for $U[0,\theta]$. The Cauchy does
+not.
+
+With $f(x\mid\theta)=\dfrac{1}{\pi\{1+(x-\theta)^2\}}$,
+\[
+\ell(\theta)=-\sum_{i=1}^n\log\big\{1+(x_i-\theta)^2\big\}+\text{const},
+\]
+\[
+\boxed{\ \ell'(\theta)=\sum_{i=1}^n\frac{2(x_i-\theta)}{1+(x_i-\theta)^2},
+\qquad
+\ell''(\theta)=\sum_{i=1}^n\frac{2\big[(x_i-\theta)^2-1\big]}{\big[1+(x_i-\theta)^2\big]^2}. }
+\]
+
+\begin{idea}{Why there is no closed form}
+Clear denominators in $\ell'(\theta)=0$:
+\[
+\sum_{i=1}^{n}2(x_i-\theta)\prod_{j\ne i}\big\{1+(x_j-\theta)^2\big\}=0 .
+\]
+Each summand is a degree-1 factor times $n-1$ quadratics, so this is a polynomial equation of
+degree $\boldsymbol{2n-1}$ in $\theta$. For $n\ge3$ there is no general solution by radicals,
+and worse, the equation can have \textbf{several roots} --- so ``the MLE'' means the
+\emph{global} maximiser, not just any stationary point. Both facts are why the course
+introduces a numerical method at all.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The two iterations}
+
+\begin{idea}{Newton--Raphson}
+Apply Newton's root-finding method to $\ell'(\theta)=0$:
+\[
+\theta^{(m+1)}=\theta^{(m)}-\frac{\ell'(\theta^{(m)})}{\ell''(\theta^{(m)})}.
+\]
+Converges \emph{quadratically} near a root --- typically 3--4 iterations to machine precision.
+\end{idea}
+
+\begin{idea}{Method of scoring (Lecture 8)}
+Replace the observed second derivative by its expectation. Since
+$\E_\theta[\ell''(\theta)]=-n\,I(\theta)$,
+\[
+\theta^{(m+1)}=\theta^{(m)}+\frac{\ell'(\theta^{(m)})}{n\,I(\theta^{(m)})}.
+\]
+\end{idea}
+
+The professor's stated reason for the substitution is that $I(\theta)$ is often free of
+$\theta$ --- in particular \textbf{whenever $\theta$ is a location parameter} --- which makes
+the iteration cheaper. But there is a second, more important reason, and it is the point of
+\S6: \emph{$-nI(\theta)$ is always negative, so every scoring step is guaranteed to point
+uphill.} Newton--Raphson carries no such guarantee.
+
+\subsection{Fisher information for the Cauchy}
+
+With $u=x-\theta$, the score is $\dfrac{\partial}{\partial\theta}\log f=\dfrac{2u}{1+u^2}$, so
+\[
+I(\theta)=\E\left[\frac{4U^2}{(1+U^2)^2}\right]
+=\frac{4}{\pi}\int_{-\infty}^{\infty}\frac{u^{2}}{(1+u^{2})^{3}}\,du .
+\]
+Substituting $u=\tan t$ (so $du=\sec^2t\,dt$ and $1+u^2=\sec^2t$),
+\[
+\int_{-\infty}^{\infty}\frac{u^2}{(1+u^2)^3}du
+=\int_{-\pi/2}^{\pi/2}\frac{\tan^2 t}{\sec^4 t}\,dt
+=\int_{-\pi/2}^{\pi/2}\sin^2t\cos^2t\,dt
+=\frac14\int_{-\pi/2}^{\pi/2}\sin^2(2t)\,dt=\frac{\pi}{8},
+\]
+so
+\[
+\boxed{\ I(\theta)=\frac4\pi\cdot\frac\pi8=\frac12\ }
+\]
+\emph{a constant}, free of $\theta$ --- exactly the location-parameter phenomenon Lecture 8
+mentions. (Monte Carlo check with $4\times10^6$ draws: $0.4999$.) The scoring iteration
+therefore collapses to something you can run on paper:
+\[
+\boxed{\ \theta^{(m+1)}=\theta^{(m)}+\frac{2}{n}\,\ell'(\theta^{(m)})\ }
+\]
+with no second derivative anywhere.
+
+\subsection{Why you start at the sample median}
+
+Lecture 10 says to start from $\tilde X_n$. The reason is that the obvious alternative is
+useless: the Cauchy is \emph{stable}, so $\Xbar\sim\mathrm{Cauchy}(\theta,1)$ for
+\emph{every} $n$ --- averaging does not concentrate at all, and $\Xbar$ is not even consistent.
+The sample median \emph{is} consistent (Lecture 10), so it is a starting value that is already
+in the right neighbourhood.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Worked example}
+
+Take $n=5$ with
+\[
+x=(-2.1,\ -0.6,\ 0.3,\ 1.2,\ 4.8),
+\qquad
+\text{median}=0.300,\qquad \Xbar=0.720 .
+\]
+The mean is already dragged off by the single observation $4.8$ --- a preview of why $\Xbar$
+is the wrong tool here. Start both iterations at $\theta^{(0)}=0.300$.
+
+\begin{center}
+\textbf{Newton--Raphson}\quad $\theta^{(m+1)}=\theta^{(m)}-\ell'/\ell''$
+
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+$m$ & $\theta^{(m)}$ & $\ell'(\theta^{(m)})$ & $\ell''(\theta^{(m)})$ & step \\
+\midrule
+0 & $0.300000$ & $-0.286530$ & $-1.938398$ & $-0.147818$ \\
+1 & $0.152182$ & $-0.003068$ & $-1.881721$ & $-0.001630$ \\
+2 & $0.150552$ & $-0.000001$ & $-1.880643$ & $-0.000001$ \\
+3 & $0.150551$ & $\approx0$ & $-1.880642$ & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\[
+\boxed{\ \hat\theta=0.1506\ }
+\]
+Three iterations. Note the quadratic convergence: the step shrinks from $10^{-1}$ to
+$10^{-3}$ to $10^{-6}$. A grid search over $[-6,8]$ confirms the global maximiser is
+$0.15056$.
+
+\begin{center}
+\textbf{Method of scoring}\quad $\theta^{(m+1)}=\theta^{(m)}+0.4\,\ell'(\theta^{(m)})$
+
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+$m$ & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\
+\midrule
+$\theta^{(m)}$ & $0.3000$ & $0.1854$ & $0.1590$ & $0.1526$ & $0.1511$ & $0.1507$ & $0.1506$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Same answer, but convergence is \emph{linear} --- the error falls by a roughly constant factor
+each step rather than squaring. That is the trade: scoring is slower but needs no second
+derivative.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& sample mean & sample median & MLE \\
+\midrule
+estimate of $\theta$ & $0.720$ & $0.300$ & $\mathbf{0.151}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Code}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+rng = np.random.default_rng(2026)
+
+def score(t, x):  return np.sum(2*(x-t)/(1+(x-t)**2))
+def hess (t, x):  return np.sum(2*((x-t)**2 - 1)/(1+(x-t)**2)**2)
+
+for n in (10, 15, 20):                  # Homework 2 Q4
+    x = rng.standard_cauchy(n)          # theta = 0
+    t = np.median(x)                    # consistent starting value
+    for _ in range(100):
+        step = score(t, x)/hess(t, x)
+        t -= step
+        if abs(step) < 1e-12: break
+    print(n, np.median(x), t, x.mean())
+\end{lstlisting}
+
+\begin{lstlisting}[language=R]
+set.seed(2026)
+for (n in c(10,15,20)) {
+  x   <- rcauchy(n)
+  nll <- function(t) sum(log(1 + (x-t)^2))
+  fit <- optimize(nll, interval = c(min(x), max(x)))
+  cat(n, median(x), fit$minimum, mean(x), "\n")
+}
+\end{lstlisting}
+
+\noindent
+\textbf{Always verify against a grid or a built-in optimiser.} The likelihood can be
+multimodal, and a single Newton run tells you nothing about whether you found the global
+maximum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{When Newton--Raphson fails --- and scoring does not}
+
+This is the most instructive example in the document, and it justifies the Lecture 8
+substitution far better than ``it is cheaper''.
+
+Take four observations in two well-separated clusters:
+\[
+x=(-5,\ -4.5,\ 4.5,\ 5),\qquad \text{median}=0 .
+\]
+The log-likelihood is bimodal, with \emph{three} stationary points:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}cccl@{}}
+\toprule
+$\theta$ & $\ell(\theta)$ & $\ell''(\theta)$ & type \\
+\midrule
+$-4.6216$ & $-9.1205$ & $<0$ & global maximum \\
+$0.0000$ & $-12.6289$ & $\mathbf{+0.3125}$ & \textbf{local MINIMUM} \\
+$+4.6216$ & $-9.1205$ & $<0$ & global maximum \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warn}{The sample median sits exactly on the local minimum}
+Newton--Raphson solves $\ell'=0$. It does \textbf{not} care whether the root is a maximum or a
+minimum. Started at $\theta^{(0)}=0$ we have $\ell'(0)=0$ already, so the step is zero and the
+iteration \emph{never moves} --- it reports a local minimum as the answer.
+
+Worse, this is not a knife-edge accident. Starting at $\theta^{(0)}=4.0$, well inside the
+right-hand mode:
+\[
+4.000\ \to\ 5.482\ \to\ 3.293\ \to\ 0.330\ \to\ 0.002\ \to\ 0 .
+\]
+It overshoots to $5.48$, comes back to $3.29$ where $\ell''$ has flipped sign to
+\emph{positive}, and from there gets dragged into the minimum. Only a start at $4.5$ ---
+already very close --- converges correctly to $4.6216$.
+\end{warn}
+
+\begin{idea}{Scoring succeeds, and here is why}
+The scoring update $\theta^{(m+1)}=\theta^{(m)}+\frac{2}{n}\ell'(\theta^{(m)})$ from
+$\theta^{(0)}=0.1$ converges to $4.6216$: the global maximum.
+
+The reason is structural. Scoring divides by $-nI(\theta)$, which is \textbf{always negative},
+so the step is always a positive multiple of $\ell'$ --- i.e.\ always in the direction of
+\emph{increasing} likelihood. It is a gradient ascent with a principled step size and
+\textbf{cannot be attracted to a minimum}. Newton--Raphson divides by $\ell''$, whose sign
+flips wherever the likelihood is locally convex, and there the step points the wrong way.
+
+\smallskip
+So the Lecture 8 substitution buys more than cheapness: it buys an \textbf{ascent guarantee}.
+\end{idea}
+
+\begin{recipe}{Practical rules}
+\begin{enumerate}
+\item Start from the sample median (Lecture 10) --- but treat it as a suggestion, not a
+guarantee. Check $\ell''<0$ there.
+\item Prefer \textbf{scoring} when the likelihood may be multimodal; prefer \textbf{NR} for
+speed once you are already near the maximum. Many implementations do scoring first, then
+switch.
+\item \textbf{Always confirm the answer is a global maximum} by evaluating $\ell$ on a grid, or
+by restarting from several points.
+\item If NR produces a $\theta$ with $\ell''(\theta)>0$, you have found a minimum. Discard it.
+\end{enumerate}
+\end{recipe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Beyond the Cauchy (not examinable, but worth seeing)}
+
+The Cauchy is the course's only instance, which can leave the impression that Newton--Raphson
+is a Cauchy trick. It is not. The Gamma with \emph{both} parameters unknown --- whose
+exponential-family form you derived in \texttt{PI\_Exponential\_Families\_Crash\_Course.pdf}
+--- is another natural case.
+
+For $X_1,\dots,X_n\iid\mathrm{Gamma}(\alpha,\beta)$ (shape, scale),
+\[
+\ell(\alpha,\beta)=(\alpha-1)\sum_i\log x_i-\frac{1}{\beta}\sum_i x_i-n\log\Gamma(\alpha)-n\alpha\log\beta .
+\]
+Setting $\partial\ell/\partial\beta=0$ gives $\hat\beta=\Xbar/\alpha$; substituting into
+$\partial\ell/\partial\alpha=0$ leaves a \emph{one}-dimensional equation,
+\[
+\boxed{\ \log\alpha-\psi(\alpha)=s,\qquad
+s:=\log\Xbar-\frac1n\sum_i\log x_i=\log\frac{\text{AM}}{\text{GM}}\ >0,\ }
+\]
+where $\psi$ is the digamma function. No closed form --- so, Newton--Raphson, with
+\[
+g(\alpha)=\log\alpha-\psi(\alpha)-s,\qquad g'(\alpha)=\frac1\alpha-\psi'(\alpha).
+\]
+
+\textbf{Worked instance.} $x=(1.2,\,3.4,\,0.8,\,5.1,\,2.6,\,1.9,\,4.3,\,2.2)$, $n=8$:
+$\Xbar=2.6875$, $\frac1n\sum\log x_i=0.8321$, so $s=0.15653$. The standard starting
+approximation $\alpha_0=\dfrac{3-s+\sqrt{(s-3)^2+24s}}{12s}$ gives $3.34579$, and then
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$m$ & $\alpha^{(m)}$ & $g(\alpha^{(m)})$ \\
+\midrule
+0 & $3.345793$ & $+2.89\times10^{-4}$ \\
+1 & $3.351692$ & $+5.31\times10^{-7}$ \\
+2 & $3.351703$ & $+1.80\times10^{-12}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\[
+\hat\alpha=3.3517,\qquad \hat\beta=\Xbar/\hat\alpha=0.8018 .
+\]
+Cross-checked against a bracketing root-finder on $[0.1,50]$: identical to six decimals.
+
+\begin{idea}{The moral}
+The MLE has no closed form here for the same underlying reason as in the Cauchy: the
+likelihood equation involves a transcendental function of the parameter. Note the connection
+to the exponential-family derivation --- since $T_1(x)=\log x$ for the Gamma, the natural
+estimating equation is about $\E[\log X]=\psi(\alpha)+\log\beta$, and inverting $\psi$ is
+exactly what has no closed form.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related questions, with sources}
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}]
+\item \textbf{[Homework 2 Q4 --- solved in \texttt{PI\_Assignment\_Solutions.pdf} \S2]}
+Generate $X_1,\dots,X_n\iid\mathrm{Cauchy}(0)$ for $n=10,15,20$, compute the MLE, and compare
+with $\Xbar$.
+
+\item \textbf{[Lecture 8 --- worked in class]} Write down the method-of-scoring update for the
+Cauchy location parameter and explain why $I(\theta)$ does not involve $\theta$.
+
+\item \textbf{[Lecture 7 --- stated in class, not set]} Show the Cauchy likelihood equation is
+a polynomial of degree $2n-1$, and deduce that the MLE need not be unique.
+
+\item \textbf{[Lecture 10 --- stated in class]} Why start the iteration from the sample median
+rather than the sample mean? \emph{(Because $\Xbar\sim\mathrm{Cauchy}(\theta,1)$ for every $n$,
+so it is not even consistent, while the median is.)}
+
+\item \textbf{[Class Exercise 10.2 --- solved in
+\texttt{PI\_Class\_Exercises\_Solved.pdf} \S10]} Prove consistency of the MLE in general, and
+explain why $U[0,\theta]$ is consistent despite failing the regularity conditions.
+
+\item \textbf{[New --- \S6 above]} For $x=(-5,-4.5,4.5,5)$, find all stationary points of the
+Cauchy log-likelihood, classify each, and show that Newton--Raphson started at the sample
+median fails while the method of scoring succeeds.
+\end{enumerate}
+
+\begin{idea}{What a written exam could realistically ask}
+Not ``perform five iterations by hand'' --- that is a lab task. Far more likely, and worth
+roughly 8--10 marks:
+\begin{quote}
+\emph{Derive the likelihood equation for the Cauchy location parameter; show it has no
+closed-form solution; describe the Newton--Raphson and method-of-scoring iterations; compute
+$I(\theta)$ and hence give the scoring update explicitly; and state, with reason, a suitable
+starting value.}
+\end{quote}
+Every ingredient of that answer is in \S2--\S3 of this document. That is also why
+Newton--Raphson does not appear in \texttt{PI\_Mock\_Exam.pdf}.
+\end{idea}
+
+\vfill
+\begin{center}
+\small\itshape
+Companions: \texttt{PI\_Assignment\_Solutions.pdf} (HW2 Q4),
+\texttt{PI\_Class\_Exercises\_Solved.pdf} \S10,
+\texttt{PI\_Exponential\_Families\_Crash\_Course.pdf},
+\texttt{PI\_Exam\_Revision.pdf} \S12--\S13.
+\end{center}
+
+\end{document}
