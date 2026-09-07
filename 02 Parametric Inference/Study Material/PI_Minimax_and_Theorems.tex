@@ -1,0 +1,694 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Minimax \& Theorem Compendium}
+\rhead{\small Parametric Inference, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\pto}{\overset{p}{\longrightarrow}}
+\newcommand{\ind}{\perp\!\!\!\perp}
+\newcommand{\I}{\mathbb{I}}
+
+\newtcolorbox{idea}[1]{colback=Blue!4,colframe=Blue!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{confusion}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={Common confusion: #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{recipe}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+
+\newcounter{thm}
+\newenvironment{Thm}[1]{\medskip\refstepcounter{thm}%
+  \noindent\textbf{\large T\thethm.\ #1}\par\nopagebreak\smallskip}{\par\medskip}
+\newcommand{\hyp}{\smallskip\noindent\textbf{\color{BrickRed}Hypotheses (state and check these):}\ }
+\newcommand{\conc}{\smallskip\noindent\textbf{Conclusion:}\ }
+\newcommand{\prf}{\smallskip\noindent\textbf{Proof:}\ }
+\newcommand{\uses}{\smallskip\noindent\textbf{\color{ForestGreen}Used for:}\ }
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Minimax Estimation}\\[3pt]
+{\large A Crash Course --- plus a Compendium of Every Theorem}\\[5pt]
+{\small Parametric Inference, B.Stat.\ 3rd Year --- Lectures 8--9, and all ten lectures}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\noindent
+Third and last of the crash courses, after \texttt{PI\_Bayes\_Crash\_Course.pdf} and
+\texttt{PI\_Testing\_Crash\_Course.pdf}. \textbf{Part I} builds minimax from scratch;
+\textbf{Part II} is a reference containing every theorem in the course, each with its
+hypotheses called out separately --- because in this subject the marks are in the hypotheses,
+not the statement.
+
+\tableofcontents
+
+\newpage
+\part*{Part I --- Minimax from scratch}
+\addcontentsline{toc}{part}{Part I --- Minimax from scratch}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The third escape route}
+
+The same starting point as always. The risk $R(\theta,T)=\E_\theta(T-\theta)^2$ is a
+\emph{function} of $\theta$, so ``minimise the risk'' is not a well-posed problem. Three ways
+to make it well posed, and you now know all three:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{2.6cm}p{5.6cm}p{7.3cm}@{}}
+\toprule
+& \textbf{How the function becomes a number} & \textbf{Character} \\
+\midrule
+\textbf{UMVUE} & Don't collapse it --- shrink the class of $T$ instead & Optimistic: assumes unbiasedness is a reasonable restriction \\
+\textbf{Bayes} & $r(\pi,T)=\int R(\theta,T)\pi(\theta)d\theta$ --- \emph{average} it & Requires you to commit to weights $\pi$ \\
+\textbf{Minimax} & $\sup_\theta R(\theta,T)$ --- take the \emph{worst case} & Pessimistic: protects against the least favourable $\theta$, commits to nothing \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{idea}{Definition}
+$T^*$ is \textbf{minimax} if
+\[
+\sup_{\theta\in\Theta}R(\theta,T^*)\ =\ \inf_{T}\ \sup_{\theta\in\Theta}R(\theta,T).
+\]
+Read it right to left: among all estimators, look at each one's worst-case risk, and pick the
+estimator whose worst case is least bad. The common value is the \textbf{minimax value} of the
+problem.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why minimax is hard, and the one trick that solves it}
+
+Suppose someone hands you a candidate $T^*$. Computing $\sup_\theta R(\theta,T^*)$ is easy ---
+it is calculus. But proving $T^*$ is \emph{minimax} means showing
+\[
+\sup_\theta R(\theta,T)\ \ge\ \sup_\theta R(\theta,T^*)\qquad\textbf{for every estimator }T,
+\]
+and there are infinitely many $T$, most of which you cannot write down. You cannot check them
+one at a time. You need a \textbf{certificate}: a lower bound on $\inf_T\sup_\theta R(\theta,T)$
+that you can compute, and that happens to equal $\sup_\theta R(\theta,T^*)$.
+
+\begin{idea}{Where lower bounds come from --- this is the whole subject}
+For \textbf{any} probability measure $\pi$ on $\Theta$ and \textbf{any} estimator $T$,
+\[
+\sup_{\theta}R(\theta,T)\ \ge\ \int_\Theta R(\theta,T)\,\pi(\theta)\,d\theta\ =\ r(\pi,T),
+\]
+simply because a supremum is at least any weighted average. Now minimise both sides over $T$:
+\[
+\inf_T\sup_\theta R(\theta,T)\ \ge\ \inf_T r(\pi,T)\ =\ r(\pi,T_\pi),
+\]
+the Bayes risk of the Bayes estimate for $\pi$.
+
+\smallskip
+\textbf{So every prior $\pi$ hands you a free lower bound on the minimax value, namely its
+Bayes risk.} That is why Bayes estimation is taught immediately before minimax --- it is not a
+detour, it is the machine that produces the certificates.
+\end{idea}
+
+\begin{idea}{The sandwich}
+Putting it together, for any $\pi$ and any $T$:
+\[
+\underbrace{\sup_\theta R(\theta,T^*)}_{\text{what you can compute}}
+\ \ \ge\ \ \underbrace{\inf_T\sup_\theta R(\theta,T)}_{\text{what you want}}
+\ \ \ge\ \ \underbrace{r(\pi,T_\pi)}_{\text{a computable lower bound}} .
+\]
+The left inequality is trivial ($T^*$ is one of the $T$'s). \textbf{If you can find a $\pi$
+making the two outer quantities equal, the sandwich collapses and $T^*$ is minimax.}
+Everything in Lectures 8--9 is a recipe for finding that $\pi$.
+
+A $\pi$ achieving the best possible lower bound is called a \textbf{least favourable prior}:
+it puts its mass where estimation is hardest, making the problem as difficult as it can be.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The two theorems, and when to use which}
+
+\begin{idea}{Theorem A --- constant-risk (equalizer) criterion}
+If $T_\pi$ is the Bayes estimate for a \textbf{proper} prior $\pi$, and
+$R(\theta,T_\pi)=c$ is \textbf{constant in $\theta$}, then $T_\pi$ is minimax.
+\end{idea}
+
+\prf Substitute into the sandwich. For any $T$,
+\[
+\sup_\theta R(\theta,T)\ \ge\ r(\pi,T)\ \ge\ r(\pi,T_\pi)
+=\int c\,\pi(\theta)d\theta=c=\sup_\theta R(\theta,T_\pi).\qquad\square
+\]
+The constant risk is what makes step three work: the average of a constant is that constant,
+so the lower bound lands exactly on $T_\pi$'s worst case.
+
+\begin{idea}{Theorem B --- limit of Bayes rules}
+Let $\{\pi_k\}$ be proper priors with Bayes risks $r(\pi_k,T_{\pi_k})\to c$. If $T^*$
+satisfies $\sup_\theta R(\theta,T^*)=c$, then $T^*$ is minimax.
+\end{idea}
+
+\prf For any $T$ and every $k$, $\sup_\theta R(\theta,T)\ge r(\pi_k,T)\ge r(\pi_k,T_{\pi_k})$.
+Let $k\to\infty$: $\sup_\theta R(\theta,T)\ge c=\sup_\theta R(\theta,T^*)$. $\square$
+
+\begin{confusion}{``Why do we need Theorem B at all?''}
+Because \textbf{the minimax estimator is often not Bayes for any proper prior}, so Theorem A
+simply does not apply.
+
+The example is $X\sim N(\theta,1)$ with $\theta\in\R$. The minimax estimator is $X$ itself,
+with constant risk 1. But is $X$ Bayes for some proper prior? No: every proper prior pulls the
+estimate toward its own mean, so every proper Bayes estimate is a strict shrinkage
+$\frac{k}{k+1}X$, never $X$. Only the \emph{improper} flat prior gives $X$, and an improper
+prior has infinite Bayes risk, so the ``$\sup\ \ge$ average'' step is meaningless.
+
+The repair is Theorem B: use proper priors $\pi_k=N(0,k)$ that approach flatness, and let
+their Bayes risks $k/(k+1)$ climb to $1$. The sequence $\{\pi_k\}$ is called a \emph{least
+favourable sequence}. \textbf{Rule of thumb: bounded $\Theta$ $\to$ try Theorem A; unbounded
+$\Theta$ $\to$ you will almost certainly need Theorem B.}
+\end{confusion}
+
+\begin{idea}{Why minimax rules tend to have constant risk}
+Not a theorem, but the right intuition. Suppose $R(\cdot,T)$ is not flat, peaking at some
+$\theta_1$. Intuitively you can nudge $T$ to do a little worse where the risk is low and a
+little better near $\theta_1$, lowering the peak --- and the peak is all that minimaxity cares
+about. At the optimum there should be nothing left to shave, i.e.\ the risk is flat.
+
+An estimator with constant risk is called an \textbf{equalizer}. So the practical search
+strategy is: \emph{look for an equalizer inside a conjugate family, then check it is Bayes.}
+That is exactly how the binomial answer is found below.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Worked example 1: the Binomial (Theorem A in full)}
+
+$X\sim\mathrm{Bin}(n,\theta)$, $\theta\in(0,1)$. Here $\Theta$ is bounded, so try Theorem A.
+
+\textbf{Step 1. Get a family of Bayes estimates.} With prior $\mathrm{Beta}(p,q)$ the posterior
+is $\mathrm{Beta}(p+x,\ q+n-x)$, so writing $c=p+q+n$,
+\[
+T_{p,q}=\frac{p+X}{c}.
+\]
+
+\textbf{Step 2. Compute its risk.} $\E_\theta X=n\theta$ and $\Var_\theta X=n\theta(1-\theta)$,
+so
+\[
+\text{Bias}=\frac{p+n\theta}{c}-\theta=\frac{p-(p+q)\theta}{c},
+\qquad
+\Var(T_{p,q})=\frac{n\theta(1-\theta)}{c^{2}},
+\]
+\[
+R(\theta,T_{p,q})=\frac{1}{c^{2}}\Big[n\theta(1-\theta)+\big(p-(p+q)\theta\big)^{2}\Big].
+\]
+
+\textbf{Step 3. Force it to be constant.} Expand the bracket as a quadratic in $\theta$:
+\[
+\underbrace{\big[(p+q)^{2}-n\big]}_{\text{coeff of }\theta^{2}}\theta^{2}
++\underbrace{\big[n-2p(p+q)\big]}_{\text{coeff of }\theta}\theta
++\underbrace{p^{2}}_{\text{constant}} .
+\]
+Both non-constant coefficients must vanish:
+\[
+(p+q)^{2}=n\ \Rightarrow\ p+q=\sqrt n;
+\qquad
+n=2p(p+q)=2p\sqrt n\ \Rightarrow\ p=\frac{\sqrt n}{2},\ q=\frac{\sqrt n}{2}.
+\]
+This is the \emph{only} solution --- two equations, two unknowns.
+
+\textbf{Step 4. Read off the answer.} With $c=n+\sqrt n=\sqrt n(1+\sqrt n)$,
+\[
+\boxed{\ T^*=\frac{X+\sqrt n/2}{n+\sqrt n},\qquad
+R(\theta,T^*)=\frac{p^{2}}{c^{2}}=\frac{n/4}{n(1+\sqrt n)^{2}}=\frac{1}{4(1+\sqrt n)^{2}}\ }
+\]
+for every $\theta$. It is Bayes for a proper prior and has constant risk, so by Theorem A it is
+\textbf{minimax}, and $\mathrm{Beta}(\sqrt n/2,\sqrt n/2)$ is least favourable.
+
+\begin{idea}{Sanity check on the least favourable prior}
+$\mathrm{Beta}(\sqrt n/2,\sqrt n/2)$ has mean $\tfrac12$ and variance
+$\dfrac{n/4}{n(\sqrt n+1)}=\dfrac{1}{4(\sqrt n+1)}\to0$. So as $n$ grows the least favourable
+prior \textbf{concentrates at $\theta=\tfrac12$} --- exactly where $\Var_\theta(X)=n\theta(1-\theta)$
+is largest, i.e.\ where estimation is hardest. The certificate is being placed precisely where
+the problem is worst, which is what ``least favourable'' should mean.
+\end{idea}
+
+\subsection{Minimax versus the UMVUE --- and what minimaxity actually buys}
+
+The UMVUE is $X/n$, with $R(\theta,X/n)=\theta(1-\theta)/n$ and
+$\max_\theta R=\dfrac{1}{4n}$ at $\theta=\tfrac12$. Since
+$(1+\sqrt n)^2=n+2\sqrt n+1>n$,
+\[
+\frac{1}{4(1+\sqrt n)^{2}}\ <\ \frac{1}{4n}
+\quad\Longrightarrow\quad \textbf{the UMVUE is not minimax.}
+\]
+But look at the whole risk curves, say $n=100$:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& $\theta=0.5$ & $\theta=0.1$ & $\theta\to0$ \\
+\midrule
+UMVUE $X/n$ & $0.00250$ & $0.00090$ & $\to0$ \\
+Minimax $T^*$ & $0.002066$ & $0.002066$ & $0.002066$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+$T^*$ wins at the peak and \textbf{loses badly everywhere else} --- near the endpoints the
+UMVUE has almost no risk while $T^*$ still pays its flat premium.
+
+\begin{confusion}{``So is the minimax estimator the best one?''}
+No. Minimaxity is a \textbf{worst-case} guarantee, not a uniform one. $T^*$ is the right choice
+only if you genuinely fear an adversary choosing the worst $\theta$. If you have any reason to
+think $\theta$ is near $0$ or $1$, the UMVUE is far better. Note also the ratio
+$\frac{(1+\sqrt n)^2}{n}\to1$: for large $n$ the two are almost identical anyway, so the whole
+distinction is a small-sample phenomenon.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Worked example 2: the Normal (Theorem B in full)}
+
+$X\sim N(\theta,1)$, $\theta\in\R$ --- now $\Theta$ is unbounded.
+
+\textbf{Step 1. Candidate and its worst-case risk.} $R(\theta,X)=\E_\theta(X-\theta)^2=1$ for
+every $\theta$, so $X$ is an equalizer with $\sup_\theta R(\theta,X)=1$.
+
+\textbf{Step 2. Build the certificate sequence.} Take $\pi_k=N(0,k)$. Completing the square,
+\[
+\theta\mid X=x\ \sim\ N\Big(\frac{k}{k+1}x,\ \frac{k}{k+1}\Big),
+\qquad T_{\pi_k}=\frac{k}{k+1}X .
+\]
+The posterior variance is the \emph{constant} $\frac{k}{k+1}$, so by
+$r(\pi,T_\pi)=\E_m[\Var(\theta\mid X)]$,
+\[
+r(\pi_k,T_{\pi_k})=\frac{k}{k+1}.
+\]
+
+\textbf{Step 3. Close the sandwich.} $r(\pi_k,T_{\pi_k})\to1=\sup_\theta R(\theta,X)$, so by
+Theorem B, $X$ is \textbf{minimax} and the minimax value is $1$.
+
+\begin{idea}{What the sequence is doing}
+$\pi_k=N(0,k)$ spreads out as $k$ grows, approaching the (improper) flat prior. Each $\pi_k$
+gives a valid lower bound $k/(k+1)$; none of them reaches $1$, but together they climb to it.
+No \emph{single} prior certifies $X$; the sequence does. That is the entire reason Theorem B
+exists, and it is Homework 2 Q1.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Worked example 3: when the minimax value is infinite}
+
+$X\sim\mathrm{Poisson}(\lambda)$, $\lambda\in(0,\infty)$. Take $\pi=\mathrm{Gamma}(a,\text{scale }b)$.
+The posterior is $\mathrm{Gamma}\big(a+x,\tfrac{b}{1+b}\big)$ with variance
+$\frac{(a+x)b^2}{(1+b)^2}$, and the marginal mean of $X$ is $\E[\lambda]=ab$, so
+\[
+r(\pi_{a,b})=\E_m\big[\Var(\lambda\mid X)\big]=\frac{b^{2}(a+ab)}{(1+b)^{2}}=\frac{ab^{2}}{1+b}.
+\]
+Take $a=1$ and $b=k\to\infty$: $r=\dfrac{k^{2}}{1+k}\to\infty$. Since every estimator's
+worst-case risk dominates every Bayes risk,
+\[
+\sup_{\lambda>0}R(\lambda,T)\ \ge\ \frac{k^{2}}{1+k}\ \longrightarrow\ \infty
+\qquad\textbf{for every }T .
+\]
+So \textbf{every} estimator has infinite maximum risk and no minimax estimator exists in any
+useful sense (Homework 2 Q2).
+
+\begin{idea}{The pattern to recognise}
+Infinite minimax value happens when $\Theta$ is \textbf{unbounded} \emph{and} the achievable
+variance grows without bound along it. Two instances in the course:
+\begin{itemize}
+\item $\mathrm{Poisson}(\lambda)$, $\lambda\in(0,\infty)$: $\Var_\lambda(X)=\lambda\to\infty$.
+\item $U[a,\theta]$, $\theta\ge a$ unbounded: with Pareto priors of scale $m$, the Bayes risk
+is $\ge C(\alpha,n)m^{2}\to\infty$.
+\end{itemize}
+Contrast $\mathrm{Bin}(n,\theta)$ with $\theta\in(0,1)$ bounded, and $N(\theta,1)$ where
+$\Theta$ is unbounded but the variance is the \emph{constant} 1. \textbf{Unboundedness alone is
+not fatal --- it has to be paired with unbounded variance.}
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The recipe}
+
+\begin{recipe}{Given a minimax question, do this}
+\begin{enumerate}
+\item \textbf{Is $\Theta$ bounded?} If not, first ask whether the variance blows up along it
+--- if so, show every estimator has infinite maximum risk (Poisson pattern) and stop.
+\item \textbf{Compute $\sup_\theta R(\theta,T^*)$} for your candidate. If the risk is constant,
+you have an equalizer and are in good shape.
+\item \textbf{Is $T^*$ Bayes for a proper prior?} Search inside the conjugate family: write
+down $R(\theta,T_{\text{prior params}})$, expand as a polynomial in $\theta$, and force the
+non-constant coefficients to vanish. If a proper prior works, quote \textbf{Theorem A} and
+finish in one line.
+\item \textbf{If no proper prior gives $T^*$} (typical when $T^*$ is generalized Bayes under an
+improper prior), build a sequence $\pi_k$ of proper priors with $r(\pi_k)\to\sup_\theta
+R(\theta,T^*)$ and quote \textbf{Theorem B}.
+\item \textbf{Say which prior (or sequence) is least favourable.} It is usually worth a mark,
+and it shows you understand what the certificate is.
+\end{enumerate}
+\end{recipe}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{@{}p{3.0cm}p{2.4cm}p{3.5cm}p{6.2cm}@{}}
+\toprule
+Problem & Minimax rule & Minimax value & Certificate \\
+\midrule
+$\mathrm{Bin}(n,\theta)$ & $\dfrac{X+\sqrt n/2}{n+\sqrt n}$ & $\dfrac{1}{4(1+\sqrt n)^2}$ &
+Theorem A with $\mathrm{Beta}(\tfrac{\sqrt n}2,\tfrac{\sqrt n}2)$ \\
+$N(\theta,1)$ & $X$ & $1$ & Theorem B with $\pi_k=N(0,k)$ \\
+$N(\theta,\sigma_0^2)$, $n$ obs & $\Xbar$ & $\sigma_0^2/n$ & Theorem B, same idea \\
+$\mathrm{Poi}(\lambda)$ & none & $\infty$ & Gamma priors, $r\to\infty$ \\
+$U[a,\theta]$ & none & $\infty$ & Pareto priors, $r\to\infty$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+\part*{Part II --- Every theorem in the course}
+\addcontentsline{toc}{part}{Part II --- Every theorem in the course}
+
+\section{Quick reference}
+
+The hypotheses column is what examiners actually check. Quoting a theorem without verifying
+its hypotheses is the most reliable way to lose marks in this subject.
+
+\renewcommand{\arraystretch}{1.35}
+\begin{longtable}{@{}p{0.7cm}p{3.5cm}p{5.6cm}p{5.4cm}@{}}
+\toprule
+& \textbf{Theorem} & \textbf{Hypotheses to verify} & \textbf{Gives you} \\
+\midrule
+\endhead
+T1 & Neyman--Fisher factorisation & $f=g(\theta,T)h(\mathbf x)$, $h$ free of $\theta$ &
+$T$ sufficient (and conversely) \\
+T2 & Rao--Blackwell & $S$ sufficient; $\E T^2<\infty$ &
+$\E[T\mid S]$ has same bias, no more variance \\
+T3 & Lehmann--Scheff\'e & $S$ \textbf{complete} sufficient; $h(S)$ unbiased &
+$h(S)$ is \emph{the} UMVUE, a.s.\ unique \\
+T4 & UMVUE uniqueness & a UMVUE exists & it is a.s.\ unique (no completeness needed) \\
+T5 & Exponential-family completeness & natural parameter space contains an open interval
+(rectangle if $k$-dim) & $\sum_iT(X_i)$ complete sufficient \\
+T6 & Basu & $S$ complete sufficient; $V$ ancillary & $S\ind V$ \\
+T7 & Cram\'er--Rao & regularity: support free of $\theta$, differentiation under $\int$ legal &
+$\Var(T)\ge[\psi']^2/(nI)$ \\
+T8 & CRLB attainment & score $=k(\theta)[T-\psi(\theta)]$ & equality, iff exp.\ family \\
+T9 & Bayes estimate & squared error loss & posterior mean; $r=\E_m[\Var(\theta\mid X)]$ \\
+T10 & Constant-risk minimax & $T_\pi$ Bayes for a \textbf{proper} $\pi$; risk constant &
+$T_\pi$ minimax \\
+T11 & Limit of Bayes rules & $\pi_k$ proper; $r(\pi_k)\to c=\sup_\theta R(\theta,T^*)$ &
+$T^*$ minimax \\
+T12 & Neyman--Pearson & both hypotheses \textbf{simple} & MP test is the LR test \\
+T13 & Exp.\ family $\Rightarrow$ MLR & $c(\theta)$ monotone & MLR in $T(x)$ \\
+T14 & Karlin--Rubin & MLR in $T$; \textbf{one-sided} $H_A$ & $\{T>c\}$ is UMP; power monotone \\
+T15 & Consistency via Chebyshev & bias $\to0$ and $\Var\to0$ & $T_n\pto\psi(\theta)$ \\
+T16 & MLE consistency & identifiability, common support, uniform LLN, unique root &
+$\hat\theta_n\pto\theta_0$ \\
+\bottomrule
+\end{longtable}
+
+\section{Estimation}
+
+\begin{Thm}{Neyman--Fisher factorisation}
+\hyp $X_1,\dots,X_n$ have joint pdf/pmf $f(\mathbf x\mid\theta)$.
+
+\conc $T$ is sufficient for $\theta$ $\iff$
+$f(\mathbf x\mid\theta)=g\big(\theta,T(\mathbf x)\big)\,h(\mathbf x)$ with $h$ free of $\theta$.
+
+\uses Every sufficiency claim in the course. Also proves that the posterior, the MLE and every
+generalized Bayes estimate depend on the data only through $T$.
+\end{Thm}
+
+\begin{Thm}{Rao--Blackwell}
+\hyp $S$ sufficient; $T$ an estimator with $\E_\theta T^2<\infty$.
+
+\conc $T^*=\E[T\mid S]$ is a statistic, $\E_\theta T^*=\E_\theta T$, and
+$R(\theta,T^*)\le R(\theta,T)$ for all $\theta$, strictly unless $T$ is already a function of
+$S$.
+
+\prf Sufficiency makes $\E[T\mid S]$ free of $\theta$, hence a statistic. Tower property gives
+equal means, hence equal bias. Then
+$\Var(T)=\E[\Var(T\mid S)]+\Var(\E[T\mid S])\ge\Var(T^*)$, the first term being $\ge0$ and
+zero iff $T$ is $S$-measurable. Equal bias plus smaller variance gives smaller MSE. $\square$
+
+\uses Constructing UMVUEs by conditioning a crude unbiased estimator (typically an indicator).
+\end{Thm}
+
+\begin{Thm}{Lehmann--Scheff\'e}
+\hyp $S$ \textbf{complete} and sufficient; $h(S)$ unbiased for $\psi(\theta)$.
+
+\conc $h(S)$ is the UMVUE of $\psi(\theta)$, a.s.\ unique.
+
+\prf For any unbiased $T$, $T^*=\E[T\mid S]$ is unbiased, a function of $S$, and has
+$\Var(T^*)\le\Var(T)$ by T2. Both $T^*$ and $h(S)$ are unbiased functions of $S$, so
+$\E_\theta[T^*-h(S)]=0$ for all $\theta$ and completeness forces $T^*=h(S)$ a.s. Hence
+$\Var(h(S))\le\Var(T)$. $\square$
+
+\uses The workhorse. \textbf{Completeness is the hypothesis people forget} --- without it the
+conclusion is false, as $U[\theta,\theta+1]$ shows.
+\end{Thm}
+
+\begin{Thm}{Uniqueness of the UMVUE}
+\hyp A UMVUE exists.
+
+\conc It is a.s.\ unique. (No complete sufficient statistic required --- this is independent
+of T3.)
+
+\prf Let $T_1,T_2$ be UMVUEs, both with variance $\sigma^2$. Then $T=\tfrac12(T_1+T_2)$ is
+unbiased, so
+$\sigma^2\le\Var(T)=\tfrac14[\sigma^2+\sigma^2+2\rho\sigma^2]=\tfrac{\sigma^2}{2}(1+\rho)$,
+giving $\rho\ge1$; but $\rho\le1$, so $\rho=1$. Perfect correlation forces $T_2=aT_1+b$ with
+$a>0$, and matching means and variances gives $a=1$, $b=0$. $\square$
+\end{Thm}
+
+\begin{Thm}{Completeness of exponential families}
+\hyp $f(x\mid\theta)=p(\theta)h(x)\exp\{c(\theta)T(x)\}$ with support free of $\theta$, and the
+natural parameter space $\Gamma=\{c(\theta):\theta\in\Theta\}$ contains an interval with
+non-empty interior. ($k$-parameter version: a $k$-dimensional rectangle with non-empty
+interior.)
+
+\conc $S=\sum_i T(X_i)$ is complete sufficient.
+
+\uses Establishing completeness in one line for Bin, Poi, Exp, Normal, Gamma, power-series and
+Multinomial. \textbf{The hypothesis bites} for $N(\theta,\theta^2)$, where the natural
+parameters trace a curve, not a rectangle.
+\end{Thm}
+
+\begin{Thm}{Basu}
+\hyp $S$ complete sufficient for $\theta$; $V$ ancillary (distribution free of $\theta$).
+
+\conc $S\ind V$ under every $P_\theta$.
+
+\prf Let $g(s)=\Prob(V\le v\mid S=s)$, free of $\theta$ by sufficiency. Then
+$\E_\theta[g(S)]=\Prob_\theta(V\le v)=\Prob(V\le v)$, a constant free of $\theta$ by
+ancillarity. So $\E_\theta\big[g(S)-\Prob(V\le v)\big]=0$ for all $\theta$, and completeness
+gives $g(S)=\Prob(V\le v)$ a.s. That is exactly independence. $\square$
+
+\uses Proving $\Xbar\ind S^2$; independence of $\sum X_i$ and scale-invariant ratios (HW1 Q6);
+and the range identity $\E[R]=\E[V]\E[S]$. \textbf{Spotting ancillarity:} differences are
+ancillary in location families, ratios in scale families.
+\end{Thm}
+
+\section{Information}
+
+\begin{Thm}{Cram\'er--Rao lower bound}
+\hyp Regularity: the support does not depend on $\theta$, and differentiation under the
+integral sign is legal.
+
+\conc For any $T$ with $\E_\theta T=\psi(\theta)$,
+$\ \Var_\theta(T)\ \ge\ \dfrac{[\psi'(\theta)]^2}{n\,I(\theta)}$, where
+$I(\theta)=\Var_\theta\big(\tfrac{\partial}{\partial\theta}\log f\big)
+=-\E_\theta\big[\tfrac{\partial^2}{\partial\theta^2}\log f\big]$.
+
+\uses A benchmark, and an easy way to \emph{prove} something is the UMVUE when the bound is
+attained. \textbf{Meaningless for $U[0,\theta]$} --- the support moves, regularity fails, and
+$\tfrac{n+1}{n}X_{(n)}$ has variance of order $\theta^2/n^2$, far below any naive bound.
+\end{Thm}
+
+\begin{Thm}{Attainment of the CRLB}
+\conc Equality holds at every $\theta$ $\iff$ the score factorises as
+$\frac{\partial}{\partial\theta}\log f(\mathbf x\mid\theta)=k(\theta)\big[T(\mathbf x)-\psi(\theta)\big]$,
+i.e.\ iff the model is a one-parameter exponential family and $\psi$ is the mean of its natural
+sufficient statistic.
+
+\uses Deciding attainment questions instantly (HW1 Q4: yes, for $\E X$ in a power-series
+family; Mock Q3: no, for $e^{-\lambda}$ in the Poisson).
+
+\begin{confusion}{failing the CRLB does not disqualify a UMVUE}
+The CRLB bounds \emph{all} unbiased estimators. If no estimator attains it, the best one still
+sits strictly above. ``Its variance exceeds the CRLB, so it is not the UMVUE'' is the single
+most common error on this topic.
+\end{confusion}
+\end{Thm}
+
+\section{Bayes and minimax}
+
+\begin{Thm}{Bayes estimate under squared error loss}
+\hyp Squared error loss. (Absolute error gives the posterior median; 0--1 loss gives the mode.)
+
+\conc $T_\pi(x)=\E[\theta\mid X=x]$, the posterior mean, and
+$r(\pi,T_\pi)=\E_m\big[\Var(\theta\mid X)\big]$.
+
+\prf Write $f(x\mid\theta)\pi(\theta)=m(x)\pi(\theta\mid x)$ and swap the order of integration:
+$r(\pi,T)=\int m(x)\big[\int(T(x)-\theta)^2\pi(\theta\mid x)d\theta\big]dx$. For each fixed $x$
+the inner bracket is minimised over the number $T(x)$ at the posterior mean, with minimum value
+the posterior variance. $\square$
+
+\uses Every Bayes computation, and --- via the risk formula --- every minimax certificate.
+\end{Thm}
+
+\begin{Thm}{Constant-risk minimax criterion}
+\hyp $T_\pi$ Bayes for a \textbf{proper} prior $\pi$; $R(\theta,T_\pi)=c$ constant in $\theta$.
+
+\conc $T_\pi$ is minimax; $\pi$ is least favourable.
+
+\prf $\sup_\theta R(\theta,T)\ge r(\pi,T)\ge r(\pi,T_\pi)=c=\sup_\theta R(\theta,T_\pi)$. $\square$
+
+\uses The Binomial minimax estimator. \textbf{Properness is essential} --- under an improper
+prior the Bayes risk is infinite and the middle step collapses.
+\end{Thm}
+
+\begin{Thm}{Limit of Bayes rules}
+\hyp $\{\pi_k\}$ proper priors with $r(\pi_k,T_{\pi_k})\to c$; $\sup_\theta R(\theta,T^*)=c$.
+
+\conc $T^*$ is minimax; $\{\pi_k\}$ is a least favourable sequence.
+
+\prf $\sup_\theta R(\theta,T)\ge r(\pi_k,T)\ge r(\pi_k,T_{\pi_k})$ for every $k$; let
+$k\to\infty$. $\square$
+
+\uses $X$ minimax for $N(\theta,1)$ (HW2 Q1); and, run in reverse, proving the minimax value is
+$\infty$ for the Poisson (HW2 Q2) and for $U[a,\theta]$.
+\end{Thm}
+
+\section{Testing}
+
+\begin{Thm}{Neyman--Pearson lemma}
+\hyp Both hypotheses \textbf{simple}: $H_0:X\sim f_0$ vs $H_A:X\sim f_1$.
+
+\conc There exist $k\ge0,\gamma\in[0,1]$ with
+$\phi^*=1,\gamma,0$ according as $f_1\gtrless kf_0$, having $\E_0\phi^*=\alpha$; any such
+$\phi^*$ is most powerful of its size; and any MP level-$\alpha$ test has this form a.e.\ off
+$\{f_1=kf_0\}$.
+
+\prf On $\{f_1>kf_0\}$, $\phi^*=1\ge\phi$; on $\{f_1<kf_0\}$, $\phi^*=0\le\phi$; on
+$\{f_1=kf_0\}$ the second factor vanishes. So $(\phi^*-\phi)(f_1-kf_0)\ge0$ pointwise.
+Integrating,
+$0\le(\E_1\phi^*-\E_1\phi)-k(\E_0\phi^*-\E_0\phi)\le\E_1\phi^*-\E_1\phi$. $\square$
+
+\uses Every MP test. Remember the region is one-sided \emph{in $\Lambda$}, not necessarily in
+$x$ --- see the Laplace-vs-normal annulus (HW2 Q5) and the non-monotone ordering in HW3 Q3.
+\end{Thm}
+
+\begin{Thm}{Exponential family $\Rightarrow$ MLR}
+\hyp $f(x\mid\theta)=p(\theta)h(x)e^{c(\theta)T(x)}$ with $c$ non-decreasing.
+
+\conc The family has MLR in $T(x)$.
+
+\prf $\dfrac{f_{\theta_1}}{f_{\theta_0}}=\dfrac{p(\theta_1)}{p(\theta_0)}
+\exp\{[c(\theta_1)-c(\theta_0)]T(x)\}$, non-decreasing in $T(x)$ since the exponent
+coefficient is $\ge0$. $\square$
+
+\uses Establishing MLR for Bin, Poi, Exp, $N(\theta,1)$, $N(0,\sigma^2)$ (in $x^2$).
+$U[0,\theta]$ has MLR in $X_{(n)}$ but must be checked \emph{directly} --- it is not an
+exponential family. The \textbf{Cauchy has no MLR}: the ratio of two quadratics tends to 1 at
+both ends, so it cannot be monotone.
+\end{Thm}
+
+\begin{Thm}{Karlin--Rubin}
+\hyp MLR in $T$; hypotheses \textbf{one-sided}, $H_0:\theta\le\theta_0$ vs $H_A:\theta>\theta_0$.
+
+\conc $\phi^*=1,\gamma,0$ according as $T\gtrless c$, with $\E_{\theta_0}\phi^*=\alpha$, is UMP
+of level $\alpha$; and $\beta_{\phi^*}(\theta)$ is non-decreasing, so the size is attained at
+$\theta_0$.
+
+\prf sketch: By NP the MP test against any fixed $\theta_1>\theta_0$ rejects for large
+$f_{\theta_1}/f_{\theta_0}$, hence for large $T$ by MLR; the cutoff is determined by
+$\Prob_{\theta_0}(T>c)=\alpha$, which does not involve $\theta_1$. So the same test is MP
+against every $\theta_1>\theta_0$. Monotone power upgrades the null from $=\theta_0$ to
+$\le\theta_0$ at no cost in size. $\square$
+
+\uses All one-sided UMP tests (HW3 Q1, Q2; Mock Q8). \textbf{Randomise if $T$ is discrete.}
+
+\begin{confusion}{two-sided alternatives}
+No UMP exists in a regular MLR family: the best test against $\theta_1>\theta_0$ rejects large
+$T$, against $\theta_1<\theta_0$ rejects small $T$. \textbf{Exception:} if the support moves
+with $\theta$, the impossible-under-$H_0$ region is free, and a two-sided UMP test can exist ---
+$U[0,\theta]$ with $H_0:\theta=1$ (HW3 Q4).
+\end{confusion}
+\end{Thm}
+
+\section{Asymptotics}
+
+\begin{Thm}{Consistency via Chebyshev}
+\hyp $\E_\theta T_n\to\psi(\theta)$ and $\Var_\theta(T_n)\to0$.
+
+\conc $T_n\pto\psi(\theta)$.
+
+\prf $\Prob(|T_n-\psi|>\varepsilon)\le\varepsilon^{-2}\E(T_n-\psi)^2
+=\varepsilon^{-2}[\text{bias}^2+\Var]\to0$. $\square$
+
+\uses Almost every consistency question. \textbf{Sufficient, not necessary} --- $X_{(n)}$ for
+$U[0,\theta]$ is biased at every $n$ and consistent; and an estimator with no moments at all
+can be consistent.
+\end{Thm}
+
+\begin{Thm}{Consistency of the MLE (Wald)}
+\hyp Identifiability; support free of $\theta$; $\Theta$ compact (or the maximiser eventually
+in a compact set); a uniform law of large numbers for $\log f$.
+
+\conc $\hat\theta_n\pto\theta_0$.
+
+\prf sketch: By Jensen,
+$M(\theta)-M(\theta_0)=\E_{\theta_0}\log\frac{f(X\mid\theta)}{f(X\mid\theta_0)}
+\le\log\int f(x\mid\theta)dx=0$, with equality only at $\theta_0$ by identifiability --- so the
+population criterion $M$ has a strict maximum at $\theta_0$. The sample criterion
+$M_n=\frac1n\sum\log f(X_i\mid\theta)$ converges to $M$ uniformly, so its maximiser converges
+to $\theta_0$. $\square$
+
+\uses \textbf{Regularity is sufficient, not necessary}: $U[0,\theta]$ violates the
+common-support hypothesis yet $X_{(n)}$ is consistent (and $n$-consistent, not merely
+$\sqrt n$-consistent).
+\end{Thm}
+
+\begin{Thm}{Consistency of UMVUEs}
+\hyp $T_n$ is the UMVUE of $\psi(\theta)$ for each $n$, and \emph{some} unbiased sequence
+$\tilde T_n$ has $\Var(\tilde T_n)\to0$.
+
+\conc $T_n\pto\psi(\theta)$.
+
+\prf $0\le\Var(T_n)\le\Var(\tilde T_n)\to0$ by minimality; $T_n$ is unbiased, so Chebyshev
+applies. $\square$
+\end{Thm}
+
+\section{Two results that are not called theorems but behave like them}
+
+\textbf{Estimability in the Binomial.} $\psi(\theta)$ has an unbiased estimator based on
+$X\sim\mathrm{Bin}(m,\theta)$ \emph{iff} $\psi$ is a polynomial of degree $\le m$. ($\Rightarrow$:
+$\E_\theta T$ is such a polynomial, and two polynomials agreeing on an interval are identical.
+$\Leftarrow$: $X^{\underline k}/m^{\underline k}$ is unbiased for $\theta^k$.)
+
+\textbf{Estimability in the Poisson.} $\psi$ is estimable \emph{iff} $\psi$ is analytic, and
+then the unbiased estimator is unique --- hence automatically the UMVUE. The same
+uniqueness-by-transform argument runs through the Laplace transform for the exponential family.
+
+\begin{idea}{The ``uniqueness $\Rightarrow$ UMVUE'' shortcut}
+Whenever a series- or transform-matching argument produces the \emph{unique} unbiased
+estimator, it is the UMVUE with nothing further to prove: there is no competitor. Worth one
+sentence whenever it applies.
+\end{idea}
+
+\vfill
+\begin{center}
+\small\itshape
+Companions: \texttt{PI\_Bayes\_Crash\_Course.pdf}, \texttt{PI\_Testing\_Crash\_Course.pdf},
+\texttt{PI\_Exam\_Revision.pdf}, \texttt{PI\_Class\_Exercises\_Solved.pdf},
+\texttt{PI\_Assignment\_Solutions.pdf}, \texttt{PI\_Mock\_Exam.pdf}.
+\end{center}
+
+\end{document}
