@@ -105,10 +105,93 @@ so $P^T=P$, and then $P=P^2$. \qed
 \[
   P_{\bX}=\bX(\bX^T\bX)^{-}\bX^T,
 \]
-where $(\bX^T\bX)^{-}$ is any symmetric g-inverse (\S2.4). When $\bX$ has full column rank
+where $(\bX^T\bX)^{-}$ is any symmetric g-inverse (\S2.6). When $\bX$ has full column rank
 this is the familiar $\bX(\bX^T\bX)^{-1}\bX^T$. \textbf{$P_\bX$ does not depend on which
-g-inverse you pick} --- see \S2.5.
+g-inverse you pick} --- see \S2.7.
 \end{recipe}
+
+\subsection{Sums and differences of projections}
+
+Two projectors can be combined, but only under a condition --- and the condition is
+exactly orthogonality of the two subspaces.
+
+\begin{idea}{Proposition (asked as a 10-mark question in 2024)}
+Let $P,Q$ be symmetric orthogonal projection matrices. Then
+\[
+  P+Q \text{ is an orthogonal projection matrix}\iff PQ=O,
+\]
+and in that case $\rank(P)+\rank(Q)=\rank(P+Q)$.
+\end{idea}
+
+\prf $P+Q$ is symmetric automatically, so everything hinges on idempotence:
+\[
+  (P+Q)^2=P^2+PQ+QP+Q^2=P+Q+(PQ+QP),
+  \qquad\text{so}\qquad
+  (P+Q)^2=P+Q\iff PQ+QP=O. \tag{$\ast$}
+\]
+
+($\Leftarrow$) If $PQ=O$ then $QP=Q^TP^T=(PQ)^T=O$ too, so $(\ast)$ holds.
+
+($\Rightarrow$) Suppose $PQ+QP=O$. Multiply on the \emph{left} by $P$ and use $P^2=P$:
+\[
+  PQ+PQP=O. \tag{i}
+\]
+Multiply on the \emph{right} by $P$:
+\[
+  PQP+QP=O. \tag{ii}
+\]
+Subtracting, $PQ-QP=O$, i.e.\ $PQ=QP$; substituting back into $(\ast)$ gives $2PQ=O$.
+
+\emph{Rank.} $P+Q$ is now idempotent, and for idempotent matrices trace counts rank, so
+\[
+  \rank(P+Q)=\tr(P+Q)=\tr(P)+\tr(Q)=\rank(P)+\rank(Q). \qquad\blacksquare
+\]
+
+\begin{idea}{The geometry, and the companion result for differences}
+$PQ=O$ says $\Cs(P)\perp\Cs(Q)$: for $u=Pa$, $v=Qb$, $u^Tv=a^TPQb=0$. Then
+$\Cs(P+Q)=\Cs(P)\oplus\Cs(Q)$ and the ranks add because dimensions of a direct sum add ---
+an alternative to the trace argument.
+
+The mirror statement is the one you use constantly later: if $\Cs(Q)\subseteq\Cs(P)$ then
+$PQ=QP=Q$, so
+\[
+  (P-Q)^2=P-PQ-QP+Q=P-Q,
+\]
+i.e.\ \textbf{$P-Q$ is an orthogonal projector with $\rank(P-Q)=\rank(P)-\rank(Q)$.} That is
+precisely why $P_\bX-P_\bZ$ is a projector in the nested-model decomposition of Crash
+Course 3.
+\end{idea}
+
+\subsection{A non-negative-definite squeeze}
+
+\begin{idea}{Proposition (asked as an 8-mark question in 2025)}
+Let $A,B$ be symmetric $n\times n$ with $B$ idempotent. If $A\succeq0$ and
+$I_n-A-B\succeq0$, then
+\[
+  AB=BA=O_n .
+\]
+\end{idea}
+
+\prf \textbf{Step 1.} $B$ is symmetric and idempotent, hence the orthogonal projector onto
+$\Cs(B)$; so $By=y$ for every $y\in\Cs(B)$, and therefore $y^TBy=y^Ty$.
+
+\textbf{Step 2 (the squeeze).} Let $y\in\Cs(B)$. Non-negative definiteness of $I-A-B$ gives
+\[
+  0\le y^T(I-A-B)y=y^Ty-y^TAy-\underbrace{y^TBy}_{=\,y^Ty}=-y^TAy,
+\]
+so $y^TAy\le0$; but $A\succeq0$ gives $y^TAy\ge0$. Hence $y^TAy=0$ on all of $\Cs(B)$.
+
+\textbf{Step 3.} $A\succeq0$ symmetric has a square root $A=L^TL$ (take $L=A^{1/2}$ from the
+spectral decomposition). Then $0=y^TAy=\|Ly\|^2$ forces $Ly=\zero$, hence $Ay=L^TLy=\zero$.
+
+\textbf{Step 4.} Every column of $B$ lies in $\Cs(B)$, so $AB=O$; transposing,
+$BA=(AB)^T=O$. \qed
+
+\begin{confusion}{$y^TAy=0$ does \emph{not} by itself give $Ay=\zero$}
+For a general symmetric $A$ it fails: take $A=\begin{pmatrix}0&1\\1&0\end{pmatrix}$ and
+$y=e_1$; then $y^TAy=0$ but $Ay=e_2\ne\zero$. Step 3 needs $A\succeq0$ --- which is exactly
+why that hypothesis is in the statement. In an exam, say where you use it.
+\end{confusion}
 
 \subsection{Generalised inverses}
 
@@ -171,6 +254,55 @@ $A^-$ is \emph{reflexive} if $A^-AA^-=A^-$; \emph{minimum-norm} if $(A^-A)^T=A^-
 \bottomrule
 \end{tabular}
 \end{center}
+
+\subsection{Building a g-inverse from a full-rank corner}
+
+The construction below is the standard way to \emph{exhibit} a g-inverse of a rank-deficient
+matrix, and it is a short exam question in its own right.
+
+\begin{idea}{Proposition (asked as a 6-mark question in 2024)}
+Let $A$ be $m\times m$, partitioned as
+$A=\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}$ with $A_{11}$ of size
+$r\times r$, $r<m$, and suppose
+\[
+  \rank(A)=\rank(A_{11})=r .
+\]
+Then $G=\begin{pmatrix}A_{11}^{-1}&0\\0&0\end{pmatrix}$ is a g-inverse of $A$.
+\end{idea}
+
+\prf $A_{11}$ is $r\times r$ of rank $r$, so $A_{11}^{-1}$ exists and $G$ is well defined.
+Compute
+\[
+  AG=\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}
+     \begin{pmatrix}A_{11}^{-1}&0\\0&0\end{pmatrix}
+    =\begin{pmatrix}I_r&0\\A_{21}A_{11}^{-1}&0\end{pmatrix},
+\]
+\[
+  AGA=\begin{pmatrix}I_r&0\\A_{21}A_{11}^{-1}&0\end{pmatrix}
+      \begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}
+     =\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{21}A_{11}^{-1}A_{12}\end{pmatrix}.
+\]
+So $AGA=A$ holds if and only if
+\[
+  A_{22}=A_{21}A_{11}^{-1}A_{12},
+  \qquad\text{i.e.\ iff the Schur complement } A_{22}-A_{21}A_{11}^{-1}A_{12} \text{ vanishes.}
+\]
+\textbf{And that is exactly what the rank hypothesis says.} The top row block
+$[A_{11}\ A_{12}]$ has $r$ rows and rank $r$ (because $A_{11}$ does), while $\rank(A)=r$; so
+the row space of $A$ is spanned by those first $r$ rows and every row of the bottom block is
+a combination of them: there is an $(m-r)\times r$ matrix $M$ with
+\[
+  [A_{21}\ \ A_{22}]=M[A_{11}\ \ A_{12}]
+  \quad\Longrightarrow\quad A_{21}=MA_{11},\quad A_{22}=MA_{12}.
+\]
+Since $A_{11}$ is invertible, $M=A_{21}A_{11}^{-1}$, and substituting into the second
+equation gives $A_{22}=A_{21}A_{11}^{-1}A_{12}$. \qed
+
+\begin{confusion}{where the hypothesis $\rank(A)=r$ is used}
+In exactly one place: forcing the Schur complement to vanish. Drop it and $AG$ is still
+idempotent, but $AGA$ differs from $A$ in the bottom-right block, so $G$ is \emph{not} a
+g-inverse. Marks are awarded for naming that step, not for the two matrix multiplications.
+\end{confusion}
 
 \section{The Gauss--Markov model}
 

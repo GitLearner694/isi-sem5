@@ -30,8 +30,7 @@
 
 \noindent Both papers are worth 40 marks. Every part is solved in full, with the
 alternative route given wherever the professor's phrasing admits one. Section~3 is a
-coverage audit: which crash course contains the machinery for each question, and which
-four results appear \emph{nowhere} except the formula sheet.
+coverage audit against the crash courses, recording where each result now lives.
 
 \tableofcontents
 \vspace{6pt}\hrule\vspace{8pt}
@@ -680,43 +679,47 @@ $\mathbf{A}\succeq0$, which is exactly why that hypothesis is in the question. S
 %==================================================================
 \section{Coverage audit: do the crash courses cover all of this?}
 
-\textbf{Short answer: the \emph{machinery} for every question is in the crash courses, but
-four specific results that were actually asked are not.} They appear only on the formula
-sheet (added after reading these papers) and now here.
+\textbf{They do now.} When these solutions were first written, the machinery for every
+question was in the crash courses but four specific results that were actually asked were
+not. Those four have since been \textbf{patched into Crash Courses 2 and 3}, and the proof of
+the third fundamental theorem has been filled in. The table below records where each one now
+lives.
 
 \begin{center}
 \begin{tabular}{@{}llp{6.4cm}l@{}}
 \toprule
 Paper & Q & Where the method is & Status \\
 \midrule
-2024 & 1 & CC2 \S2.2--2.3 (projection TFAE, $\tr=\rank$) & \textbf{Result missing} \\
-2024 & 2 & CC2 \S4--5 (estimability, G--M); CC3 \S6 (test) & Fully covered \\
-2024 & 3 & CC2 \S2.4--2.5 (g-inverses) & \textbf{Result missing} \\
-2024 & 4 & CC3 \S2.3 (Frisch--Waugh) & Formula not stated \\
-2025 & 1 & CC3 \S7 (3rd fundamental theorem) & Covered (orientation hedged) \\
-2025 & 2 & CC2 \S4.2 (the $2\times2$ $\alpha_i+\gamma_j$ example) & Fully covered \\
-2025 & 3 & CC3 \S2.3 (Frisch--Waugh) & Worked instance missing \\
-2025 & 4 & CC2 \S2.3 (orthogonal projectors) & \textbf{Result missing} \\
+2024 & 1 & CC2 \S2.4 \emph{Sums and differences of projections} & \textbf{Added} \\
+2024 & 2 & CC2 \S4--5 (estimability, G--M); CC3 \S6 (test) & Already covered \\
+2024 & 3 & CC2 \S2.8 \emph{Building a g-inverse from a full-rank corner} & \textbf{Added} \\
+2024 & 4 & CC3 \S2.4(a),(b) \emph{Two consequences} & \textbf{Added} \\
+2025 & 1 & CC3 \S7 (3rd fundamental theorem, proof now given) & \textbf{Strengthened} \\
+2025 & 2 & CC2 \S4.2 (the $2\times2$ $\alpha_i+\gamma_j$ example) & Already covered \\
+2025 & 3 & CC3 \S2.4(c) \emph{Analysis of covariance} & \textbf{Added} \\
+2025 & 4 & CC2 \S2.5 \emph{A non-negative-definite squeeze} & \textbf{Added} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\begin{recipe}{The four gaps, all now closed above}
+\begin{recipe}{The four results that were missing, and where they now are}
 \begin{enumerate}
-  \item \textbf{$\Pj+\mathbf{Q}$ is a projector $\iff\Pj\mathbf{Q}=\mathbf{O}$} (2024 Q1).
-        Not in any crash course. Solved in \S1.1.
+  \item \textbf{$\Pj+\mathbf{Q}$ is a projector $\iff\Pj\mathbf{Q}=\mathbf{O}$}, with rank
+        additivity (2024 Q1). Now \textbf{CC2 \S2.4}, together with the mirror result that
+        $\Pj-\mathbf{Q}$ is a projector when $\Cs(\mathbf{Q})\subseteq\Cs(\Pj)$ --- which is
+        what makes $P_\bX-P_\bZ$ a projector in the nested-model decomposition.
   \item \textbf{The block g-inverse} $G=\begin{bsmallmatrix}A_{11}^{-1}&0\\0&0\end{bsmallmatrix}$
-        (2024 Q3). The crash course defines g-inverses and proves invariance, but never this
-        construction. Solved in \S1.3.
+        (2024 Q3). Now \textbf{CC2 \S2.8}, with the point that the rank hypothesis is used in
+        exactly one place: forcing the Schur complement to vanish.
   \item \textbf{$\mathbf{A}\succeq0$, $I-\mathbf{A}-\mathbf{B}\succeq0$,
-        $\mathbf{B}^2=\mathbf{B}$ $\Rightarrow\mathbf{AB}=\mathbf{BA}=\mathbf{O}$}
-        (2025 Q4). Not in any crash course. Solved in \S2.4.
-  \item \textbf{$\Var(\wh\beta_j)=\sigma^2/d_j$ and the $T_j$ decomposition} (2024 Q4), and
-        the \textbf{ANCOVA instance} of Frisch--Waugh with the $S_{zz},S_{zw},\dots$ notation
-        (2025 Q3). The general lemma is in CC3 \S2.3, but neither worked case is.
-        Solved in \S1.4 and \S2.3.
+        $\mathbf{B}^2=\mathbf{B}\Rightarrow\mathbf{AB}=\mathbf{BA}=\mathbf{O}$} (2025 Q4).
+        Now \textbf{CC2 \S2.5}, with the counterexample showing why $\mathbf{A}\succeq0$
+        cannot be dropped.
+  \item \textbf{$\Var(\wh\beta_j)=\sigma^2/d_j$, the $T_j$ decomposition and the collinearity
+        argument} (2024 Q4), and the \textbf{ANCOVA} instance of Frisch--Waugh with the
+        $S_{zz},S_{zw},\dots$ notation and the $U$, $V$ statistics (2025 Q3). Now
+        \textbf{CC3 \S2.4}, parts (a)--(c).
 \end{enumerate}
-\textbf{Everything else the two papers asked is fully developed in the crash courses.}
 \end{recipe}
 
 \begin{idea}{What the two papers never asked}

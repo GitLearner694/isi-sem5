@@ -125,6 +125,125 @@ then run an ordinary regression of the leftovers. This is the meaning of ``the e
 $\bW$ \emph{adjusted for} $\bZ$''.
 \end{idea}
 
+\subsection{Two consequences you will be asked for}
+
+Frisch--Waugh is not just a formula for $\hat{\boldsymbol\delta}$; two of its specialisations
+are standard exam questions.
+
+\paragraph{(a) The variance of a single coefficient.}
+Take $\bZ=\bX_{-j}$ (all columns except the $j$-th) and $\bW=\bX_{\cdot j}$ (that one
+column, with scalar coefficient $\beta_j$). Write
+\[
+  d_j:=\bX_{\cdot j}^T(I-P_{-j})\bX_{\cdot j}=\big\|(I-P_{-j})\bX_{\cdot j}\big\|^2,
+\]
+where $P_{-j}$ is the orthogonal projector onto $\Cs(\bX_{-j})$.
+
+\begin{idea}{Variance of $\hat\beta_j$ (2024 exam, 4 marks)}
+\[
+  \boxed{\ \Var(\hat\beta_j)=\frac{\sigma^2}{\bX_{\cdot j}^T(I-P_{-j})\bX_{\cdot j}}=\frac{\sigma^2}{d_j}\ }
+\]
+\end{idea}
+
+\prf Frisch--Waugh gives $\hat\beta_j=d_j^{-1}\bX_{\cdot j}^T(I-P_{-j})\bY=a^T\bY$ with
+$a=(I-P_{-j})\bX_{\cdot j}/d_j$. Since $\Var(\bY)=\sigma^2I$ and $I-P_{-j}$ is symmetric
+idempotent,
+\[
+  \Var(\hat\beta_j)=\sigma^2a^Ta
+  =\frac{\sigma^2}{d_j^2}\bX_{\cdot j}^T(I-P_{-j})(I-P_{-j})\bX_{\cdot j}
+  =\frac{\sigma^2}{d_j^2}\cdot d_j=\frac{\sigma^2}{d_j}. \qquad\blacksquare
+\]
+
+\begin{idea}{Second route: the Schur complement}
+$\Var(\hat\beta_j)=\sigma^2[(\bX^T\bX)^{-1}]_{jj}$. Permute column $j$ to the end and use the
+partitioned inverse: the bottom-right entry of the inverse is the reciprocal of the Schur
+complement
+$\bX_{\cdot j}^T\bX_{\cdot j}-\bX_{\cdot j}^T\bX_{-j}(\bX_{-j}^T\bX_{-j})^{-1}\bX_{-j}^T\bX_{\cdot j}
+=\bX_{\cdot j}^T(I-P_{-j})\bX_{\cdot j}=d_j$. Either route is acceptable; the Frisch--Waugh
+one is shorter.
+\end{idea}
+
+\paragraph{(b) The $t$-statistic, and why collinearity kills power.}
+From (a), $\hat\beta_j\sim\N(\beta_j,\sigma^2/d_j)$. Standardising,
+$W_j:=(\hat\beta_j-\beta_j)\sqrt{d_j}/\sigma\sim\N(0,1)$, and inserting $\sigma/\sigma$ into
+$T_j=\hat\beta_j/(\hat\sigma/\sqrt{d_j})$:
+
+\begin{idea}{Decomposition of the $t$-statistic}
+\[
+  \boxed{\ T_j=\frac{\hat\beta_j}{\hat\sigma/\sqrt{d_j}}
+   =\frac{1}{\hat\sigma/\sigma}\left(\frac{\beta_j}{\sigma}\sqrt{d_j}+W_j\right),\qquad
+   W_j\sim\N(0,1)\ \text{independent of}\ \hat\sigma^2. }
+\]
+Under $H_0:\beta_j=0$ this is $W_j/\sqrt{\hat\sigma^2/\sigma^2}\sim t_{n-p}$.
+\end{idea}
+
+\begin{confusion}{collinearity does not bias anything --- it destroys power}
+Suppose the truth is $\E\bY=\beta_{j_0}\bX_{\cdot j_0}$ but you fit the full model, and
+$\bX_{\cdot j_0}$ is nearly in $\Cs(\bX_{-j_0})$. Then
+$(I-P_{-j_0})\bX_{\cdot j_0}\approx\zero$, so $d_{j_0}\approx0$ and the \emph{non-centrality}
+$\beta_{j_0}\sqrt{d_{j_0}}/\sigma$ is $\approx0$: the statistic behaves like a central
+$t_{n-p}$ and the test rejects at barely more than its level. In the true one-regressor
+model nothing is projected out, $d=\|\bX_{\cdot j_0}\|^2$ is large, and the same $\beta_{j_0}$
+is highly significant.
+
+$\hat\beta_{j_0}$ stays \textbf{unbiased} throughout. What collinearity inflates is
+$\Var(\hat\beta_{j_0})=\sigma^2/d_{j_0}$.
+\end{confusion}
+
+\paragraph{(c) Analysis of covariance --- the standard worked instance.}
+Model: $r$ treatments plus two continuous covariates,
+\[
+  Y_{ij}=\mu_i+\beta_1z_{ij}+\beta_2w_{ij}+\varepsilon_{ij},
+  \qquad j=1,\dots,n_i,\ i=1,\dots,r,\ \ n=\textstyle\sum_i n_i .
+\]
+Here $\bZ$ is the $n\times r$ matrix of treatment indicators and $\bW=[\,z:w\,]$.
+
+\begin{recipe}{The one observation that solves the whole problem}
+$P_\bZ$ replaces each observation by its \textbf{treatment mean}, so $I-P_\bZ$ \textbf{centres
+within treatment}: $[(I-P_\bZ)v]_{ij}=v_{ij}-\bar v_{i\cdot}$. Hence, by symmetry and
+idempotence,
+\[
+  u^T(I-P_\bZ)v=\sum_i\sum_j(u_{ij}-\bar u_{i\cdot})(v_{ij}-\bar v_{i\cdot}).
+\]
+Every ``$S$'' below is one of these inner products.
+\end{recipe}
+
+With $S_{zz}=\sum_i\sum_j(z_{ij}-\bar z_{i\cdot})^2$, and $S_{zw},S_{ww},S_{zy},S_{wy}$
+defined the same way, Frisch--Waugh reads
+\[
+  \bW^T(I-P_\bZ)\bW=\begin{pmatrix}S_{zz}&S_{zw}\\S_{zw}&S_{ww}\end{pmatrix}=:M,
+  \qquad
+  \bW^T(I-P_\bZ)\bY=\begin{pmatrix}S_{zy}\\S_{wy}\end{pmatrix},
+\]
+\begin{idea}{ANCOVA estimates (2025 exam, 12 marks)}
+\[
+  \boxed{\ \hat{\boldsymbol\beta}=M^{-1}\begin{pmatrix}S_{zy}\\S_{wy}\end{pmatrix},
+  \qquad \Var(\hat{\boldsymbol\beta})=\sigma^2M^{-1},
+  \qquad \text{d.f.}=n-r-2 . }
+\]
+\end{idea}
+
+The two natural tests then follow from \S6 (all of Wald, $F$ and LRT coincide):
+\[
+  H_0:\beta_2=0:\quad
+  [M^{-1}]_{22}=\frac{S_{zz}}{S_{zz}S_{ww}-S_{zw}^2}=\Big(S_{ww}-\tfrac{S_{zw}^2}{S_{zz}}\Big)^{-1}
+  \ \Longrightarrow\
+  U=\Big(S_{ww}-\frac{S_{zw}^2}{S_{zz}}\Big)\frac{\hat\beta_2^{\,2}}{\hat\sigma^2}\sim F_{1,\,n-r-2},
+\]
+\[
+  H_0:\beta_1=\beta_2=0:\quad
+  V=\frac{1}{\hat\sigma^2}\hat{\boldsymbol\beta}^TM\hat{\boldsymbol\beta},
+  \qquad \frac{V}{2}\sim F_{2,\,n-r-2},
+\]
+both rejecting for \emph{large} values.
+
+\begin{idea}{Reading the coefficient in $U$}
+$S_{ww}-S_{zw}^2/S_{zz}=w^T\big(I-P_{[\bZ:z]}\big)w$ is what is left of $w$ after removing
+\emph{both} the treatment means and $z$. So $U$ is
+$\hat\beta_2^{\,2}\times(\text{information about }\beta_2)/\hat\sigma^2$ --- the same
+collinearity story as (b): the more of $w$ survives adjustment for $z$, the more powerful the
+test.
+\end{idea}
+
 \section{$R^2$ and partial correlation}
 
 \subsection{$R^2$ as a ratio of projections}
@@ -467,10 +586,26 @@ Let $\bX=[\bX_1:\bX_2]$ with $\bX_1$ of $q$ columns and $r_1=\rho(\bX_1)$. Defin
 \]
 Then $U\sim \mathrm{Beta}\Big(\dfrac{n-r}{2},\ \dfrac{r-r_1}{2}\Big)$.
 \end{idea}
-(This is the Beta form of the $F$: if $A\sim\chi^2_a$, $B\sim\chi^2_b$ independent, then
-$A/(A+B)\sim\mathrm{Beta}(a/2,b/2)$, and $U=\mathrm{SSE}/(\mathrm{SSE}+(\mathrm{SSE}_{\text{red}}-\mathrm{SSE}))$.
-Note that $U$ and $R^2$-type quantities are monotone functions of $F$; the notes' statement
-uses the reciprocal orientation, so check which way round the question defines it.)
+\prf $S_1:=\mathrm{SSE}_{\text{full}}\sim\sigma^2\chi^2_{n-r}$ and
+$S_0-S_1=\bY^T(P_\bX-P_{\bX_1})\bY\sim\sigma^2\chi^2_{r-r_1}$, and they are independent
+because $(I-P_\bX)(P_\bX-P_{\bX_1})=O$. Both are \emph{central} precisely when
+$\E\bY\in\Cs(\bX_1)$, i.e.\ when the sub-model holds. Then
+\[
+  U=\frac{S_1}{S_0}=\frac{S_1}{S_1+(S_0-S_1)}=\frac{A}{A+B},
+  \qquad A\sim\chi^2_{n-r}\ \text{independent of}\ B\sim\chi^2_{r-r_1},
+\]
+and $A/(A+B)\sim\mathrm{Beta}(a/2,b/2)$ for independent $\chi^2_a,\chi^2_b$ (change variables
+to $(A/(A+B),\,A+B)$; the Jacobian factorises the joint Gamma density). \qed
+
+\begin{confusion}{which way up is the ratio?}
+$S_1\le S_0$ always --- the bigger model cannot fit worse --- so the Beta variate is
+$\mathrm{SSE}_{\text{full}}/\mathrm{SSE}_{\text{red}}\in[0,1]$, \emph{full over reduced}. Writing it the
+other way gives a quantity $\ge1$, which cannot be Beta. That inequality is the fastest
+check, and it also tells you the first parameter is half the \emph{numerator's} degrees of
+freedom. In the 2025 paper this appeared verbatim as
+$S_1/S_0\sim\mathrm{Beta}\big(\tfrac{n-p}{2},\tfrac{p-q}{2}\big)$ with $p=\rho(\bX)$,
+$q=\rho(\bZ)$.
+\end{confusion}
 
 \section{Practice, with answers}
 
