@@ -1,0 +1,323 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper,top=0.42in,bottom=0.36in,left=0.38in,right=0.38in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{microtype}
+
+\setlength{\columnsep}{11pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.2pt}
+\setlist{nosep,leftmargin=1.05em,topsep=1pt,itemsep=0.4pt}
+
+\newcommand{\spyq}[1]{{\tiny\color{Yellow}\textbf{[#1]}}}
+\newcommand{\sect}[1]{\vspace{2.5pt}\noindent\colorbox{Blue!78}{\parbox{0.955\columnwidth}{\color{white}\bfseries\footnotesize\let\pyq\spyq\strut #1}}\vspace{1.5pt}\par}
+\newcommand{\ssec}[1]{\textbf{\color{BrickRed}#1}\ }
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\Cs}{\mathcal{C}}
+\newcommand{\Nsp}{\mathcal{N}}
+\newcommand{\Rsp}{\mathcal{R}}
+\newcommand{\N}{N}
+\newcommand{\Yb}{\overline{Y}}
+\newcommand{\xb}{\bar{x}}
+\newcommand{\bY}{\mathbf{Y}}\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bZ}{\mathbf{Z}}\newcommand{\bW}{\mathbf{W}}
+\newcommand{\bb}{\boldsymbol{\beta}}\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bep}{\boldsymbol{\varepsilon}}\newcommand{\bal}{\boldsymbol{\alpha}}
+\newcommand{\one}{\mathbf{1}}\newcommand{\zero}{\mathbf{0}}
+\newcommand{\Pj}{\mathbf{P}}
+\newcommand{\hd}[1]{\textbf{\color{ForestGreen}#1}}
+\newcommand{\wh}[1]{\widehat{#1}}
+\newcommand{\key}[1]{\par\vspace{1.2pt}\noindent\centerline{\adjustbox{max width=0.96\columnwidth}{\colorbox{Yellow!35}{$\displaystyle #1$}}}\vspace{1.2pt}\par}
+\newcommand{\pyq}[1]{{\scriptsize\color{BrickRed}\textbf{[#1]}}}
+
+\pagestyle{empty}
+
+\begin{document}
+\scriptsize
+\raggedcolumns
+\begin{multicols}{2}
+
+\begin{center}
+{\footnotesize\bfseries LINEAR STATISTICAL MODELS --- MID-SEM SHEET}\\
+{\tiny \pyq{24} $=$ in 2024 paper \quad \pyq{25} $=$ in 2025 paper \quad \pyq{G} $=$ in the professor's guide}
+\end{center}
+\vspace{-3pt}
+
+%==========================================================
+\sect{1. PROJECTIONS \& IDEMPOTENT MATRICES \pyq{24 Q1, 25 Q4}}
+
+\ssec{TFAE (projection).} $\Pj$ proj.\ matrix $\iff \Pj^2=\Pj$ $\iff \Nsp(\Pj)=\Cs(I-\Pj)$ $\iff \rho(\Pj)+\rho(I-\Pj)=n$.
+
+\ssec{TFAE (orthogonal projector).} $\Pj$ orth.\ proj.\ $\iff \Pj=\Pj^T\Pj$ $\iff$ [$\Pj^T=\Pj$ \emph{and} $\Pj^2=\Pj$].
+
+\ssec{Consequences.} eigenvalues of idempotent $\in\{0,1\}$; hence
+\key{\tr(\Pj)=\rho(\Pj)}
+$\Cs(\Pj)=S$, $\Cs(I-\Pj)=S^{\perp}$, $\Pj$ nnd, $\bY^T\Pj\bY=\|\Pj\bY\|^2\ge0$.
+
+\ssec{Formula.} $\Pj_\bX=\bX(\bX^T\bX)^-\bX^T$, \emph{invariant} to the g-inverse. $\Pj_\bX\bX=\bX$, $(I-\Pj_\bX)\bX=0$, $\rho(\Pj_\bX)=\rho(\bX)$. If $\Cs(\bZ)\subseteq\Cs(\bX)$ then $\Pj_\bX\Pj_\bZ=\Pj_\bZ\Pj_\bX=\Pj_\bZ$.
+
+\ssec{Decomposition lemma.} $\bX=[\bZ:\bW]\Rightarrow$
+\key{\Pj_\bX=\Pj_\bZ+\Pj_{\bW\mid\bZ}}
+$\Pj_{\bW\mid\bZ}=$ orth.\ proj.\ onto $\Cs\big((I-\Pj_\bZ)\bW\big)$; explicitly $(I-\Pj_\bZ)\bW\big(\bW^T(I-\Pj_\bZ)\bW\big)^{-1}\bW^T(I-\Pj_\bZ)$.
+
+\ssec{\pyq{24 Q1} $\Pj,\mathbf{Q}$ symm.\ orth.\ proj.: $\Pj+\mathbf{Q}$ is an orth.\ proj.\ $\iff \Pj\mathbf{Q}=\mathbf{O}$; then $\rho(\Pj)+\rho(\mathbf{Q})=\rho(\Pj+\mathbf{Q})$.}
+($\Leftarrow$) $\Pj\mathbf{Q}=0\Rightarrow \mathbf{Q}\Pj=(\Pj\mathbf{Q})^T=0$; then $(\Pj{+}\mathbf{Q})^2=\Pj^2{+}\Pj\mathbf{Q}{+}\mathbf{Q}\Pj{+}\mathbf{Q}^2=\Pj{+}\mathbf{Q}$, and it is symmetric. \\
+($\Rightarrow$) idempotence gives $\Pj\mathbf{Q}+\mathbf{Q}\Pj=0$. Multiply on the \emph{left} by $\Pj$: $\Pj\mathbf{Q}+\Pj\mathbf{Q}\Pj=0$; on the \emph{right} by $\Pj$: $\Pj\mathbf{Q}\Pj+\mathbf{Q}\Pj=0$. Subtract $\Rightarrow \Pj\mathbf{Q}=\mathbf{Q}\Pj$; combined with the sum $=0$ gives $2\Pj\mathbf{Q}=0$.\\
+Rank: $\rho(\Pj{+}\mathbf{Q})=\tr(\Pj{+}\mathbf{Q})=\tr\Pj+\tr\mathbf{Q}=\rho(\Pj)+\rho(\mathbf{Q})$.
+
+\ssec{\pyq{25 Q4} $\mathbf{A},\mathbf{B}$ symm., $\mathbf{B}$ idempotent, $\mathbf{A}\succeq0$, $I-\mathbf{A}-\mathbf{B}\succeq0$ $\Rightarrow \mathbf{A}\mathbf{B}=\mathbf{B}\mathbf{A}=0$.}
+Let $y\in\Cs(\mathbf{B})$, so $\mathbf{B}y=y$ ($\mathbf{B}$ is the orth.\ projector onto $\Cs(\mathbf{B})$). Then
+$0\le y^T(I{-}\mathbf{A}{-}\mathbf{B})y=y^Ty-y^T\mathbf{A}y-y^Ty=-y^T\mathbf{A}y$, so $y^T\mathbf{A}y\le0$; with $\mathbf{A}\succeq0$, $y^T\mathbf{A}y=0$. Write $\mathbf{A}=L^TL$: $\|Ly\|^2=0\Rightarrow Ly=0\Rightarrow \mathbf{A}y=0$. True for every column of $\mathbf{B}$, so $\mathbf{A}\mathbf{B}=0$; transpose gives $\mathbf{B}\mathbf{A}=0$.
+
+%==========================================================
+\sect{2. GENERALISED INVERSES \pyq{24 Q3}}
+
+$G$ is a g-inverse of $A$ iff \key{AGA=A}. If $y\in\Cs(A)$ then $x=Gy$ solves $Ax=y$; \hd{full solution set} $=A^-y+(I-A^-A)z$, $z$ arbitrary.
+
+\ssec{Symmetric $A=P\Lambda P^T$.} $A^-=P\Delta P^T$ with $\delta_i=1/\lambda_i$ if $\lambda_i\ne0$, \emph{arbitrary} if $\lambda_i=0$. Moore--Penrose $A^+$: take $\delta_i=0$ there; gives the min-norm solution.
+
+\ssec{Facts.} $A^T(AA^T)^-$ and $(A^TA)^-A^T$ are g-inverses of $A$. $AG$ idempotent with $\rho(AG)=\rho(A)$ $\iff$ $G=A^-$. \hd{Invariance:} if $\Rsp(A)\subseteq\Rsp(B)$ and $\Cs(C)\subseteq\Cs(B)$ then $AB^-C$ does not depend on $B^-$. Reflexive: $A^-AA^-=A^-$.
+
+\ssec{\pyq{24 Q3} Block g-inverse.} $A=\begin{bsmallmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{bsmallmatrix}$, $A_{11}$ is $r\times r$, $\rho(A)=\rho(A_{11})=r$. Then $G=\begin{bsmallmatrix}A_{11}^{-1}&0\\0&0\end{bsmallmatrix}$ is a g-inverse.\\
+\emph{Proof:} $AG=\begin{bsmallmatrix}I_r&0\\A_{21}A_{11}^{-1}&0\end{bsmallmatrix}$, so $AGA=\begin{bsmallmatrix}A_{11}&A_{12}\\A_{21}&A_{21}A_{11}^{-1}A_{12}\end{bsmallmatrix}$. Since $\rho(A)=\rho(A_{11})=r$, the last $m-r$ rows of $A$ are combinations of the first $r$: $[A_{21}\,A_{22}]=M[A_{11}\,A_{12}]$. Then $A_{21}=MA_{11}\Rightarrow M=A_{21}A_{11}^{-1}$, hence $A_{22}=MA_{12}=A_{21}A_{11}^{-1}A_{12}$. So $AGA=A$.
+
+%==========================================================
+\sect{3. ESTIMABILITY \& GAUSS--MARKOV \pyq{24 Q2, 25 Q2 --- BOTH YEARS}}
+
+Model $\bY=\bX\bb+\bep$, $\E\bep=\zero$, $\Var\bep=\sigma^2I$. \hd{Normal eq.} $\bX^T\bX\bb=\bX^T\bY$ --- \emph{always} solvable ($\bX^T\bY\in\Cs(\bX^T)=\Cs(\bX^T\bX)$); unique iff $\rho(\bX)=p$.
+
+\ssec{Identifiable} $\iff \bX^T\bX$ non-singular $\iff\rho(\bX)=p$.
+
+\ssec{Estimable} $=$ an unbiased estimator exists.
+\key{a^T\bb\ \text{estimable}\iff a\in\Cs(\bX^T)=\Cs(\bX^T\bX)}
+\emph{Why:} $\E(\ell^T\bY)=a^T\bb\ \forall\bb\iff \ell^T\bX=a^T\iff a=\bX^T\ell$.
+
+\ssec{FAST TEST (use this).} Find a basis $\{z\}$ of $\Nsp(\bX)$ once. Then
+\key{a^T\bb\text{ estimable}\iff a^Tz=0\ \ \forall z\in\Nsp(\bX)}
+because $\Cs(\bX^T)=\Nsp(\bX)^{\perp}$.
+
+\ssec{Uniqueness.} If $a^T\bb$ estimable, $a^T\wh\bb$ is the \emph{same} for every solution $\wh\bb$ ($a=\bX^T\bX c\Rightarrow a^T\wh\bb=c^T\bX^T\bY$).
+
+\ssec{LZF.} $c^T\bY$ is a linear zero function iff $\E(c^T\bY)=0\ \forall\bb$ iff $\bX^Tc=0$ (i.e.\ $c\perp\Cs(\bX)$).
+
+\ssec{BLUE criterion.} LUE $\ell^T\bY$ is BLUE $\iff \Cov(\ell^T\bY,c^T\bY)=0$ for every LZF $c^T\bY$.
+
+\ssec{GAUSS--MARKOV THM.} If $a^T\bb$ is estimable then $a^T\wh\bb$ is its \emph{unique} BLUE, $\wh\bb$ any solution of the normal equations. $\Var(a^T\wh\bb)=\sigma^2a^T(\bX^T\bX)^-a$.\\
+\emph{Proof:} $a=\bX^T\bX u\Rightarrow a^T\wh\bb=u^T\bX^T\bY$; for LZF $h^T\bY$ ($\bX^Th=0$), $\Cov=\sigma^2u^T\bX^Th=0$. \checkmark
+
+\ssec{$\wh\bmu$ and $\bX^T\bmu$.} $\wh\bmu=\Pj_\bX\bY$. $\theta=\bX^T\bmu=\bX^T\bX\bb$ is \emph{always} estimable, BLUE $=\bX^T\bY$ (since $\bX^T\Pj_\bX=\bX^T$). \pyq{25 Q2b}
+
+\ssec{Estimate of $\sigma^2$.} $\wh\sigma^2=\mathrm{MSE}=\dfrac{\bY^T(I-\Pj_\bX)\bY}{n-\rho(\bX)}$, unbiased. \hd{Use $n-\rho(\bX)$, the RANK.}
+
+\ssec{GLS.} If $\Var(\bep)=\Sigma\succ0$: BLUE from $\bX^T\Sigma^{-1}\bX\bb=\bX^T\Sigma^{-1}\bY$; $\Var(a^T\wh\bb^{GLS})=a^T(\bX^T\Sigma^{-1}\bX)^{-1}a\ \le\ \Var(a^T\wh\bb^{LS})=a^T(\bX^T\bX)^{-1}\bX^T\Sigma\bX(\bX^T\bX)^{-1}a$.
+
+%==========================================================
+\sect{4. TWO WORKED DESIGNS (memorise the method)}
+
+\ssec{\pyq{25 Q2} $Y_{ijk}=\alpha_i+\beta_j+\varepsilon_{ijk}$, $i,j\in\{1,2\}$, $k\le m$.}
+$\bb=(\alpha_1,\alpha_2,\beta_1,\beta_2)^T$; 4 distinct rows $(1,0,1,0),(1,0,0,1),(0,1,1,0),(0,1,0,1)$. \hd{$\rho(\bX)=3$} (col$_1{+}$col$_2=$col$_3{+}$col$_4$). $\Nsp(\bX)=\mathrm{span}\{z\}$, \key{z=(1,1,-1,-1)^T}
+Test: $a_1+a_2-a_3-a_4=0$. Fitted cell means $\wh\mu_{ij}=\Yb_{i\cdot\cdot}+\Yb_{\cdot j\cdot}-\Yb_{\cdots}$.
+\nopagebreak\vspace{1pt}
+{\tiny\noindent\begin{tabular}{@{}llll@{}}
+\toprule
+$a^T\bb$ & $a^Tz$ & Est.? & BLUE (Var)\\
+\midrule
+$\alpha_1$ & $1$ & \textbf{No} & ---\\
+$\alpha_1{-}\alpha_2$ & $0$ & Yes & $\Yb_{1\cdot\cdot}-\Yb_{2\cdot\cdot}$ \ $(\sigma^2/m)$\\
+$\alpha_1{+}\alpha_2{+}\beta_1{+}\beta_2$ & $0$ & Yes & $2\Yb_{\cdots}$ \ $(\sigma^2/m)$\\
+$\alpha_1{-}\alpha_2{+}\beta_1{-}\beta_2$ & $0$ & Yes & $(\Yb_{1\cdot\cdot}{-}\Yb_{2\cdot\cdot}){+}(\Yb_{\cdot1\cdot}{-}\Yb_{\cdot2\cdot})$ $(2\sigma^2/m)$\\
+\bottomrule
+\end{tabular}}\vspace{1.5pt}
+
+(3rd row $=\mu_{11}+\mu_{22}$; 4th $=\mu_{11}-\mu_{22}$.)
+
+\ssec{\pyq{24 Q2} $Y_{1j}=\beta_1$, $Y_{2j}=\beta_1{+}\beta_2$, $Y_{3j}=\beta_2{+}\beta_3$, $Y_{4j}=\beta_3{+}\beta_4$.}
+Distinct rows $\begin{bsmallmatrix}1&0&0&0\\1&1&0&0\\0&1&1&0\\0&0&1&1\end{bsmallmatrix}$, $\det=1$ $\Rightarrow$ \hd{full rank 4: EVERYTHING estimable} (a trap --- always check the rank first).
+$\wh\beta_1=\Yb_{1\cdot}$, $\wh\beta_2=\Yb_{2\cdot}{-}\Yb_{1\cdot}$, $\wh\beta_3=\Yb_{3\cdot}{-}\Yb_{2\cdot}{+}\Yb_{1\cdot}$, $\wh\beta_4=\Yb_{4\cdot}{-}\Yb_{3\cdot}{+}\Yb_{2\cdot}{-}\Yb_{1\cdot}$; $\Var=\tfrac{\sigma^2}{m},\tfrac{2\sigma^2}{m},\tfrac{3\sigma^2}{m},\tfrac{4\sigma^2}{m}$.
+$H_0:\beta_1{=}\beta_2$: $\wh\beta_1{-}\wh\beta_2=2\Yb_{1\cdot}{-}\Yb_{2\cdot}$, $\Var=5\sigma^2/m$,
+$T=\dfrac{2\Yb_{1\cdot}-\Yb_{2\cdot}}{\wh\sigma\sqrt{5/m}}\sim t_{4m-4}$, $F=T^2\sim F_{1,4m-4}$.
+
+%==========================================================
+\sect{5. NORMAL THEORY \& QUADRATIC FORMS}
+
+$\bY\sim N_n(\bmu,\Sigma)$, $A$ symmetric:
+\begin{itemize}
+\item $\E(\bY^TA\bY)=\tr(A\Sigma)+\bmu^TA\bmu$
+\item $\Cov(\bY,\bY^TA\bY)=2\Sigma A\bmu$
+\item $\Var(\bY^TA\bY)=2\tr((A\Sigma)^2)+4\bmu^TA\Sigma A\bmu$
+\item $\bY^TA\bY\perp\!\!\!\perp B\bY \iff B\Sigma A=0$
+\item $A\bY\perp\!\!\!\perp B\bY\iff A\Sigma B^T=0$
+\end{itemize}
+
+\ssec{KEY THEOREM.} $\bY\sim N_n(\bmu,I)$, $A$ symm.:
+\key{\bY^TA\bY\sim\chi^2_{\rho(A)}\big(\tfrac12\bmu^TA\bmu\big)\iff A^2=A}
+Central ($\lambda=0$) iff $A\bmu=0$. MGF of $\chi^2_n$: $(1-2t)^{-n/2}$, $t<\tfrac12$. Proof: $|\det(I{-}2tA)|^{-1/2}=\prod(1{-}2t\lambda_j)^{-1/2}=(1{-}2t)^{-r/2}\ \forall t\iff\lambda_j=1$.
+
+\ssec{Cor.} $\bY\sim N(\bX\bb,\sigma^2I)$, $A=I-\Pj_\bX$: $\mathrm{SSE}/\sigma^2\sim\chi^2_{n-\rho(\bX)}$, and $\mathrm{SSE}\perp\!\!\!\perp\wh\bb$ (since $(I-\Pj_\bX)\bX=0$).
+
+\ssec{FISHER--COCHRAN.} $\bY\sim N_n(\bmu,I)$, $A_j$ symm.\ nnd, $\bY^T\bY=\sum_j\bY^TA_j\bY$. Then each $\bY^TA_j\bY\sim\chi^2_{\rho(A_j)}(\lambda_j/2)$ \emph{and} they are mutually independent
+\key{\iff \textstyle\sum_j\rho(A_j)=n}
+in which case $\lambda_j=\bmu^TA_j\bmu$, $\sum\lambda_j=\bmu^T\bmu$, each $A_j$ idempotent, $A_jA_k=0$. \hd{This is what licenses the ANOVA table: the d.f.\ column adding up IS the hypothesis.}
+
+\columnbreak
+%==========================================================
+\sect{6. TESTING: WALD $=$ $F$ $=$ LRT \pyq{25 Q1,Q3}}
+
+$\bY=\bX\bb+\bep$, $\bep\sim N_n(\zero,\sigma^2I)$, $\rho(\bX)=p$. $H_0:L^T\bb=\theta_0$, $\rho(L)=r$.
+
+\ssec{Constrained LSE.}
+\key{\tilde\bb=\wh\bb-(\bX^T\bX)^{-1}L\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(\wh\theta-\theta_0)}
+$\wh\theta=L^T\wh\bb\sim N_r\big(L^T\bb,\ \sigma^2L^T(\bX^T\bX)^{-1}L\big)$.
+
+\ssec{Reduction in SSE (the bridge).}
+\key{\mathrm{SSE}_{red}-\mathrm{SSE}_{full}=(\wh\theta-\theta_0)^T\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(\wh\theta-\theta_0)}
+
+\ssec{Wald $T^2$.} $W=\dfrac{1}{\wh\sigma^2}(\wh\theta{-}\theta_0)^T\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(\wh\theta{-}\theta_0)$,
+\key{\tfrac{W}{r}\sim F_{r,\,n-p}(\lambda/2)}
+$\lambda=\sigma^{-2}(L^T\bb-\theta_0)^T\big(L^T(\bX^T\bX)^{-1}L\big)^{-1}(L^T\bb-\theta_0)$.
+Under $H_0$: $\lambda=0$. Power $\uparrow1$ as $\lambda\uparrow\infty$. \hd{$W\sim rF_{r,n-p}$ --- don't lose the $r$.}
+
+\ssec{$F$-test.}
+\key{F=\frac{(\mathrm{SSE}_{red}-\mathrm{SSE}_{full})/(\mathrm{df}_{red}-\mathrm{df}_{full})}{\mathrm{MSE}_{full}}=\frac{W}{r}}
+$\mathrm{df}_{full}=n-p$, $\mathrm{df}_{red}=n-(p-r)$. Reject if $F>F^{1-\alpha}_{r,n-p}$.
+
+\ssec{LRT.} $\Lambda=\Big(\dfrac{\mathrm{SSE}_{full}}{\mathrm{SSE}_{red}}\Big)^{n/2}$; reject for small $\Lambda$ $\iff$ large $\dfrac{\mathrm{SSE}_{red}-\mathrm{SSE}_{full}}{\mathrm{SSE}_{full}}$ $\iff$ large $F$. \hd{All three tests are the same rejection region.} $-2\log\Lambda\xrightarrow{d}\chi^2_r$.
+
+\ssec{Sub-model form.} $\bX=[\bZ:\bW]$, $H_0:\boldsymbol\delta=0$:
+$F=\dfrac{\bY^T\Pj_{\bW\mid\bZ}\bY/s}{\bY^T(I-\Pj_\bX)\bY/(n-p)}$, with $\bY^T\bY=\bY^T\Pj_\bZ\bY+\bY^T\Pj_{\bW\mid\bZ}\bY+\bY^T(I-\Pj_\bX)\bY$, ranks $q+s+(n-p)=n$.
+
+\ssec{FUNDAMENTAL THEOREMS OF LS.}
+\textbf{1st:} $\mathrm{SSE}=\min_{\bb}\|\bY-\bX\bb\|^2\sim\sigma^2\chi^2_{n-\rho(\bX)}$.\\
+\textbf{2nd:} $\Cs(L)\subseteq\Cs(\bX^T)$; then $\mathrm{SSE}$ and $\mathrm{SSE}_{red}-\mathrm{SSE}$ are \emph{independent}, and $\mathrm{SSE}_{red}-\mathrm{SSE}\sim\sigma^2\chi^2_m(\delta)$ with $\delta=0$ iff $L^T\bb=\theta_0$.\\
+\textbf{3rd} \pyq{25 Q1}\textbf{:} $\bX=[\bZ:\bW]$, $\rho(\bX)=p$, $\rho(\bZ)=q<p$,
+$S_1=\min_{\bb\in\mathbb{R}^p}\|\bY-\bX\bb\|^2$, $S_0=\min_{\gamma\in\mathbb{R}^q}\|\bY-\bZ\gamma\|^2$. If $\E\bY\in\Cs(\bZ)$:
+\key{\frac{S_1}{S_0}\sim\mathrm{Beta}\Big(\frac{n-p}{2},\ \frac{p-q}{2}\Big)}
+\emph{Proof:} $S_1\sim\sigma^2\chi^2_{n-p}$, $S_0-S_1\sim\sigma^2\chi^2_{p-q}$ (central, as $H_0$ true), independent by the 2nd thm; and $\frac{A}{A+B}\sim\mathrm{Beta}(\frac a2,\frac b2)$ for $A\sim\chi^2_a\perp B\sim\chi^2_b$. Here $\frac{S_1}{S_0}=\frac{S_1}{S_1+(S_0-S_1)}$.
+
+%==========================================================
+\sect{7. PARTIALLING OUT / COLLINEARITY \pyq{24 Q4, 25 Q3}}
+
+\ssec{Frisch--Waugh.} $\wh{\boldsymbol\delta}=\big(\bW^T(I-\Pj_\bZ)\bW\big)^{-1}\bW^T(I-\Pj_\bZ)\bY$ --- i.e.\ regress $(I-\Pj_\bZ)\bY$ on $(I-\Pj_\bZ)\bW$. ``Effect of $\bW$ \emph{adjusted for} $\bZ$.''
+
+\ssec{\pyq{24 Q4a} Single coefficient.} $\bX_{-j}=$ $\bX$ with column $j$ removed, $d_j:=\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}$:
+\key{\Var(\wh\beta_j)=\frac{\sigma^2}{\bX_{\cdot j}^T(I-\Pj_{-j})\bX_{\cdot j}}=\frac{\sigma^2}{d_j}}
+
+\ssec{\pyq{24 Q4b} $t$-statistic decomposition.} $\wh\beta_j\sqrt{d_j}/\sigma\sim N(\beta_j\sqrt{d_j}/\sigma,1)$, so
+\key{T_j=\frac{\wh\beta_j}{\wh\sigma/\sqrt{d_j}}=\frac{1}{\wh\sigma/\sigma}\Big(\frac{\beta_j}{\sigma}\sqrt{d_j}+W_j\Big)}
+with $W_j\sim N(0,1)$ independent of $\wh\sigma^2$.
+
+\ssec{\pyq{24 Q4c} Collinearity moral.} If $\bX_{\cdot j_0}$ is nearly in $\Cs(\bX_{-j_0})$ then $(I-\Pj_{-j_0})\bX_{\cdot j_0}\approx0$, so $d_{j_0}\approx0$, the non-centrality $\beta_{j_0}\sqrt{d_{j_0}}/\sigma\approx0$, and $T_{j_0}\approx W_{j_0}/(\wh\sigma/\sigma)$ --- \emph{no power}. In the true one-regressor model $d=\|\bX_{\cdot j_0}\|^2$ is large, so the same $\beta_{j_0}$ is highly significant. \hd{Collinearity inflates $\Var(\wh\beta_j)$ and destroys the $t$-test, without biasing anything.}
+
+\ssec{\pyq{25 Q3} ANCOVA $Y_{ij}=\mu_i+\beta_1z_{ij}+\beta_2w_{ij}+\varepsilon_{ij}$.}
+$(I-\Pj_\bZ)$ $=$ centring \emph{within each treatment}; write $S_{zz}=\sum_i\sum_j(z_{ij}-\bar z_{i\cdot})^2$ etc. Then
+\key{\wh\bb=\begin{bmatrix}S_{zz}&S_{zw}\\S_{zw}&S_{ww}\end{bmatrix}^{-1}\begin{bmatrix}S_{zy}\\S_{wy}\end{bmatrix}=:M^{-1}s}
+$\Var(\wh\bb)=\sigma^2M^{-1}$, error d.f.\ $=n-r-2$.\\
+$H_0:\beta_2=0$: $(M^{-1})_{22}=\big(S_{ww}-S_{zw}^2/S_{zz}\big)^{-1}$, so reject for large
+\key{U=\Big(S_{ww}-\frac{S_{zw}^2}{S_{zz}}\Big)\frac{\wh\beta_2^{\,2}}{\wh\sigma^2}\ \sim F_{1,\,n-r-2}}
+$H_0:\beta_1=\beta_2=0$: reject for large $V=\dfrac{1}{\wh\sigma^2}\wh\bb^TM\wh\bb$, $V/2\sim F_{2,\,n-r-2}$.
+
+%==========================================================
+\sect{8. SIMPLE LINEAR REGRESSION}
+
+$S_x^2:=\sum(x_i-\xb)^2$ (\hd{no division}). $\wh\beta_1=S_{xY}/S_x^2$, $\wh\beta_0=\Yb-\wh\beta_1\xb$; $\wh\beta_1=\sum c_iY_i$, $c_i=(x_i-\xb)/S_x^2$.
+\[
+\Var\wh\beta_1=\tfrac{\sigma^2}{S_x^2},\ \Var\wh\beta_0=\sigma^2\big(\tfrac1n{+}\tfrac{\xb^2}{S_x^2}\big),\ \Cov=-\tfrac{\sigma^2\xb}{S_x^2}
+\]
+Normal eqns $\equiv\sum e_i=0$, $\sum e_ix_i=0$; $\wh\sigma^2=\mathrm{SSE}/(n-2)$; $\wh\sigma^2_{ML}=\frac{n-2}{n}\wh\sigma^2$ (biased). $\mathrm{SST}=\mathrm{SSR}+\mathrm{SSE}$; $R^2=\mathrm{SSR}/\mathrm{SST}=\mathrm{corr}(x,Y)^2$.
+$\wh Y_h=\Yb+\wh\beta_1(x_h-\xb)$ with $\Yb\perp\wh\beta_1$, so
+\[\Var(\wh Y_h)=\sigma^2\Big(\tfrac1n+\tfrac{(x_h-\xb)^2}{S_x^2}\Big).\]
+\hd{CI for mean} $\wh Y_h\pm t^{1-\alpha/2}_{n-2}\wh\sigma\sqrt{\tfrac1n{+}\tfrac{(x_h-\xb)^2}{S_x^2}}$;
+\hd{PI for new $Y$} same with \key{1+\tfrac1n+\tfrac{(x_h-\xb)^2}{S_x^2}} inside.
+Ellipse CS: $(\bb{-}\wh\bb)^T(\bX^T\bX)(\bb{-}\wh\bb)\le2\wh\sigma^2F^{1-\alpha}_{2,n-2}$. Bonferroni rectangle uses $t^{1-\alpha/4}_{n-2}$.
+Leave-one-out: $\wh\beta_1=\wh\beta_1^{(-n)}+\frac{x_n-\xb}{S_x^2}e_n^{(-n)}$. $R^2$ never decreases when a predictor is added ($\bY^T\Pj_{\bW\mid\bZ}\bY\ge0$).
+
+%==========================================================
+\sect{9. ONE-WAY ANOVA \pyq{G --- THE NUMERICAL QUESTION}}
+
+$Y_{ij}=\mu+\alpha_i+\varepsilon_{ij}$, $i\le r$, $j\le n_i$, $n=\sum n_i$; $\rho(\bX)=r$ (not $r{+}1$).
+\hd{Identifiability constraint} $\sum_iw_i\alpha_i=0$, $\sum w_i=1$; natural choice $w_i=n_i/n$ i.e.
+\key{\textstyle\sum_i n_i\alpha_i=0}
+(The constraint is a labelling convention: SSE, $F$, fitted values do NOT depend on it.)
+\hd{Estimable:} $\mu_i$; $\alpha_i-\alpha_{i'}$; any contrast $\sum c_i\alpha_i$ with $\sum c_i=0$. \hd{Not:} $\mu$ or $\alpha_i$ alone.
+\[\wh\mu_i=\Yb_{i\cdot},\quad \wh\mu=\Yb_{\cdot\cdot},\quad \wh\alpha_i=\Yb_{i\cdot}-\Yb_{\cdot\cdot}\]
+
+\ssec{COMPUTATIONAL RECIPE.} $T_i=\sum_jY_{ij}$, $G=\sum_iT_i$, $\mathrm{CF}=G^2/n$:
+\key{\mathrm{SSTO}=\textstyle\sum\sum Y_{ij}^2-\mathrm{CF}}
+\key{\mathrm{SSTR}=\textstyle\sum_i T_i^2/n_i-\mathrm{CF}}
+\key{\mathrm{SSE}=\mathrm{SSTO}-\mathrm{SSTR}}
+
+\nopagebreak\vspace{1pt}
+{\tiny\noindent\begin{tabular}{@{}lcccl@{}}
+\toprule
+Source & d.f. & SS & MS & $\E(\mathrm{MS})$\\
+\midrule
+Treatments & $r-1$ & SSTR & MSTR & $\sigma^2+\frac{\sum n_i(\mu_i-\mu)^2}{r-1}$\\
+Error & $n-r$ & SSE & MSE & $\sigma^2$\\
+Total & $n-1$ & SSTO & &\\
+\bottomrule
+\end{tabular}}\vspace{1.5pt}
+
+$H_0:\alpha_1{=}\cdots{=}\alpha_r{=}0$: \key{F=\mathrm{MSTR}/\mathrm{MSE}\sim F_{r-1,\,n-r}} reject if $F>F^{1-\alpha}_{r-1,n-r}$. (Under $H_1$: non-central with $\lambda=\sum n_i\alpha_i^2/\sigma^2$.) $\mathrm{MSE}=\sum_i(n_i{-}1)s_i^2/(n{-}r)$ (pooled).
+
+\ssec{INTERVALS ($t^\ast=t^{1-\alpha/2}_{n-r}$, all use MSE).}
+\[\mu_i:\ \Yb_{i\cdot}\pm t^\ast\sqrt{\tfrac{\mathrm{MSE}}{n_i}}\qquad
+\mu_i{-}\mu_{i'}:\ \Yb_{i\cdot}{-}\Yb_{i'\cdot}\pm t^\ast\sqrt{\mathrm{MSE}\big(\tfrac1{n_i}{+}\tfrac1{n_{i'}}\big)}\]
+\hd{Contrast} $\theta=\sum c_i\mu_i$, $\sum c_i=0$: BLUE $\wh\theta=\sum c_i\Yb_{i\cdot}$, $\Var=\sigma^2\sum\frac{c_i^2}{n_i}$,
+\key{\textstyle\sum_ic_i\Yb_{i\cdot}\pm t^{\ast}\sqrt{\mathrm{MSE}}\sqrt{\sum_i c_i^2/n_i}}
+
+\ssec{CALCULATOR CHECKS.} $\sum T_i=G$; $\mathrm{SSTR}+\mathrm{SSE}=\mathrm{SSTO}$; $(r{-}1)+(n{-}r)=n{-}1$; $\sum n_i\wh\alpha_i=0$; all SS $\ge0$; keep MSE to 4 d.p. \hd{$r=2\Rightarrow F=T^2$ (two-sample $t$, pooled over all groups).}
+
+%==========================================================
+\sect{10. QUANTILES (insurance)}
+\nopagebreak\vspace{1pt}
+{\tiny\noindent\begin{tabular}{@{}r|ccc|ccccc@{}}
+\toprule
+ & \multicolumn{3}{c|}{$t_\nu$} & \multicolumn{5}{c}{$F^{0.95}_{d_1,\nu}$}\\
+$\nu$ & $.95$ & $.975$ & $.995$ & $d_1{=}1$ & $2$ & $3$ & $4$ & $5$\\
+\midrule
+4 & 2.132&2.776&4.604& 7.71&6.94&6.59&6.39&6.26\\
+5 & 2.015&2.571&4.032& 6.61&5.79&5.41&5.19&5.05\\
+6 & 1.943&2.447&3.707& 5.99&5.14&4.76&4.53&4.39\\
+8 & 1.860&2.306&3.355& 5.32&4.46&4.07&3.84&3.69\\
+9 & 1.833&2.262&3.250& 5.12&4.26&3.86&3.63&3.48\\
+10& 1.812&2.228&3.169& 4.96&4.10&3.71&3.48&3.33\\
+12& 1.782&2.179&3.055& 4.75&3.89&3.49&3.26&3.11\\
+15& 1.753&2.131&2.947& 4.54&3.68&3.29&3.06&2.90\\
+16& 1.746&2.120&2.921& 4.49&3.63&3.24&3.01&2.85\\
+18& 1.734&2.101&2.878& 4.41&3.55&3.16&2.93&2.77\\
+20& 1.725&2.086&2.845& 4.35&3.49&3.10&2.87&2.71\\
+21& 1.721&2.080&2.831& 4.32&3.47&3.07&2.84&2.68\\
+24& 1.711&2.064&2.797& 4.26&3.40&3.01&2.78&2.62\\
+27& 1.703&2.052&2.771& 4.21&3.35&2.96&2.73&2.57\\
+30& 1.697&2.042&2.750& 4.17&3.32&2.92&2.69&2.53\\
+40& 1.684&2.021&2.704& 4.08&3.23&2.84&2.61&2.45\\
+60& 1.671&2.000&2.660& 4.00&3.15&2.76&2.53&2.37\\
+\bottomrule
+\end{tabular}}\vspace{1.5pt}
+
+$z_{.95}=1.645$, $z_{.975}=1.960$, $z_{.995}=2.576$. \ $t^2_\nu=F_{1,\nu}$.
+
+%==========================================================
+\sect{11. DECISION TREE}
+\begin{itemize}
+\item ``Is $a^T\bb$ estimable?'' $\to$ find $\Nsp(\bX)$, check $a^Tz=0$. \hd{First compute $\rho(\bX)$ --- it may be full rank.}
+\item ``Find the BLUE'' $\to$ Gauss--Markov: $a^T\wh\bb$; get $\wh\bb$ from cell means. Variance $=\sigma^2a^T(\bX^T\bX)^-a$.
+\item ``Propose a test for $H_0$'' $\to$ write it as $L^T\bb=\theta_0$, quote $W/r\sim F_{r,n-p}$ \emph{or} $\frac{(\mathrm{SSE}_{red}-\mathrm{SSE}_{full})/r}{\mathrm{MSE}}$. One constraint $\Rightarrow$ use $t$.
+\item ``Show $\ldots\sim\chi^2$'' $\to$ show the matrix is symmetric idempotent, quote $\rho=\tr$.
+\item ``Show independence'' $\to$ $A\Sigma B^T=0$ (linear/linear) or $B\Sigma A=0$ (linear/quadratic), or Fisher--Cochran d.f.\ sum.
+\item ``Show $G$ is a g-inverse'' $\to$ compute $AGA$ and use $\rho(A)=\rho(A_{11})$ to write the dependent rows.
+\item Numerical $\to$ totals table, CF, SS by shortcut, ANOVA table, then contrasts.
+\end{itemize}
+
+\end{multicols}
+\end{document}
