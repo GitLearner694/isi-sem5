@@ -1,0 +1,559 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small Exponential Families --- Crash Course}
+\rhead{\small Parametric Inference, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\pto}{\overset{p}{\longrightarrow}}
+\newcommand{\I}{\mathbb{I}}
+
+\newtcolorbox{idea}[1]{colback=Blue!4,colframe=Blue!55,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{confusion}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={Common confusion: #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{recipe}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+
+\newcommand{\prf}{\smallskip\noindent\textbf{Proof.}\ }
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Exponential Families}\\[3pt]
+{\large A Crash Course from First Principles}\\[5pt]
+{\small Parametric Inference, B.Stat.\ 3rd Year --- Lectures 4--5, and everywhere else}
+\end{center}
+
+\vspace{4pt}\hrule\vspace{10pt}
+
+\noindent
+Fourth of the crash courses. This one is different in kind: Bayes, testing and minimax are
+\emph{topics}, but exponential families are the \emph{structure underneath all of them}. Read
+this and a lot of the course stops looking like a list of separate results.
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Why this class of distributions exists}
+
+Notice something about the whole course. The same handful of families keeps appearing ---
+Binomial, Poisson, Exponential, Normal, Gamma --- and for all of them \emph{everything works}:
+\begin{itemize}
+\item a low-dimensional sufficient statistic exists,
+\item it turns out to be complete, so Lehmann--Scheff\'e applies,
+\item the Cram\'er--Rao bound is attained,
+\item the family has MLR, so UMP tests exist,
+\item there is a tidy conjugate prior with two hyperparameters.
+\end{itemize}
+Meanwhile two families keep breaking things: the \textbf{Cauchy} (sufficient statistic is the
+whole order statistic, not complete, no closed-form MLE, no MLR, no useful conjugate prior)
+and $\boldsymbol{U[0,\theta]}$ (Cram\'er--Rao meaningless, non-standard rates).
+
+\begin{idea}{The single fact that explains all of this}
+The well-behaved families are all \textbf{exponential families} --- the same object wearing
+different clothes. The badly behaved ones are not.
+
+So exponential families are not one more topic. They are the \emph{hypothesis} of most of the
+theorems in the course, and the two villains are villains precisely because they fail it.
+Everything in Section 5 below is a consequence of one definition.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The definition, and how to recognise one}
+
+\begin{idea}{Definition (one parameter)}
+$\{f(\cdot\mid\theta):\theta\in\Theta\}$ is a \textbf{one-parameter exponential family} if
+\begin{enumerate}[label=(\roman*)]
+\item the \textbf{support} $\{x:f(x\mid\theta)>0\}$ does \textbf{not depend on $\theta$}, and
+\item $f(x\mid\theta)=p(\theta)\,h(x)\,\exp\{c(\theta)\,T(x)\}$
+\end{enumerate}
+for some functions $p>0$, $h>0$, $c$, $T$.
+\end{idea}
+
+Both conditions matter, and condition (i) is the one people skip.
+
+\begin{recipe}{The recognition drill}
+\textbf{Take logs.} You have an exponential family iff
+\[
+\log f(x\mid\theta)=\underbrace{\log p(\theta)}_{\text{pure }\theta}
++\underbrace{\log h(x)}_{\text{pure }x}
++\underbrace{c(\theta)\,T(x)}_{\text{a product: one }\theta\text{-factor}\times\text{one }x\text{-factor}} ,
+\]
+with a support that does not move. So: expand $\log f$, sort the terms into three piles, and
+check that every term mixing $\theta$ and $x$ separates into a product.
+
+\smallskip
+\textbf{Quick test for failure.} If it is an exponential family then
+$\dfrac{\partial^{2}}{\partial\theta\,\partial x}\log f=c'(\theta)T'(x)$, which must factor
+into (function of $\theta$) $\times$ (function of $x$). If the mixed partial does not
+factor, it is not an exponential family.
+\end{recipe}
+
+\subsection{Worked identifications}
+
+\textbf{Binomial}, $X\sim\mathrm{Bin}(m,\theta)$:
+\[
+\binom mx\theta^{x}(1-\theta)^{m-x}
+=\underbrace{(1-\theta)^{m}}_{p(\theta)}\underbrace{\binom mx}_{h(x)}
+\exp\Big\{\underbrace{\log\tfrac{\theta}{1-\theta}}_{c(\theta)}\underbrace{x}_{T(x)}\Big\}.
+\]
+Support $\{0,\dots,m\}$, free of $\theta$. \checkmark
+
+\smallskip
+\textbf{Poisson}: $\dfrac{e^{-\theta}\theta^{x}}{x!}
+=\underbrace{e^{-\theta}}_{p}\underbrace{\tfrac{1}{x!}}_{h}
+\exp\{\underbrace{\log\theta}_{c}\cdot\underbrace{x}_{T}\}$.
+
+\smallskip
+\textbf{Exponential (mean $\theta$)}: $\dfrac1\theta e^{-x/\theta}
+=\underbrace{\theta^{-1}}_{p}\underbrace{\I[x>0]}_{h}\exp\{\underbrace{-\tfrac1\theta}_{c}\cdot
+\underbrace{x}_{T}\}$. Support $(0,\infty)$, free of $\theta$. \checkmark
+
+\smallskip
+\textbf{$N(\theta,1)$}: $\dfrac{1}{\sqrt{2\pi}}e^{-(x-\theta)^2/2}
+=\underbrace{\tfrac{e^{-\theta^2/2}}{\sqrt{2\pi}}}_{p}\underbrace{e^{-x^2/2}}_{h}
+\exp\{\underbrace{\theta}_{c}\cdot\underbrace{x}_{T}\}$.
+
+\smallskip
+\textbf{Geometric}, $f=\theta(1-\theta)^x$ on $x=0,1,\dots$:
+$=\underbrace{\theta}_{p}\cdot\underbrace{1}_{h}\exp\{\underbrace{\log(1-\theta)}_{c}\cdot
+\underbrace{x}_{T}\}$.
+
+\smallskip
+\textbf{Negative binomial} (the HW1 Q1 form),
+$f=\tfrac{\Gamma(\alpha+x)}{\Gamma(\alpha)x!}\theta^{\alpha}(1-\theta)^{x}$:
+$p=\theta^{\alpha}$, $h=\tfrac{\Gamma(\alpha+x)}{\Gamma(\alpha)x!}$, $c=\log(1-\theta)$, $T=x$.
+
+\smallskip
+\textbf{Power series family}, $f=\dfrac{a_x\theta^{x}}{A(\theta)}$:
+$p=1/A(\theta)$, $h=a_x$, $c=\log\theta$, $T=x$. (So Bernoulli, Binomial, Poisson, Geometric
+and Negative Binomial are all power-series families, hence all exponential families --- one
+observation covering five rows of the table.)
+
+\subsection{And the failures}
+
+\textbf{$U[0,\theta]$.} $f=\tfrac1\theta\I[0\le x\le\theta]$. The functional form is fine, but
+the \textbf{support moves with $\theta$}: condition (i) fails outright. Not an exponential
+family.
+
+\smallskip
+\textbf{$U[\theta,\theta+1]$.} Same reason.
+
+\smallskip
+\textbf{Cauchy$(\theta)$.} The support is all of $\R$, so condition (i) holds --- the failure
+is structural. Apply the mixed-partial test with $u=x-\theta$:
+\[
+\log f=-\log\pi-\log(1+u^{2}),\qquad
+\frac{\partial}{\partial x}\log f=\frac{-2u}{1+u^{2}},\qquad
+\frac{\partial^{2}}{\partial\theta\,\partial x}\log f=\frac{2(1-u^{2})}{(1+u^{2})^{2}} .
+\]
+This vanishes exactly at $x=\theta\pm1$ --- zeros whose \emph{position moves with $\theta$}.
+A product $c'(\theta)T'(x)$ has its $x$-zeros at fixed places. Contradiction, so the Cauchy is
+not an exponential family.
+
+\emph{Second proof, and the more memorable one:} in an exponential family
+$\sum_iT(X_i)$ is sufficient for every $n$ --- a \textbf{one-dimensional} statistic no matter
+how much data you have. For the Cauchy the minimal sufficient statistic is the whole order
+statistic, whose dimension grows with $n$. So it cannot be an exponential family.
+
+\begin{confusion}{``exponential distribution'' vs ``exponential family''}
+Unrelated names. The \emph{exponential distribution} $\tfrac1\theta e^{-x/\theta}$ is one
+member of the exponential \emph{family} class --- but so are the Binomial, Poisson, Normal and
+Gamma, none of which is ``an exponential distribution''. The word refers to the
+$\exp\{c(\theta)T(x)\}$ \emph{form}, not to any particular density.
+
+Equally: having an $e^{(\cdot)}$ in the formula neither proves nor disproves membership.
+$U[0,\theta]$ has no exponential and is not a member; the Cauchy has no exponential and is
+also not a member --- but for a completely different reason.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Natural parameter and natural parameter space}
+
+The parametrisation you are handed is arbitrary. The theory is cleanest in the parameter that
+appears \emph{linearly in the exponent}.
+
+\begin{idea}{Definitions}
+$\eta:=c(\theta)$ is the \textbf{natural parameter}, and
+\[
+\Gamma:=\{c(\theta):\theta\in\Theta\}\subseteq\R
+\]
+is the \textbf{natural parameter space}. Rewriting the density in terms of $\eta$ gives the
+\emph{natural form}
+\[
+f(x\mid\eta)=h(x)\exp\{\eta\,T(x)-A(\eta)\},\qquad
+A(\eta)=\log\int h(x)e^{\eta T(x)}\,dx ,
+\]
+where $A$ (the \emph{log-partition} or \emph{cumulant} function) is just whatever makes the
+density integrate to 1.
+\end{idea}
+
+\begin{confusion}{$\Theta$ versus $\Gamma$}
+The completeness criterion is a condition on $\boldsymbol\Gamma$, \textbf{not} on $\Theta$.
+$\Theta$ is almost always a nice interval; that tells you nothing. You must compute the image
+$c(\Theta)$.
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Family & $\Theta$ & $c(\theta)$ & $\Gamma=c(\Theta)$ \\
+\midrule
+$\mathrm{Bin}(m,\theta)$ & $(0,1)$ & $\log\frac{\theta}{1-\theta}$ & $\R$ \\
+$\mathrm{Poi}(\theta)$ & $(0,\infty)$ & $\log\theta$ & $\R$ \\
+$\mathrm{Exp}(\theta)$ & $(0,\infty)$ & $-1/\theta$ & $(-\infty,0)$ \\
+Power series & $(0,b)$ & $\log\theta$ & $(-\infty,\log b)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+In each case $\Gamma$ contains an open interval, which is all the criterion asks.
+\end{confusion}
+
+\subsection{Multiparameter version}
+
+\[
+f(x\mid\theta)=p(\theta)h(x)\exp\Big\{\sum_{j=1}^{k}c_j(\theta)T_j(x)\Big\},
+\qquad
+\Gamma=\big\{(c_1(\theta),\dots,c_k(\theta)):\theta\in\Theta\big\}\subseteq\R^{k}.
+\]
+For $n$ iid observations the sufficient statistic is
+$S=\big(\sum_iT_1(X_i),\dots,\sum_iT_k(X_i)\big)$, and for completeness $\Gamma$ must contain a
+\textbf{$k$-dimensional rectangle with non-empty interior}.
+
+\smallskip
+\textbf{$N(\mu,\sigma^{2})$:}
+\[
+f=\underbrace{\frac{e^{-\mu^{2}/2\sigma^{2}}}{\sqrt{2\pi\sigma^{2}}}}_{p(\theta)}\cdot
+\underbrace{1}_{h}\cdot
+\exp\Big\{\underbrace{\tfrac{\mu}{\sigma^{2}}}_{c_1}\underbrace{x}_{T_1}
++\underbrace{\big(-\tfrac{1}{2\sigma^{2}}\big)}_{c_2}\underbrace{x^{2}}_{T_2}\Big\},
+\quad \Gamma=\R\times(-\infty,0).
+\]
+An open half-plane, so it contains a rectangle: $(\sum X_i,\sum X_i^{2})$ is complete
+sufficient.
+
+\smallskip
+\textbf{Gamma$(\alpha,\beta)$} (shape, scale, both unknown): $T=(\log x,\ x)$,
+$c=(\alpha-1,\ -1/\beta)$, $\Gamma=(-1,\infty)\times(-\infty,0)$. Complete.
+
+\smallskip
+\textbf{Beta$(\theta,\phi)$}: $T=(\log x,\ \log(1-x))$, $c=(\theta-1,\ \phi-1)$,
+$\Gamma=(-1,\infty)^{2}$. Complete, with
+\[
+S=\Big(\sum_i\log X_i,\ \sum_i\log(1-X_i)\Big)
+\ \equiv\ \Big(\prod_iX_i,\ \prod_i(1-X_i)\Big).
+\]
+\emph{That is why the class notes record the Beta sufficient statistic as a pair of
+products}: sums of logs are logs of products.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Curved families: where the criterion bites}
+
+\begin{idea}{Full rank versus curved}
+Write $k$ for the number of $(c_j,T_j)$ terms and $d$ for the dimension of $\Theta$.
+\begin{itemize}
+\item If $d=k$ and $\Gamma$ has non-empty interior in $\R^{k}$, the family is \textbf{full
+rank} and the criterion applies: $S$ is complete.
+\item If $d<k$, the natural parameters are constrained to a lower-dimensional surface. The
+family is \textbf{curved}, $\Gamma$ contains no rectangle, and \textbf{the criterion says
+nothing}.
+\end{itemize}
+\end{idea}
+
+\textbf{The standard example: $N(\theta,\theta^{2})$}, $\theta>0$. Here $k=2$ but $d=1$:
+\[
+(\eta_1,\eta_2)=\Big(\frac{\theta}{\theta^{2}},\ -\frac{1}{2\theta^{2}}\Big)
+=\Big(\frac1\theta,\ -\frac{1}{2\theta^{2}}\Big),
+\qquad\text{so}\qquad \eta_2=-\tfrac12\eta_1^{2}:
+\]
+a \emph{parabola} in $\R^{2}$, which contains no rectangle. The criterion is unavailable ---
+and in this case completeness genuinely fails.
+
+\begin{idea}{Proof that $(\sum X_i,\sum X_i^{2})$ is not complete for $N(\theta,\theta^{2})$}
+Exhibit two \emph{different} unbiased estimators of $\theta^{2}$, both functions of $S$. Using
+$\E X_i^{2}=\Var+\text{mean}^2=\theta^{2}+\theta^{2}=2\theta^{2}$ and
+$\E\Xbar^{2}=\tfrac{\theta^{2}}{n}+\theta^{2}=\tfrac{(n+1)\theta^{2}}{n}$:
+\[
+\E\Big[\frac{1}{2n}\sum_iX_i^{2}\Big]=\theta^{2},
+\qquad
+\E\Big[\frac{n}{n+1}\,\Xbar^{2}\Big]=\theta^{2}.
+\]
+So $g(S)=\dfrac{1}{2n}\sum_iX_i^{2}-\dfrac{n}{n+1}\Xbar^{2}$ satisfies
+$\E_\theta\,g(S)=0$ for every $\theta$, while $g\not\equiv0$. That is a non-trivial zero
+function: \textbf{$S$ is not complete}. (Simulation at $\theta=2$, $n=6$: $\E g=-0.001$ against
+a standard deviation of $1.61$ --- mean zero, but very far from the zero function.)
+
+Consequence: Lehmann--Scheff\'e is unavailable here, and neither estimator above is a UMVUE.
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The five consequences --- why the course cares}
+
+This is the payoff. \textbf{One structure, five theorems.}
+
+\begin{idea}{1. Sufficiency of fixed dimension}
+For $X_1,\dots,X_n$ iid,
+\[
+f(\mathbf x\mid\theta)=p(\theta)^{n}\Big(\prod_ih(x_i)\Big)
+\exp\Big\{c(\theta)\sum_iT(x_i)\Big\},
+\]
+so by the factorisation theorem $S=\sum_iT(X_i)$ is sufficient --- \textbf{one number,
+whatever $n$ is}. Contrast the Cauchy, where you must keep all $n$ order statistics. Data
+reduction of this kind is exactly what exponential families are for.
+\end{idea}
+
+\begin{idea}{2. Completeness, hence Lehmann--Scheff\'e}
+If $\Gamma$ contains an open interval (rectangle in the $k$-parameter case), $S$ is
+\textbf{complete}. Combined with (1), Lehmann--Scheff\'e applies: \emph{any} unbiased function
+of $S$ is automatically \emph{the} UMVUE.
+
+That is why the UMVUE recipe is so short for these families --- find one unbiased $h(S)$ by
+series matching, and stop.
+\end{idea}
+
+\begin{idea}{3. The Cram\'er--Rao bound is attained --- for the right target}
+In natural form, $\log f=\log h(x)+\eta T(x)-A(\eta)$, so the score is
+\[
+\frac{\partial}{\partial\eta}\log f=T(x)-A'(\eta)=T(x)-\E_\eta[T],
+\]
+which is exactly the factorisation $k(\eta)[T-\psi(\eta)]$ required for equality in
+Cauchy--Schwarz. \textbf{So $T$ attains the CRLB for $\psi(\eta)=\E_\eta[T]$}, and it is the
+UMVUE by (2).
+
+The caveat that costs marks: this holds for $\E[T]$, \textbf{not for arbitrary $\psi$}. The
+UMVUE of $e^{-\lambda}$ in the Poisson (Mock Q3) is a function of $S$ but is \emph{not} $S$
+itself, and its variance sits strictly above the bound.
+\end{idea}
+
+\begin{idea}{4. MLR, hence UMP tests}
+For $\theta_0<\theta_1$,
+\[
+\frac{f_{\theta_1}(x)}{f_{\theta_0}(x)}
+=\frac{p(\theta_1)}{p(\theta_0)}\exp\big\{[c(\theta_1)-c(\theta_0)]T(x)\big\},
+\]
+increasing in $T(x)$ whenever $c$ is non-decreasing. So the family has \textbf{MLR in $T$},
+and Karlin--Rubin delivers a UMP test for every one-sided hypothesis. The Cauchy, not being an
+exponential family, has no MLR and no UMP test.
+\end{idea}
+
+\begin{idea}{5. Finite-dimensional conjugate priors}
+$\prod_if(x_i\mid\theta)$ depends on the data only through $\big(n,\sum_iT(x_i)\big)$ --- two
+numbers. So the family of priors
+\[
+\pi(\theta)\ \propto\ p(\theta)^{a}\exp\{c(\theta)\,b\},\qquad (a,b)\ \text{hyperparameters},
+\]
+is closed under sampling, with the update $(a,b)\mapsto(a+n,\ b+\sum_iT(x_i))$ ---
+\emph{pure arithmetic}. That is Beta--Binomial, Gamma--Poisson and Normal--Normal, all at
+once; look back at those update rules and you will see exactly this shape.
+
+For the Cauchy no such compression exists, so the conjugate family must grow by one
+hyperparameter per observation --- useless, which is the point of the Lecture 7 discussion.
+\end{idea}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{4.3cm}p{5.3cm}p{5.5cm}@{}}
+\toprule
+& \textbf{Exponential family} & \textbf{Cauchy / $U[0,\theta]$} \\
+\midrule
+Sufficient statistic & $\sum_iT(X_i)$, fixed dimension &
+order statistic (Cauchy); $X_{(n)}$ ($U[0,\theta]$) \\
+Complete? & yes, if $\Gamma$ has interior & no (Cauchy); yes but proved directly ($U[0,\theta]$) \\
+CRLB & attained for $\E[T]$ & regularity fails ($U[0,\theta]$) \\
+MLR / UMP & yes, if $c$ monotone & no (Cauchy); yes, directly ($U[0,\theta]$) \\
+Conjugate prior & two hyperparameters & grows with $n$ (Cauchy); Pareto ($U[0,\theta]$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{confusion}{``So nothing works outside exponential families?''}
+Not so --- and $U[0,\theta]$ is the proof. It is \emph{not} an exponential family, yet
+$X_{(n)}$ is complete sufficient, the family has MLR, a UMP test exists (even a two-sided
+one), and there is a Pareto conjugate prior.
+
+The correct statement is: being an exponential family is a \textbf{sufficient} condition for
+these conclusions, not a necessary one. When the hypothesis fails you simply lose the general
+theorem and must verify the conclusion \emph{by hand} --- which is precisely what the
+$U[0,\theta]$ questions in this course make you do.
+\end{confusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The cumulant trick: moments for free}
+
+\begin{idea}{The identity}
+In natural form $f(x\mid\eta)=h(x)e^{\eta T(x)-A(\eta)}$,
+\[
+\boxed{\ \E_\eta[T]=A'(\eta),\qquad \Var_\eta(T)=A''(\eta),\qquad I(\eta)=A''(\eta).\ }
+\]
+\end{idea}
+
+\prf Integrating the density to 1 gives $\int h(x)e^{\eta T(x)}dx=e^{A(\eta)}$. Differentiate
+in $\eta$ and divide by $e^{A(\eta)}$:
+\[
+\int T(x)h(x)e^{\eta T(x)-A(\eta)}dx=A'(\eta)\ \Longrightarrow\ \E[T]=A'(\eta).
+\]
+Differentiate once more: $\E[T^{2}]=A''+(A')^{2}$, so $\Var(T)=A''(\eta)$. And since the score
+is $T-A'(\eta)$, the Fisher information is $\Var(T)=A''(\eta)$. $\square$
+
+\textbf{Poisson, as a check.} $\eta=\log\lambda$, $T=x$, $h=1/x!$, and
+$A(\eta)=\lambda=e^{\eta}$. Then $\E[X]=A'=e^{\eta}=\lambda$ and $\Var(X)=A''=e^{\eta}=\lambda$
+--- both classical facts in one line, with no sums.
+
+\begin{idea}{This subsumes the power-series identities of HW1 Q4}
+For a power-series family, $\eta=\log\theta$ (so $\tfrac{d\theta}{d\eta}=\theta$) and
+$A(\eta)=\log \tilde A(e^{\eta})$ where $\tilde A(\theta)=\sum_xa_x\theta^{x}$. Then
+\[
+\E[X]=\frac{dA}{d\eta}=\frac{\tilde A'(\theta)}{\tilde A(\theta)}\cdot\theta=\psi(\theta),
+\qquad
+\Var(X)=\frac{d^{2}A}{d\eta^{2}}=\frac{d\psi}{d\eta}
+=\frac{d\psi}{d\theta}\cdot\frac{d\theta}{d\eta}=\theta\,\psi'(\theta).
+\]
+Those are exactly the two boxed identities from Homework 1 Q4 ---
+$\E X=\theta \tilde A'/\tilde A$ and $\Var X=\theta\psi'(\theta)$ --- obtained here with no
+computation at all. And the CRLB check falls out too:
+$\text{CRLB}=[\psi']^{2}/I=[\psi']^{2}\theta/\psi'=\theta\psi'=\Var(X)$, attained. \checkmark
+\end{idea}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Master table}
+
+\renewcommand{\arraystretch}{1.45}
+\begin{longtable}{@{}p{2.9cm}p{2.0cm}p{2.6cm}p{3.0cm}p{3.4cm}@{}}
+\toprule
+Family & $T(x)$ & $c(\theta)$ & $\Gamma$ & Complete suff.\ stat. \\
+\midrule
+\endhead
+$\mathrm{Bern}/\mathrm{Bin}(m,\theta)$ & $x$ & $\log\frac{\theta}{1-\theta}$ & $\R$ & $\sum X_i$ \\
+$\mathrm{Poi}(\theta)$ & $x$ & $\log\theta$ & $\R$ & $\sum X_i$ \\
+$\mathrm{Geom}(\theta)$ & $x$ & $\log(1-\theta)$ & $(-\infty,0)$ & $\sum X_i$ \\
+$\mathrm{NegBin}(\alpha,\theta)$ & $x$ & $\log(1-\theta)$ & $(-\infty,0)$ & $\sum X_i$ \\
+Power series & $x$ & $\log\theta$ & $(-\infty,\log b)$ & $\sum X_i$ \\
+$\mathrm{Exp}(\theta)$ & $x$ & $-1/\theta$ & $(-\infty,0)$ & $\sum X_i$ \\
+$N(\theta,1)$ & $x$ & $\theta$ & $\R$ & $\Xbar$ \\
+$N(\mu,\sigma^{2})$ & $(x,x^{2})$ & $(\frac{\mu}{\sigma^{2}},-\frac{1}{2\sigma^{2}})$ &
+$\R\times(-\infty,0)$ & $(\sum X_i,\sum X_i^{2})$ \\
+$N(0,\sigma^{2})$ & $x^{2}$ & $-\frac{1}{2\sigma^{2}}$ & $(-\infty,0)$ & $\sum X_i^{2}$ \\
+$\mathrm{Gamma}(\alpha,\beta)$ & $(\log x,x)$ & $(\alpha-1,-\frac1\beta)$ & open rectangle &
+$(\sum\log X_i,\sum X_i)$ \\
+$\mathrm{Beta}(\theta,\phi)$ & $(\log x,\log(1-x))$ & $(\theta-1,\phi-1)$ & $(-1,\infty)^{2}$ &
+$(\prod X_i,\prod(1-X_i))$ \\
+Multinomial & $(y_1,\dots,y_{k-1})$ & $\log\frac{p_j}{1-p_1-\cdots}$ & $\R^{k-1}$ &
+$(Y_1,\dots,Y_{k-1})$ \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{Not exponential families}} \\
+$N(\theta,\theta^{2})$ & \multicolumn{4}{l}{curved: $\Gamma$ is the parabola
+$\eta_2=-\tfrac12\eta_1^{2}$; sufficient but \emph{not} complete} \\
+$U[0,\theta]$, $U[\theta,\theta+1]$ & \multicolumn{4}{l}{support depends on $\theta$;
+handle by hand} \\
+$\mathrm{Cauchy}(\theta)$ & \multicolumn{4}{l}{mixed partial does not factor; sufficient
+statistic grows with $n$} \\
+\bottomrule
+\end{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Practice, with answers}
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item $X_1,\dots,X_n\iid\mathrm{Geometric}$, $f(x\mid\theta)=\theta(1-\theta)^{x}$,
+$x=0,1,2,\dots$ Show this is an exponential family, identify $\Gamma$, and deduce that
+$\sum X_i$ is complete sufficient. Then find the UMVUE of $\theta$ for $n=1$.
+
+\item Show that $N(\theta,\theta^{2})$ is a curved exponential family, and exhibit a
+non-trivial zero function to show its sufficient statistic is not complete.
+
+\item $X_1,\dots,X_n\iid\mathrm{Gamma}(\alpha,\beta)$ with both parameters unknown. Identify
+$T$, $c$, and $\Gamma$, and state the complete sufficient statistic.
+
+\item Use $\E[T]=A'(\eta)$, $\Var(T)=A''(\eta)$ to obtain the mean and variance of the
+Binomial from its cumulant function.
+
+\item $U[0,\theta]$ is not an exponential family. Which conclusions of Section 5 nevertheless
+hold for it, and what does that tell you about the logical status of the theory?
+\end{enumerate}
+
+\subsection*{Answers}
+
+\noindent\textbf{P1.} $f=\theta\exp\{x\log(1-\theta)\}$, so $p=\theta$, $h=1$, $T=x$,
+$c=\log(1-\theta)$. Support $\{0,1,2,\dots\}$ is free of $\theta$. \checkmark\ As $\theta$
+ranges over $(0,1)$, $\Gamma=(-\infty,0)$ --- an open interval, so $\sum X_i$ is complete
+sufficient.
+
+For $n=1$, unbiasedness reads $\sum_x T(x)\theta(1-\theta)^{x}=\theta$, i.e.\ with $p=1-\theta$,
+$\sum_x T(x)p^{x}=1$ for all $p\in(0,1)$. Matching coefficients: $T(0)=1$ and $T(x)=0$ for
+$x\ge1$. So the UMVUE is $\boxed{\I\{X=0\}}$, with variance $\theta(1-\theta)$. (Sensible: you
+see one observation, and the only unbiased signal about $\theta=\Prob(X=0)$ is whether $X$ was
+$0$.)
+
+\smallskip
+\noindent\textbf{P2.} With $\mu=\theta$, $\sigma^{2}=\theta^{2}$,
+$(\eta_1,\eta_2)=(1/\theta,\ -1/(2\theta^{2}))$, so $\eta_2=-\tfrac12\eta_1^{2}$: the natural
+parameters lie on a parabola, a one-dimensional curve in $\R^{2}$. It contains no rectangle,
+so the completeness criterion does not apply --- the family is \emph{curved}.
+
+Completeness genuinely fails. Since $\E X_i^{2}=2\theta^{2}$ and
+$\E\Xbar^{2}=\tfrac{(n+1)}{n}\theta^{2}$, both
+$\tfrac{1}{2n}\sum_iX_i^{2}$ and $\tfrac{n}{n+1}\Xbar^{2}$ are unbiased for $\theta^{2}$, so
+\[
+g(S)=\frac{1}{2n}\sum_iX_i^{2}-\frac{n}{n+1}\Xbar^{2}
+\]
+has $\E_\theta g=0$ for all $\theta$ with $g\not\equiv0$. Hence $S$ is not complete.
+
+\smallskip
+\noindent\textbf{P3.}
+$f=\dfrac{x^{\alpha-1}e^{-x/\beta}}{\Gamma(\alpha)\beta^{\alpha}}
+=\dfrac{1}{\Gamma(\alpha)\beta^{\alpha}}\exp\{(\alpha-1)\log x-\tfrac{x}{\beta}\}$, so
+$T=(\log x,\ x)$ and $c=(\alpha-1,\ -1/\beta)$, giving
+$\Gamma=(-1,\infty)\times(-\infty,0)$ --- an open rectangle. Therefore
+$S=\big(\sum_i\log X_i,\ \sum_iX_i\big)$ is complete sufficient.
+
+\smallskip
+\noindent\textbf{P4.} $X\sim\mathrm{Bin}(m,\theta)$ has $\eta=\log\frac{\theta}{1-\theta}$, so
+$\theta=\frac{e^{\eta}}{1+e^{\eta}}$ and, from $p(\theta)=(1-\theta)^{m}$,
+\[
+A(\eta)=-\log p=-m\log(1-\theta)=m\log(1+e^{\eta}).
+\]
+Then
+\[
+\E[X]=A'(\eta)=\frac{me^{\eta}}{1+e^{\eta}}=m\theta,\qquad
+\Var(X)=A''(\eta)=\frac{me^{\eta}}{(1+e^{\eta})^{2}}=m\theta(1-\theta). \ \checkmark
+\]
+
+\smallskip
+\noindent\textbf{P5.} It fails condition (i) --- the support $[0,\theta]$ moves. Yet:
+$X_{(n)}$ is sufficient (factorisation) \emph{and} complete (proved directly by
+differentiating $\int_0^\theta g(u)nu^{n-1}du=0$ in $\theta$); the family has MLR in $X_{(n)}$
+(the ratio is constant then jumps to $+\infty$); a UMP test exists, and unusually a two-sided
+one as well; and the Pareto family is conjugate. What genuinely breaks is Cram\'er--Rao, which
+needs the regularity that moving support destroys.
+
+\textbf{Moral:} the exponential-family hypothesis is \emph{sufficient} for the good behaviour,
+not \emph{necessary}. Losing it means losing the general theorem, so you must verify the
+conclusion by hand --- which is exactly why $U[0,\theta]$ appears so often in this course.
+
+\vfill
+\begin{center}
+\small\itshape
+Companions: \texttt{PI\_Bayes\_Crash\_Course.pdf},
+\texttt{PI\_Testing\_Crash\_Course.pdf},
+\texttt{PI\_Minimax\_and\_Theorems.pdf};
+\texttt{PI\_Exam\_Revision.pdf} \S5--\S7.
+\end{center}
+
+\end{document}
