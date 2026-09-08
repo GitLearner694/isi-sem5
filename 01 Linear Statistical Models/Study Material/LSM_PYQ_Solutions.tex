@@ -29,8 +29,9 @@
 \vspace{2pt}\hrule\vspace{10pt}
 
 \noindent Both papers are worth 40 marks. Every part is solved in full, with the
-alternative route given wherever the professor's phrasing admits one. Section~3 is a
-coverage audit against the crash courses, recording where each result now lives.
+alternative route given wherever the professor's phrasing admits one. Section~3 adds five
+worked practice questions in the same pure linear-algebra style, and Section~4 is a coverage
+audit against the crash courses, recording where each result now lives.
 
 \tableofcontents
 \vspace{6pt}\hrule\vspace{8pt}
@@ -675,6 +676,241 @@ $\mathbf{A}=\begin{bsmallmatrix}0&1\\1&0\end{bsmallmatrix}$ and $y=e_1$ give
 $y^T\mathbf{A}y=0$ but $\mathbf{A}y=e_2\ne\zero$. Step 3 needs
 $\mathbf{A}\succeq0$, which is exactly why that hypothesis is in the question. State this.
 \end{confusion}
+
+%==================================================================
+\section{Practice: linear-algebra proofs at paper level}
+
+Five questions in the style of 2024 Q1/Q3 and 2025 Q4 --- pure matrix algebra, no data.
+Q\,3.1 is Homework~2 Q4 of this year, so it is the likeliest of the five.
+
+\qhead{10}{}
+\begin{stmt}
+$A$ is an $n\times n$ positive semidefinite matrix with $\rank(A)=r$ and
+$\rank(I_n-A)=n-r$, for some $1\le r<n$. Prove that $A$ is an orthogonal projection matrix.
+In addition, if $\bY\sim\N(\bmu,I_n)$ and $U_1:=\bY^TA\bY$, $U_2:=\bY^T\bY-\bY^TA\bY$, show
+--- \emph{without using the Fisher--Cochran theorem} --- that $U_1$ and $U_2$ are
+independent, with $U_1\sim\chi^2_r(\lambda_1/2)$ and $U_2\sim\chi^2_{n-r}(\lambda_2/2)$,
+where $\lambda_1=\bmu^TA\bmu$ and $\lambda_2=\bmu^T\bmu-\bmu^TA\bmu$.
+\end{stmt}
+
+\pt{Part 1: $A$ is an orthogonal projector} $A$ is positive semidefinite, hence symmetric, so
+spectrally decompose
+\[
+  A=P\Lambda P^T,\qquad P^TP=PP^T=I_n,\qquad \Lambda=\mathrm{diag}(\lambda_1,\dots,\lambda_n),\ \lambda_i\ge0 .
+\]
+\begin{itemize}
+  \item $\rank(A)=r$ $\Longrightarrow$ \textbf{exactly $r$} of the $\lambda_i$ are non-zero.
+  \item $I_n-A=P(I-\Lambda)P^T$ has eigenvalues $1-\lambda_i$, so $\rank(I_n-A)=n-r$
+        $\Longrightarrow$ exactly $n-r$ of the $1-\lambda_i$ are non-zero $\Longrightarrow$
+        \textbf{exactly $r$} of the $\lambda_i$ equal $1$.
+\end{itemize}
+Those $r$ eigenvalues equal to $1$ are certainly non-zero, and there are only $r$ non-zero
+ones altogether. Hence the non-zero eigenvalues are \emph{precisely} those $r$ ones equal to
+$1$:
+\[
+  \lambda_i\in\{0,1\}\ \ \forall i,\qquad\text{with exactly } r \text{ ones.}
+\]
+Therefore $\Lambda^2=\Lambda$, so $A^2=P\Lambda^2P^T=P\Lambda P^T=A$. Being symmetric and
+idempotent, $A$ is an orthogonal projection matrix. \qed
+
+\pt{Part 2: distributions and independence} Split
+$P=[\,C:D\,]$, where $C$ is the $n\times r$ block of eigenvectors with eigenvalue $1$ and $D$
+the $n\times(n-r)$ block with eigenvalue $0$. Orthogonality of $P$ gives
+\[
+  C^TC=I_r,\qquad D^TD=I_{n-r},\qquad C^TD=0,\qquad A=CC^T,\qquad I-A=DD^T .
+\]
+Hence
+\[
+  U_1=\bY^TCC^T\bY=\|C^T\bY\|^2,
+  \qquad
+  U_2=\bY^T(I-A)\bY=\|D^T\bY\|^2 .
+\]
+Put $Z_1=C^T\bY$ and $Z_2=D^T\bY$. As linear images of a normal vector these are jointly
+normal, with
+\[
+  Z_1\sim\N_r(C^T\bmu,\ C^TC)=\N_r(C^T\bmu,I_r),
+  \qquad
+  Z_2\sim\N_{n-r}(D^T\bmu,I_{n-r}),
+\]
+\[
+  \Cov(Z_1,Z_2)=C^TI_nD=C^TD=0 .
+\]
+Jointly normal and uncorrelated $\Longrightarrow$ independent; therefore
+$U_1=\|Z_1\|^2$ and $U_2=\|Z_2\|^2$ are independent. Finally, a squared norm of a
+$\N_k(\theta,I_k)$ vector is $\chi^2_k(\|\theta\|^2/2)$, and
+\[
+  \|C^T\bmu\|^2=\bmu^TCC^T\bmu=\bmu^TA\bmu=\lambda_1,
+  \qquad
+  \|D^T\bmu\|^2=\bmu^T(I-A)\bmu=\bmu^T\bmu-\bmu^TA\bmu=\lambda_2 ,
+\]
+so $U_1\sim\chi^2_r(\lambda_1/2)$ and $U_2\sim\chi^2_{n-r}(\lambda_2/2)$. \qed
+
+\begin{idea}{Why ``without Fisher--Cochran'' is not a handicap}
+Once $A$ is known to be a projector you can \emph{split the space}: $C$ and $D$ are two
+blocks of a single orthogonal matrix, so independence is just $C^TD=0$. Fisher--Cochran is
+the general $r$-piece theorem; this is the two-piece case done by hand, and it is shorter.
+\end{idea}
+
+%------------------------------------------------------------------
+\qhead{8}{}
+\begin{stmt}
+Show that $G$ is a generalised inverse of $A$ if and only if $AG$ is idempotent and
+$\rank(AG)=\rank(A)$.
+\end{stmt}
+
+\pt{$\Rightarrow$} Suppose $AGA=A$. Then
+\[
+  (AG)^2=AGAG=(AGA)G=AG,
+\]
+so $AG$ is idempotent. For the rank, $\rank(AG)\le\rank(A)$ always, while
+$\rank(A)=\rank(AGA)\le\rank(AG)$. Hence $\rank(AG)=\rank(A)$.
+
+\pt{$\Leftarrow$} Suppose $AG$ is idempotent with $\rank(AG)=\rank(A)$. Since
+$\Cs(AG)\subseteq\Cs(A)$ and the two dimensions agree,
+\[
+  \Cs(AG)=\Cs(A).
+\]
+An idempotent matrix acts as the identity on its own column space: if $u\in\Cs(AG)$, say
+$u=AGw$, then $(AG)u=(AG)^2w=AGw=u$. Now take any $x$. Then $Ax\in\Cs(A)=\Cs(AG)$, so
+$Ax=AGu$ for some $u$, and
+\[
+  AGAx=AG(AGu)=(AG)^2u=AGu=Ax .
+\]
+This holds for every $x$, so $AGA=A$. \qed
+
+\begin{confusion}{the rank condition cannot be dropped}
+$AG$ idempotent alone is not enough: $G=O$ makes $AG=O$ idempotent, but $AGA=O\ne A$. The
+rank condition is what forces $\Cs(AG)$ to be all of $\Cs(A)$.
+\end{confusion}
+
+%------------------------------------------------------------------
+\qhead{6}{}
+\begin{stmt}
+For an $n\times p$ matrix $\bX$, show that $\Nsp(\bX)=\Nsp(\bX^T\bX)$, and deduce that
+$\Cs(\bX^T)=\Cs(\bX^T\bX)$ and $\rank(\bX)=\rank(\bX^T\bX)$.
+\end{stmt}
+
+\sol \textbf{$\Nsp(\bX)\subseteq\Nsp(\bX^T\bX)$:} if $\bX v=\zero$ then $\bX^T\bX v=\zero$.
+
+\textbf{$\Nsp(\bX^T\bX)\subseteq\Nsp(\bX)$:} if $\bX^T\bX v=\zero$ then
+\[
+  0=v^T\bX^T\bX v=\|\bX v\|^2 \quad\Longrightarrow\quad \bX v=\zero .
+\]
+So the two null spaces coincide. Both $\bX$ and $\bX^T\bX$ have $p$ columns, so rank--nullity
+gives
+\[
+  \rank(\bX)=p-\dim\Nsp(\bX)=p-\dim\Nsp(\bX^T\bX)=\rank(\bX^T\bX).
+\]
+Finally $\Cs(\bX^T\bX)\subseteq\Cs(\bX^T)$ is immediate, and
+\[
+  \dim\Cs(\bX^T\bX)=\rank(\bX^T\bX)=\rank(\bX)=\rank(\bX^T)=\dim\Cs(\bX^T),
+\]
+so a subspace of equal dimension must be the whole space: $\Cs(\bX^T)=\Cs(\bX^T\bX)$. \qed
+
+\begin{recipe}{The two consequences to quote}
+\begin{itemize}
+  \item The normal equations $\bX^T\bX\bb=\bX^T\bY$ are \textbf{always consistent}, because
+        $\bX^T\bY\in\Cs(\bX^T)=\Cs(\bX^T\bX)$.
+  \item $a^T\bb$ is estimable $\iff a\in\Cs(\bX^T)=\Cs(\bX^T\bX)$ --- the two forms of the
+        criterion are the same statement.
+\end{itemize}
+\end{recipe}
+
+%------------------------------------------------------------------
+\qhead{10}{}
+\begin{stmt}
+Let $G$ be any generalised inverse of $\bX^T\bX$ and set $P=\bX G\bX^T$. Show that $P$ is the
+orthogonal projection matrix onto $\Cs(\bX)$, and that it does not depend on which g-inverse
+$G$ is chosen.
+\end{stmt}
+
+\pt{Step 1: $\bX G\bX^T\bX=\bX$} Put $M=\bX G\bX^T\bX-\bX$ and expand $M^TM$, using
+$\bX^T\bX G\bX^T\bX=\bX^T\bX$ repeatedly:
+\begin{align*}
+  M^TM &= \bX^T\bX G^T\big(\bX^T\bX G\bX^T\bX\big)-\bX^T\bX G^T\bX^T\bX
+         -\big(\bX^T\bX G\bX^T\bX\big)+\bX^T\bX\\
+       &= \bX^T\bX G^T\bX^T\bX-\bX^T\bX G^T\bX^T\bX-\bX^T\bX+\bX^T\bX=O .
+\end{align*}
+The diagonal entries of $M^TM$ are the squared norms of the columns of $M$, so $M^TM=O$
+forces $M=O$. Hence $\bX G\bX^T\bX=\bX$, i.e.\ $P\bX=\bX$.
+
+\pt{Step 2: idempotent} $P^2=\bX G\bX^T\cdot\bX G\bX^T=\big(\bX G\bX^T\bX\big)G\bX^T=\bX G\bX^T=P$.
+
+\pt{Step 3: the image is $\Cs(\bX)$} $\Cs(P)\subseteq\Cs(\bX)$ from the leading factor $\bX$;
+and $P\bX=\bX$ gives $\Cs(\bX)\subseteq\Cs(P)$. So $\Cs(P)=\Cs(\bX)$.
+
+\pt{Step 4: invariance} Use the rule \emph{$AB^-C$ is invariant to the choice of $B^-$ when
+$\mathcal{R}(A)\subseteq\mathcal{R}(B)$ and $\Cs(C)\subseteq\Cs(B)$}, with $A=\bX$,
+$B=\bX^T\bX$, $C=\bX^T$. By Q\,3.3,
+\[
+  \mathcal{R}(\bX)=\Cs(\bX^T)=\Cs(\bX^T\bX)=\mathcal{R}(B),
+  \qquad
+  \Cs(\bX^T)=\Cs(\bX^T\bX)=\Cs(B),
+\]
+both with equality. Hence $P=\bX G\bX^T$ is the same matrix for every g-inverse $G$.
+
+\pt{Step 5: symmetry} A \emph{symmetric} g-inverse of $\bX^T\bX$ always exists: spectrally
+decompose $\bX^T\bX=P_0\Lambda P_0^T$ and take $G_0=P_0\Delta P_0^T$ with
+$\delta_i=1/\lambda_i$ where $\lambda_i\ne0$ and $\delta_i=0$ elsewhere. For that choice
+$\bX G_0\bX^T$ is visibly symmetric --- and by Step 4 every choice gives the \emph{same}
+matrix. So $P$ is symmetric.
+
+Symmetric, idempotent, with image $\Cs(\bX)$: $P$ is the orthogonal projector onto
+$\Cs(\bX)$. \qed
+
+\begin{idea}{The move worth stealing}
+Prove \textbf{invariance first}, then verify the awkward property (here, symmetry) for one
+conveniently chosen $G$. Trying to show $\bX G\bX^T$ is symmetric for an \emph{arbitrary} $G$
+is painful and unnecessary.
+\end{idea}
+
+%------------------------------------------------------------------
+\qhead{6}{}
+\begin{stmt}
+$A$ and $B$ are symmetric idempotent $n\times n$ matrices with $\Cs(B)\subseteq\Cs(A)$. Show
+that $AB=BA=B$, that $A-B$ is an orthogonal projection matrix, and that
+$\rank(A-B)=\rank(A)-\rank(B)$.
+\end{stmt}
+
+\sol \textbf{$AB=B$.} $A$ is symmetric and idempotent, hence the orthogonal projector onto
+$\Cs(A)$, so $Au=u$ for every $u\in\Cs(A)$. For any $x$ we have $Bx\in\Cs(B)\subseteq\Cs(A)$,
+so $A(Bx)=Bx$. As this holds for all $x$, $AB=B$.
+
+\textbf{$BA=B$.} Transpose, using symmetry of both: $BA=B^TA^T=(AB)^T=B^T=B$.
+
+\textbf{$A-B$ is an orthogonal projector.} It is symmetric as a difference of symmetric
+matrices, and
+\[
+  (A-B)^2=A^2-AB-BA+B^2=A-B-B+B=A-B .
+\]
+
+\textbf{Rank.} $A-B$ is idempotent, so trace counts rank:
+\[
+  \rank(A-B)=\tr(A-B)=\tr(A)-\tr(B)=\rank(A)-\rank(B). \qquad\blacksquare
+\]
+
+\begin{idea}{Where you have already used this}
+This is exactly why $P_\bX-P_\bZ$ is a projector of rank $\rank(\bX)-\rank(\bZ)$ in the
+nested-model decomposition $P_\bX=P_\bZ+P_{\bW\mid\bZ}$ --- and hence why
+$\mathrm{SSE}_{red}-\mathrm{SSE}_{full}$ is a chi-square with the right degrees of freedom.
+Every ANOVA table rests on it.
+\end{idea}
+
+\begin{recipe}{The five moves these questions keep testing}
+\begin{enumerate}
+  \item Eigenvalues of an idempotent matrix lie in $\{0,1\}$, hence $\tr=\rank$.
+        \hfill(Q\,3.1, Q\,3.5)
+  \item Spectral decomposition to split $\R^n$ into orthogonal blocks. \hfill(Q\,3.1)
+  \item $M^TM=O\Rightarrow M=O$, and $v^TA v=\|\bX v\|^2=0\Rightarrow \bX v=\zero$.
+        \hfill(Q\,3.3, Q\,3.4)
+  \item An idempotent matrix acts as the identity on its own column space.
+        \hfill(Q\,3.2, Q\,3.5)
+  \item Prove invariance first, then check the property for one convenient choice.
+        \hfill(Q\,3.4)
+\end{enumerate}
+\textbf{If a question asks you to prove anything about projections, the first line is
+``symmetric and idempotent'' and the second is $\tr=\rank$.}
+\end{recipe}
 
 %==================================================================
 \section{Coverage audit: do the crash courses cover all of this?}
