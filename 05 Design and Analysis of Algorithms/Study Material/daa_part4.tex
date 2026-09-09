@@ -1,0 +1,408 @@
+%==================================================================
+\section{The 2022 Mid-Semester Paper}
+
+\setcounter{pq}{0}
+
+\begin{center}
+\fbox{\parbox{0.93\textwidth}{\centering
+\textbf{INDIAN STATISTICAL INSTITUTE}\\
+\textbf{Mid Semestral Examination}\\
+B.Stat.\ --- 3rd Year (Semester V)\\
+\textit{Design and Analysis of Algorithms}\\[3pt]
+Date: September 22, 2022 \qquad Maximum Marks: 60 \qquad Duration: 2:30 Hours\\[3pt]
+\small\textit{Note: You may answer any part of any question,\\ but maximum you can score is 60.}
+}}
+\end{center}
+
+\qhead{5+5}
+\pt{a} $A$ is an unsorted array of size $n$ where $A[i]\in\{1,2,3,4\}$ for each
+$i\in\{0,1,2,\dots,n-1\}$. Write an algorithm to sort the array $A$ in $\Oh n$ time.
+
+\pt{b} Let $S=\langle(a_i,b_i):a\in\N,\ b\in\{0,1\}\rangle$ be a sequence stored in an array of
+size $2n$. Write a linear-time algorithm using $\Oh1$ space that rearranges $S$ such that all
+the tuples $(a_i,b_i)$ having $b_i=0$ appear at the beginning.
+
+\qhead{7+3}
+\pt{a} Let $S$ be a point set in the plane where $|S|=n$. Design an algorithm to find the convex
+hull of $S$ in $\Oh{n\log n}$ time.
+
+\pt{b} Prove that the lower bound of an algorithm that finds the convex hull of a given set of
+points $S$ is $\Om{n\log n}$, where $|S|=n$.
+
+\qhead{5+5}
+\pt{a} An inversion in an array $A$ is a pair $(i,j)$ having the property $i<j$ and $A[i]>A[j]$.
+Let $X$ be the total number of inversions in an array. Calculate $\E(X)$.
+
+\pt{b} Let $T(n)$ be a positive and non-decreasing function such that $T(n)=a\,T(n/b)+c\,n^k$
+and $T(1)=d$ where $a,c>0$, $k,d\ge0$, $b\ge2$. Prove that
+$T(n)=\Th{n^{\log_b a}}$.\footnote{The scanned paper carries a handwritten addition
+``\emph{and} $a>b^k$'' --- without it the claim is false (see \S2), so read the condition as
+part of the question.}
+
+\qhead{10}
+Let $S=\langle a_1,a_2,\dots,a_n\rangle$ be an increasing sequence of points on the real line.
+Write a linear time algorithm that determines a unit length interval that contains maximum
+number of points of $S$.
+
+\qhead{10}
+Let $S$ be a set of size $n$ and $x$ be a number. The sum of the elements of the set $S$ is $m$.
+Write an efficient algorithm to determine the subset of $S$ whose sum is closest to $x$ but does
+not exceed $x$.
+
+\qhead{10}
+A pair $(i,j)$ is called a \emph{significant pair} if $i<j$ and $A[i]>2A[j]$. Design an
+$\Oh{n\log n}$-time algorithm to count the number of significant pairs in an array.
+
+\qhead{10}
+Let $S$ be a set of $n$ distinct numbers and $k$ be a positive integer such that $k\le n$. Write
+an $\Oh n$-time algorithm that determines the $k$ numbers in $S$ that are nearest to the median
+of $S$.
+
+%==================================================================
+\section{Solutions to the 2022 Paper}
+
+\setcounter{pq}{0}
+
+\qhead{5+5}
+\pt{a} \textbf{Counting sort with four counters.}
+\begin{enumerate}
+  \item Initialise $C[1..4]\leftarrow0$.
+  \item One pass: for each $i$, increment $C[A[i]]$.
+  \item One pass: write $C[1]$ copies of $1$, then $C[2]$ copies of $2$, then $C[3]$ copies of
+        $3$, then $C[4]$ copies of $4$, overwriting $A$ from the front.
+\end{enumerate}
+\emph{Correctness.} The output is non-decreasing by construction, and it is a permutation of the
+input because each value $v$ is written exactly $C[v]=\#\{i:A[i]=v\}$ times.
+
+\emph{Complexity.} Two linear passes plus $\Oh1$ counter work: $\boxed{\Oh n}$ time, $\Oh1$ extra
+space (four counters).
+
+\begin{trap}{``but sorting is $\Om{n\log n}$!''}
+No contradiction. The $\Om{n\log n}$ bound of \S6 applies only to \textbf{comparison-based}
+algorithms. Counting sort never compares two array elements --- it uses their \emph{values as
+indices}. Say this sentence explicitly; it is almost certainly worth a mark.
+\end{trap}
+
+\pt{b} \textbf{Two-pointer (Lomuto) partition on the $b$-field.}
+\begin{enumerate}
+  \item $i\leftarrow0$.
+  \item For $j=0,1,\dots,n-1$: if $b_j=0$, swap the tuples at positions $i$ and $j$, then
+        $i\leftarrow i+1$.
+\end{enumerate}
+(If the array literally stores the flattened sequence $a_1,b_1,a_2,b_2,\dots$ in $2n$ cells, a
+``swap'' is a swap of two adjacent-cell blocks --- still $\Oh1$ per operation.)
+
+\emph{Loop invariant.} Before each iteration, positions $[0,i)$ hold exactly the tuples with
+$b=0$ seen so far, and positions $[i,j)$ hold exactly those with $b=1$ seen so far.
+
+\emph{Correctness.} If $b_j=1$ the invariant extends trivially (the region of $1$s grows by one).
+If $b_j=0$, the swap sends the tuple to position $i$ --- the first slot of the $1$s block --- and
+moves that displaced $1$-tuple to position $j$, which is the new end of the $1$s block; then $i$
+advances. Both blocks stay correct. On termination $j=n$, so $[0,i)$ is all the $b=0$ tuples and
+$[i,n)$ all the $b=1$ tuples.
+
+\emph{Complexity.} $n$ iterations, each $\Oh1$: $\boxed{\Oh n}$ time, $\Oh1$ space (two indices).
+
+\emph{Remark.} This is exactly the partition primitive of quicksort/quickselect, and the same
+idea as the \textsc{Partition} step of median-of-medians (\S3). The output is \textbf{not
+stable}; if stability were demanded, $\Oh1$ space and linear time together become genuinely hard.
+
+\qhead{7+3}
+\pt{a} \textbf{Andrew's monotone chain.}
+\begin{enumerate}
+  \item Sort the points lexicographically by $(x,y)$.
+  \item \textbf{Lower hull:} scan left to right with a stack; before pushing $p$, while the top
+        two stack points $q,r$ and $p$ fail to make a counter-clockwise turn --- i.e.\ the cross
+        product $(r-q)\times(p-q)\le0$ --- pop the top.
+  \item \textbf{Upper hull:} run the same scan on the points in reverse order.
+  \item Concatenate the two chains, dropping the two duplicated endpoints.
+\end{enumerate}
+(Graham scan is an equally acceptable answer: pick the lowest point, sort the rest by polar
+angle about it, then run the same left-turn stack scan.)
+
+\emph{Correctness.} A point is a vertex of the lower hull exactly when it makes a strict left turn
+with its two hull neighbours. The stack maintains the invariant ``\emph{the stack currently holds
+the lower hull of the points scanned so far}''. Popping removes precisely those points that the
+new point $p$ renders non-convex, and a popped point can never return: it lies strictly below the
+segment joining two points that remain, so it is inside the hull of the points already seen, and
+adding more points only enlarges that hull. Doing the scan in both directions yields the lower and
+upper chains, whose concatenation is the full hull.
+
+\emph{Complexity.} Sorting is $\Oh{n\log n}$. In each scan every point is pushed once and popped
+at most once, so each scan is $\Oh n$ amortised. Total $\boxed{\Oh{n\log n}}$ --- which by part
+(b) is optimal.
+
+\pt{b} \textbf{Lower bound by reduction from sorting.}
+
+Let $\mathcal H$ be any algorithm computing the convex hull (as a cyclically ordered list of
+vertices) in time $T(n)$. Given arbitrary reals $x_1,\dots,x_n$ to sort:
+\begin{enumerate}
+  \item In $\Oh n$ time build the point set $P=\{(x_i,\,x_i^2):i=1,\dots,n\}$, i.e.\ lift every
+        number onto the parabola $y=x^2$.
+  \item Run $\mathcal H$ on $P$, costing $T(n)$.
+  \item In $\Oh n$ time, read the output starting from the leftmost vertex and walking along the
+        lower chain, outputting the $x$-coordinates.
+\end{enumerate}
+\emph{Why step 3 works.} The parabola $y=x^2$ is \textbf{strictly convex}, so \emph{every} point
+of $P$ is a vertex of the hull --- no point lies inside or on a chord joining two others. The hull
+is therefore a convex polygon on all $n$ points, and traversing its boundary from the leftmost
+vertex along the lower chain visits them in strictly increasing order of $x$. So step 3 emits
+$x_1,\dots,x_n$ sorted.
+
+Hence sorting $n$ reals is possible in $T(n)+\Oh n$ time. But comparison-based sorting requires
+$\Om{n\log n}$ (\S6, decision-tree argument), so
+\[
+  T(n)+\Oh n=\Om{n\log n}\quad\Longrightarrow\quad \boxed{T(n)=\Om{n\log n}} . \qquad\square
+\]
+
+\begin{facts}{the reduction template, in three lines}
+To prove problem $\Pi$ needs $\Om{n\log n}$: \textbf{(i)} transform a sorting instance into a
+$\Pi$ instance in $\Oh n$; \textbf{(ii)} show a solution to $\Pi$ can be converted back into the
+sorted order in $\Oh n$; \textbf{(iii)} conclude $T_\Pi(n)+\Oh n=\Om{n\log n}$. State all three
+steps --- marks are awarded per step, and step (ii) is the one people omit.
+\end{facts}
+
+\qhead{5+5}
+\pt{a} The statement is only meaningful once the array is random, so take $A$ to be a
+\textbf{uniformly random permutation} of $n$ distinct numbers.
+
+For each pair $i<j$ define the indicator
+\[
+  X_{ij}=\mathbf 1\{A[i]>A[j]\},\qquad\text{so}\qquad X=\sum_{1\le i<j\le n}X_{ij}.
+\]
+Fix such a pair. In a uniformly random permutation the two relative orders of the values at
+positions $i$ and $j$ are equally likely, so $\Prob(A[i]>A[j])=\tfrac12$ and
+$\E(X_{ij})=\tfrac12$.
+
+Linearity of expectation needs \emph{no} independence (and indeed the $X_{ij}$ are highly
+dependent), so
+\[
+  \E(X)=\sum_{i<j}\E(X_{ij})=\binom n2\cdot\frac12=\boxed{\frac{n(n-1)}{4}} .
+\]
+\emph{Sanity checks.} $n=2$ gives $\tfrac12$ ($0$ or $1$ inversion, equally likely) \checkmark;
+the maximum possible is $\binom n2$, attained by the reversed array, and the mean sits at exactly
+half of it, as symmetry demands (reversing a permutation maps $X\mapsto\binom n2-X$).
+
+\pt{b} \textbf{Claim.} If $a>b^k$ then $T(n)=\Th{n^{\log_b a}}$.
+
+Take $n=b^L$, so $L=\log_b n$. Unrolling the recurrence $L$ times:
+\[
+  T(n)=\sum_{i=0}^{L-1}a^i\,c\!\left(\frac{n}{b^i}\right)^{\!k}+a^L\,T(1)
+      =c\,n^k\sum_{i=0}^{L-1}\left(\frac{a}{b^k}\right)^{\!i}+d\,a^L .
+\]
+Note $a^L=a^{\log_b n}=n^{\log_b a}$. Write $r=a/b^k$; the hypothesis $a>b^k$ gives $r>1$, so the
+geometric sum is dominated by its \emph{largest} (last) term:
+\[
+  \sum_{i=0}^{L-1}r^i=\frac{r^L-1}{r-1}=\Th{r^L},
+  \qquad
+  r^L=\left(\frac{a}{b^k}\right)^{\log_b n}=\frac{n^{\log_b a}}{n^{k}} .
+\]
+Substituting,
+\[
+  c\,n^k\cdot\Th{\frac{n^{\log_b a}}{n^k}}=\Th{n^{\log_b a}},
+\]
+and the second term $d\,n^{\log_b a}$ is of the same order. Hence
+\[
+  \boxed{T(n)=\Th{n^{\log_b a}} .}
+\]
+(For general $n$, monotonicity of $T$ --- given in the question --- lets you sandwich $n$ between
+consecutive powers of $b$, and $\lceil\cdot\rceil$ effects change nothing since
+$b^{\log_b a}$ is a constant factor.) \qed
+
+\emph{Interpretation.} $r>1$ means the total work \emph{grows} geometrically down the recursion
+tree, so the bottom level --- the $a^L=n^{\log_b a}$ leaves --- dominates. That one sentence is
+the whole theorem, and is worth writing.
+
+\qhead{10}
+\textbf{Algorithm --- two-pointer sweep.}
+\begin{enumerate}
+  \item $j\leftarrow1$, $\mathit{best}\leftarrow0$, $\mathit{bestStart}\leftarrow1$.
+  \item For $i=1,2,\dots,n$:
+        \begin{enumerate}
+          \item While $j\le n$ and $a_j\le a_i+1$: $j\leftarrow j+1$.
+          \item Now the interval $[a_i,\,a_i+1]$ contains exactly $a_i,a_{i+1},\dots,a_{j-1}$, so
+                its count is $j-i$. If $j-i>\mathit{best}$, set $\mathit{best}\leftarrow j-i$ and
+                $\mathit{bestStart}\leftarrow i$.
+        \end{enumerate}
+  \item Return the interval $[a_{\mathit{bestStart}},\,a_{\mathit{bestStart}}+1]$ and the count
+        $\mathit{best}$.
+\end{enumerate}
+
+\begin{correct}
+\textbf{Step 1: it suffices to consider intervals whose left endpoint is a point of $S$.}
+Let $I=[t,t+1]$ be any unit interval and let $a_i$ be the \emph{smallest} point of $S$ inside
+$I$ (if $I$ contains no point, it is not a candidate for the maximum unless the maximum is $0$).
+Then $a_i\ge t$, so $a_i+1\ge t+1$, and every point of $S\cap I$ lies in $[a_i,\,t+1]\subseteq
+[a_i,\,a_i+1]$. Hence
+\[
+  |S\cap I|\ \le\ \bigl|S\cap[a_i,a_i+1]\bigr| ,
+\]
+so no interval beats the best one of the restricted form. Since the algorithm examines
+$[a_i,a_i+1]$ for \emph{every} $i$, it examines an optimal interval.
+
+\textbf{Step 2: the count computed is correct.} $S$ is increasing, so the points in
+$[a_i,a_i+1]$ are consecutive, starting at $a_i$. The inner loop advances $j$ to the first index
+with $a_j>a_i+1$, so the contained points are exactly $a_i,\dots,a_{j-1}$, a count of $j-i$.
+
+\textbf{Step 3: $j$ never needs to move backwards.} $a_i+1$ is increasing in $i$, so the first
+index exceeding it is non-decreasing in $i$. Hence carrying $j$ over from the previous iteration
+--- rather than restarting it --- is valid. \qed
+\end{correct}
+
+\begin{cplx}
+$i$ increases $n$ times in total; $j$ increases at most $n$ times \emph{in total across the whole
+run} (it never decreases and is capped at $n+1$). Every other operation is $\Oh1$. So the total
+is $\boxed{\Oh n}$, with $\Oh1$ extra space.
+\end{cplx}
+
+\begin{trap}{do not restart the inner pointer}
+The naive ``for each $i$, scan forward from $i$'' is $\Oh{n^2}$ in the worst case (e.g.\ all $n$
+points inside one unit interval). The linear bound comes \emph{entirely} from the observation in
+Step 3 that $j$ is monotone. Say it explicitly --- that is where the marks are.
+\end{trap}
+
+\qhead{10}
+\textbf{Assumption.} The elements of $S$ are positive (otherwise shift them; the problem's mention
+of the total $m$ signals this reading). Write $S=\{s_1,\dots,s_n\}$ and set $B=\min(x,m)$ --- if
+$x\ge m$ the answer is all of $S$, so we may assume the target is capped at $m$.
+
+\textbf{Algorithm --- subset-sum dynamic programming.}
+\begin{enumerate}
+  \item Boolean table $R[0..B]$, with $R[0]=\text{true}$ and $R[s]=\text{false}$ otherwise. (Also
+        keep $\mathit{take}[s]$, the index of the element used to first reach $s$, for recovery.)
+  \item For each element $s_t\in S$, for $s=B$ \textbf{down to} $s_t$:
+        if $R[s-s_t]$ and not $R[s]$, set $R[s]\leftarrow\text{true}$ and
+        $\mathit{take}[s]\leftarrow t$.
+  \item Let $s^\star=\max\{s\le B:R[s]=\text{true}\}$ --- scan $R$ downwards from $B$.
+  \item Recover the subset by repeatedly following $\mathit{take}$: from $s^\star$, output element
+        $\mathit{take}[s^\star]$ and move to $s^\star-s_{\mathit{take}[s^\star]}$, until reaching
+        $0$.
+\end{enumerate}
+
+\begin{correct}
+\textbf{Invariant.} After processing the first $t$ elements, $R[s]$ is true exactly when some
+subset of $\{s_1,\dots,s_t\}$ sums to $s$.
+
+\emph{Base:} with no elements only $s=0$ is reachable. \emph{Step:} a subset of the first $t$
+elements summing to $s$ either omits $s_t$ (so $s$ was already reachable) or includes it (so
+$s-s_t$ was reachable using the first $t-1$), which is precisely the update rule.
+
+\textbf{Why the loop runs downwards.} Iterating $s$ from high to low guarantees that
+$R[s-s_t]$ still refers to the table \emph{before} $s_t$ was processed. Ascending order would let
+$s_t$ be used repeatedly, solving the \emph{unbounded} knapsack instead.
+
+Since every achievable sum $\le B$ is marked, $s^\star$ is the largest achievable sum not
+exceeding $x$ --- i.e.\ the closest from below. \qed
+\end{correct}
+
+\begin{cplx}
+$n$ elements, each sweeping a table of size $B+1$:
+\[
+  \boxed{\Oh{n\,B}=\Oh{n\min(x,m)}\ \le\ \Oh{nm}}
+\]
+time, $\Oh{B}$ space (the $\mathit{take}$ array costs the same). Recovery is $\Oh n$.
+\end{cplx}
+
+\begin{facts}{say the word ``pseudo-polynomial''}
+Subset-sum is \textbf{NP-hard}, so no algorithm polynomial in the \emph{input length} is expected;
+$\Oh{nm}$ is polynomial in the \emph{value} $m$, not in its bit-length $\Oh{\log m}$. That is what
+``pseudo-polynomial'' means, and it is exactly why the question says ``\emph{efficient}'' rather
+than naming a complexity. Contrast with the brute force over all $2^n$ subsets.
+\end{facts}
+
+\qhead{10}
+\textbf{Algorithm --- modified merge sort.} \code{Count}$(A[\ell..r])$ returns the number of
+significant pairs inside the range \emph{and} leaves the range sorted ascending.
+\begin{enumerate}
+  \item If $\ell\ge r$, return $0$.
+  \item $m\leftarrow\floor{(\ell+r)/2}$; recursively
+        $c_L\leftarrow\code{Count}(A[\ell..m])$ and $c_R\leftarrow\code{Count}(A[m{+}1..r])$.
+        Both halves are now sorted.
+  \item \textbf{Cross-count.} Let $L=A[\ell..m]$ and $R=A[m{+}1..r]$. Walk a pointer $q$ over $R$
+        in increasing order and maintain a pointer $p$ into $L$ at the first position with
+        $L[p]>2R[q]$. Add $|L|-p$ to a counter $c_X$. Because $2R[q]$ increases with $q$, the
+        pointer $p$ only moves \textbf{forward}.
+  \item Merge $L$ and $R$ into $A[\ell..r]$ in the standard way.
+  \item Return $c_L+c_R+c_X$.
+\end{enumerate}
+
+\begin{correct}
+\textbf{Every significant pair is counted exactly once.} Merge sort splits by \textbf{index}, so
+for a pair $(i,j)$ with $i<j$ exactly one of three things holds: both indices lie in the left
+half (counted by the recursive call on $L$), both in the right half (counted by the call on $R$),
+or $i$ is in the left half and $j$ in the right half (counted in step 3). The third case is
+correct because \emph{every} left-half index is smaller than \emph{every} right-half index, so the
+condition $i<j$ is automatic and only $A[i]>2A[j]$ needs testing.
+
+\textbf{The cross-count is correct.} With $L$ sorted ascending, $\{p:L[p]>2R[q]\}$ is an upward-
+closed set, so its size is $|L|-p$ where $p$ is the first such position --- which is what the
+pointer tracks.
+
+\textbf{Sorting the halves is harmless.} Whether a pair is significant depends only on the two
+\emph{values} and on which half each index came from, never on the order within a half. So
+reordering inside a half after its own pairs have been counted changes nothing.
+
+\textbf{Monotonicity is what makes the sweep legal.} $R$ is scanned in increasing order and
+$z\mapsto2z$ is increasing, so the threshold $2R[q]$ increases and $p$ never needs to retreat.
+\qed
+\end{correct}
+
+\begin{cplx}
+Steps 3 and 4 are each one linear pass, so
+\[
+  T(n)=2T(n/2)+\Oh n \quad\Longrightarrow\quad \boxed{\Oh{n\log n}}
+\]
+by the Master Theorem, Case 2 ($a=b=2$, $n^{\log_b a}=n$, $f(n)=\Th n$).
+\end{cplx}
+
+\begin{facts}{one skeleton, many questions}
+Identical structure solves: counting inversions ($A[i]>A[j]$), this problem ($A[i]>2A[j]$), and
+practice Q5 ($A[i]>3A[j]+5$). \textbf{The only requirement is that the threshold function
+$g(A[j])$ be monotone increasing} --- that is what permits the single forward pointer. If it were
+not monotone you would need a balanced BST or BIT per merge, giving $\Oh{n\log^2n}$.
+\end{facts}
+
+\qhead{10}
+\textbf{Algorithm --- two applications of median-of-medians.}
+\begin{enumerate}
+  \item Find the median $M$ of $S$ by median-of-medians (\S3). \hfill $\Oh n$
+  \item Form the array of distances $d_i=|s_i-M|$ for every $s_i\in S$. \hfill $\Oh n$
+  \item Find the $k$-th smallest value $\delta$ among $d_1,\dots,d_n$, again by
+        median-of-medians. \hfill $\Oh n$
+  \item Output every $s_i$ with $d_i<\delta$; then top the answer up to exactly $k$ elements using
+        elements with $d_i=\delta$. \hfill $\Oh n$
+\end{enumerate}
+
+\begin{correct}
+Step 3 gives the value $\delta$ such that exactly $k$ of the $d_i$ are $\le\delta$ when counted
+with multiplicity. Step 4 outputs a set $K$ of size exactly $k$ consisting of elements with the
+$k$ smallest distances: every element with $d_i<\delta$ must be in any optimal answer, and the
+remaining slots are filled with elements at distance exactly $\delta$, which are interchangeable.
+
+Hence for any $s\in K$ and $s'\notin K$ we have $|s-M|\le|s'-M|$, which is precisely the
+statement that $K$ consists of $k$ numbers nearest the median. (With $S$ a set of \emph{distinct}
+numbers, ties $d_i=d_j$ can still occur --- one element on each side of $M$ --- so step 4's
+tie-handling is genuinely needed, and any choice is optimal.) \qed
+\end{correct}
+
+\begin{cplx}
+Four phases, each $\Oh n$ in the worst case:
+\[
+  \boxed{\Oh n} .
+\]
+The whole point is that \emph{both} selections use the worst-case-linear algorithm. Sorting $S$
+($\Oh{n\log n}$) or sorting the $d_i$ would miss the bound.
+\end{cplx}
+
+\begin{trap}{do not sort, and do not use randomised quickselect}
+Two tempting wrong answers:
+\begin{itemize}
+  \item ``Sort $S$, take the $k$ values around the middle'': $\Oh{n\log n}$, fails the required
+        $\Oh n$.
+  \item ``Use randomised quickselect'': that is $\Oh n$ \emph{expected}, but $\Oh{n^2}$ in the
+        worst case. The question says $\Oh n$-time, so you need the deterministic
+        median-of-medians guarantee. Name it.
+\end{itemize}
+Also note the answer is \emph{not} simply ``the $k$ elements around position $n/2$ in sorted
+order'' unless you have already sorted --- and you must not.
+\end{trap}
