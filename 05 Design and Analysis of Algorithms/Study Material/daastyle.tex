@@ -1,0 +1,57 @@
+% Shared preamble for the DAA crash course.
+\usepackage[a4paper,margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=2pt,topsep=3pt}
+\pagestyle{fancy}\fancyhf{}
+\rhead{\small Design and Analysis of Algorithms, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Oh}[1]{O(#1)}
+\newcommand{\Th}[1]{\Theta(#1)}
+\newcommand{\Om}[1]{\Omega(#1)}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\prf}{\smallskip\noindent\textbf{Proof.}\ }
+\renewcommand{\qed}{\hfill$\blacksquare$}
+\newcommand{\chrom}{\chi}
+\newcommand{\clq}{\omega}
+\newcommand{\indep}{\alpha}
+\newcommand{\cc}{\kappa}
+
+% --- the five-part rhythm -------------------------------------------------
+\newtcolorbox{prob}[1]{colback=Blue!4,colframe=Blue!60,
+  title={\textsc{Problem} --- #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{algo}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,
+  title={\textsc{Algorithm} --- #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{correct}{colback=Purple!4,colframe=Purple!55,
+  title={\textsc{Correctness}},fonttitle=\bfseries,breakable}
+\newtcolorbox{cplx}{colback=Orange!6,colframe=Orange!70,
+  title={\textsc{Time complexity}},fonttitle=\bfseries,breakable}
+\newtcolorbox{facts}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={\textsc{Exam facts} --- #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{trap}[1]{colback=black!5,colframe=black!45,
+  title={\textsc{Trap} --- #1},fonttitle=\bfseries,breakable}
+
+% --- practice questions ---------------------------------------------------
+\newcounter{pq}
+\newcommand{\qhead}[1]{\medskip\refstepcounter{pq}%
+  \noindent\textbf{\color{Blue}Q\thepq.}\hfill\textnormal{[\textbf{#1} marks]}\par\smallskip}
+\newcommand{\pt}[1]{\smallskip\noindent\textbf{(#1)}\ }
+\newcommand{\sol}{\smallskip\noindent\textbf{\color{ForestGreen}Solution.}\ }
+\newcommand{\hint}{\smallskip\noindent\textbf{\color{Orange}Hint.}\ }

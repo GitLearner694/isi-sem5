@@ -1,0 +1,474 @@
+%==================================================================
+\section{What the 2022 paper actually tested}
+
+The last time this professor set this paper (22 September 2022; 60 marks, 2\,h\,30\,m, ``you may
+answer any part of any question, but maximum you can score is 60''), every question was an
+\textbf{algorithm-design} question. Here is the mapping onto this crash course:
+
+\begin{center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+2022 Q & Topic & Technique & Here \\
+\midrule
+1(a) & Sort $A[i]\in\{1,2,3,4\}$ in $\Oh n$ & counting sort & \S6 facts \\
+1(b) & In-place rearrange by a $0/1$ key & two-pointer partition & \S3 (partition step) \\
+2(a) & Convex hull in $\Oh{n\log n}$ & sort $+$ scan & \S6 facts \\
+2(b) & Convex hull is $\Om{n\log n}$ & reduction from sorting & \S6 \\
+3(a) & $\E(\#\text{inversions})$ & linearity of expectation & Practice Q3 \\
+3(b) & $T(n)=aT(n/b)+cn^k$, $a>b^k$ & unroll the geometric sum & \S2 \\
+4 & Unit interval with most points & two-pointer sweep & Practice Q4 \\
+5 & Subset sum closest to $x$ from below & DP & \S5 template \\
+6 & Count pairs $A[i]>2A[j]$ in $\Oh{n\log n}$ & merge-sort variant & Practice Q5 \\
+7 & $k$ numbers nearest the median in $\Oh n$ & median of medians & \S3 facts \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{facts}{what this tells you about the exam}
+\begin{itemize}
+  \item \textbf{Nothing was pure bookwork.} Even the two theory parts (2(b), 3(b)) were
+        \emph{proofs}, not statements.
+  \item \textbf{Every algorithm question named a target complexity.} That target is the hint:
+        $\Oh n$ means counting/two-pointer/selection; $\Oh{n\log n}$ means sort-then-scan or a
+        merge-sort variant; $\Oh{n^2}$ means DP or all-pairs.
+  \item \textbf{The 2022 paper contained no graph theory} --- but \S\S9--13 of your notes are
+        entirely graph theory, so the syllabus has clearly widened. Prepare both. Practice
+        Q7--Q9 below cover that half.
+  \item \textbf{Always give all four parts:} algorithm, correctness, complexity, and the
+        data structure that achieves it. The marks are split across them.
+\end{itemize}
+\end{facts}
+
+%==================================================================
+\section{Practice Set}
+
+\noindent\emph{In the style and at the level of the 2022 paper. Total available: 105 marks; treat
+any 60 of them as a full paper. Solutions begin in \S\ref{sec:sols} --- attempt first.}
+
+\qhead{5+5}
+\pt{a} $A$ is an unsorted array of size $n$ with $A[i]\in\{0,1,\dots,k-1\}$ for a fixed constant
+$k$. Give an $\Oh n$-time, $\Oh1$-extra-space algorithm to sort $A$. What changes if
+$k=\Th n$?
+
+\pt{b} An array of $n$ items is given, each coloured Red, White or Blue. Rearrange the array
+\emph{in place} in $\Oh n$ time and $\Oh 1$ extra space so that all Reds come first, then all
+Whites, then all Blues. State the loop invariant.
+
+\qhead{7+3}
+\pt{a} Given $n$ points in the plane, design an $\Oh{n\log n}$ algorithm to compute the convex
+hull. Prove it correct and justify the complexity.
+
+\pt{b} Prove that any comparison-based algorithm computing the convex hull of $n$ points
+requires $\Om{n\log n}$ time.
+
+\qhead{5+5}
+\pt{a} Let $A$ be a uniformly random permutation of $n$ distinct numbers. An \emph{inversion} is
+a pair $(i,j)$ with $i<j$ and $A[i]>A[j]$; let $X$ be the number of inversions. Compute $\E(X)$.
+Then give an $\Oh{n\log n}$ algorithm to count the inversions of a \emph{given} array.
+
+\pt{b} Let $T(n)=a\,T(n/b)+c\,n^k$ with $T(1)=d$, $a,c>0$, $k,d\ge0$, $b\ge2$. Prove that if
+$a<b^k$ then $T(n)=\Th{n^k}$.
+
+\qhead{10}
+$S=\langle a_1<a_2<\cdots<a_n\rangle$ is an increasing sequence of points on the real line, and
+$k\le n$ is a positive integer. Give an $\Oh n$-time algorithm that finds the \textbf{shortest}
+interval containing at least $k$ points of $S$. Prove correctness.
+
+\qhead{10}
+Let $A$ be an array of $n$ distinct reals. Call $(i,j)$ a \emph{heavy pair} if $i<j$ and
+$A[i]>3A[j]+5$. Design an $\Oh{n\log n}$ algorithm to count the heavy pairs.
+
+\qhead{10}
+There are $n$ jobs; job $i$ occupies the interval $[s_i,f_i]$ and has weight $w_i>0$. Find a
+maximum-weight set of pairwise non-overlapping jobs in $\Oh{n\log n}$. Prove optimal substructure.
+What does this problem become in the language of \S12, and why is that significant?
+
+\qhead{10}
+Let $T$ be a tree on $n$ vertices. Give an $\Oh n$ algorithm that computes the eccentricity
+$\mathrm{ecc}(v)=\max_u d(v,u)$ for \emph{every} vertex $v$ simultaneously. Prove it correct.
+
+\qhead{5+5}
+\pt{a} Prove that a simple planar graph with $n\ge3$ vertices has at most $3n-6$ edges, and
+deduce that $K_5$ is not planar.
+
+\pt{b} Prove that a \emph{triangle-free} simple planar graph with $n\ge3$ vertices has at most
+$2n-4$ edges, and deduce that $K_{3,3}$ is not planar.
+
+\qhead{10}
+$G$ is a chordal graph on $n$ vertices and $m$ edges, and a perfect elimination ordering of $G$
+is given. Give an $\Oh{n+m}$ algorithm that computes $\chrom(G)$ and $\clq(G)$, and prove that
+they are equal.
+
+\qhead{10}
+Given a set $S$ of $n$ distinct reals, decide whether there exist four \emph{distinct} elements
+$x,y,z,w\in S$ with $x+y=z+w$. Give an algorithm and analyse it. (Aim for $\Oh{n^2}$ up to the
+cost of a dictionary.)
+
+\qhead{10}
+You are given the \textbf{preorder} traversal of a binary search tree on $n$ distinct keys.
+Reconstruct the tree in $\Oh n$ time and prove correctness. Explain why the analogous problem for
+a general binary tree is impossible.
+
+\qhead{5}
+Prove that any comparison-based algorithm that merges two sorted arrays of size $n$ each requires
+at least $2n-1$ comparisons in the worst case.
+
+%==================================================================
+\section{Solutions to the Practice Set}\label{sec:sols}
+
+\setcounter{pq}{0}
+
+\qhead{5+5}
+\pt{a} \textbf{Counting sort.} Keep an array $C[0..k-1]$ of counters (size $k$, a constant, hence
+$\Oh1$ space). One pass over $A$ incrementing $C[A[i]]$; then one pass writing $C[0]$ copies of
+$0$, then $C[1]$ copies of $1$, and so on. Time $\Oh{n+k}=\Oh n$; extra space $\Oh k=\Oh1$.
+
+\emph{Correctness:} the output is non-decreasing by construction, and it is a permutation of the
+input because each value $v$ is written exactly $C[v]=\#\{i:A[i]=v\}$ times.
+
+\emph{No contradiction with the $\Om{n\log n}$ bound:} this is not a comparison sort --- it uses
+the values as array indices.
+
+\emph{If $k=\Th n$:} the time is still $\Oh{n+k}=\Oh n$, but the counter array now needs $\Th n$
+space, so the $\Oh1$-space claim fails. It becomes an $\Oh n$-time, $\Oh n$-space algorithm.
+
+\pt{b} \textbf{Dutch national flag, three pointers.} Maintain $\mathit{lo}=0$, $\mathit{mid}=0$,
+$\mathit{hi}=n-1$ and loop while $\mathit{mid}\le \mathit{hi}$:
+\begin{itemize}
+  \item $A[\mathit{mid}]$ Red: swap $A[\mathit{lo}]\leftrightarrow A[\mathit{mid}]$; $\mathit{lo}{+}{+}$; $\mathit{mid}{+}{+}$.
+  \item $A[\mathit{mid}]$ White: $\mathit{mid}{+}{+}$.
+  \item $A[\mathit{mid}]$ Blue: swap $A[\mathit{mid}]\leftrightarrow A[\mathit{hi}]$; $\mathit{hi}{-}{-}$ (do \emph{not} advance $\mathit{mid}$).
+\end{itemize}
+\textbf{Loop invariant:} $A[0,\mathit{lo})$ all Red, $A[\mathit{lo},\mathit{mid})$ all White,
+$A(\mathit{hi},n)$ all Blue, and $A[\mathit{mid},\mathit{hi}]$ unexamined.
+
+\emph{Correctness:} each branch restores the invariant --- the Blue case cannot advance
+$\mathit{mid}$ because the element swapped in from $\mathit{hi}$ is still unexamined. On
+termination $\mathit{mid}>\mathit{hi}$, so the unexamined region is empty and the three blocks
+tile the array.
+
+\emph{Complexity:} every iteration either increments $\mathit{mid}$ or decrements $\mathit{hi}$,
+so the quantity $\mathit{hi}-\mathit{mid}$ strictly decreases: at most $n$ iterations, each
+$\Oh1$. Time $\Oh n$, extra space $\Oh1$ (three indices). The same three-way partition is exactly
+what a robust quicksort/quickselect uses when duplicates are present.
+
+\qhead{7+3}
+\pt{a} \textbf{Andrew's monotone chain.}
+\begin{enumerate}
+  \item Sort the points lexicographically by $(x,y)$: $\Oh{n\log n}$.
+  \item \textbf{Lower hull:} scan left to right maintaining a stack; before pushing $p$, while the
+        top two stack points $q,r$ and $p$ do \emph{not} make a counter-clockwise turn (i.e.\
+        the cross product $(r-q)\times(p-q)\le0$), pop.
+  \item \textbf{Upper hull:} the same scan on the reversed order.
+  \item Concatenate, dropping the duplicated endpoints.
+\end{enumerate}
+\emph{Correctness:} a point is a vertex of the lower hull iff it makes a strict left turn with its
+hull-neighbours. The stack maintains the invariant ``the current stack is the lower hull of the
+points scanned so far'': popping removes exactly the points that the new point makes non-convex,
+and no popped point can return to the hull, since it lies below the segment joining two points
+that remain. Doing this in both directions gives the full hull.
+
+\emph{Complexity:} $\Oh{n\log n}$ for the sort; the scan pushes each point once and pops it at
+most once, so it is $\Oh n$ amortised. Total $\Oh{n\log n}$, which by (b) is optimal.
+
+\pt{b} \textbf{Reduction from sorting.} Given reals $x_1,\dots,x_n$, build the points
+$(x_i,x_i^2)$ in $\Oh n$ time. All of them lie on the parabola $y=x^2$, which is strictly convex,
+so \emph{every} input point is a hull vertex. A hull algorithm outputs the vertices in cyclic
+order; starting at the leftmost and reading along the lower chain gives $x_1,\dots,x_n$ in
+increasing order --- an $\Oh n$ extraction.
+
+So a hull algorithm running in $T(n)$ would sort in $T(n)+\Oh n$. Since comparison sorting is
+$\Om{n\log n}$ (\S6), $T(n)+\Oh n=\Om{n\log n}$, hence $T(n)=\Om{n\log n}$. \qed
+
+\qhead{5+5}
+\pt{a} \textbf{Expectation.} For each pair $i<j$ let $X_{ij}=\mathbf 1\{A[i]>A[j]\}$, so
+$X=\sum_{i<j}X_{ij}$. In a uniformly random permutation the two orderings of any fixed pair are
+equally likely, so $\E(X_{ij})=\tfrac12$. By linearity (no independence needed):
+\[
+  \E(X)=\binom n2\cdot\frac12=\boxed{\frac{n(n-1)}{4}} .
+\]
+
+\textbf{Counting algorithm --- modified merge sort.} Sort recursively, and during the merge of
+the sorted halves $L$ and $R$: whenever an element of $R$ is output while $t$ elements of $L$
+remain unconsumed, add $t$ to the counter (that element of $R$ is inverted with exactly those $t$
+elements).
+
+\emph{Correctness:} every pair $(i,j)$ with $i<j$ has both indices in $L$, both in $R$, or split.
+The first two are counted by the recursive calls, the third exactly once during this merge, and
+$L$ holds precisely the smaller indices. So each inverted pair is counted once.
+
+\emph{Complexity:} $T(n)=2T(n/2)+\Oh n=\Oh{n\log n}$ (Master Theorem, Case 2).
+
+\pt{b} Unroll for $n=b^L$, $L=\log_b n$, exactly as in \S2:
+\[
+  T(n)=c\,n^k\sum_{i=0}^{L-1}\left(\frac{a}{b^k}\right)^{\!i}+d\,n^{\log_b a}.
+\]
+Put $r=a/b^k$. Now $a<b^k$ gives $r<1$, so the geometric series \emph{converges}:
+\[
+  \sum_{i=0}^{L-1}r^i\ \le\ \sum_{i=0}^{\infty}r^i=\frac{1}{1-r}=\Th1 ,
+\]
+and it is at least $1$. Hence the first term is $\Th{n^k}$. For the second, $a<b^k$ gives
+$\log_b a<k$, so $n^{\log_b a}=o(n^k)$. Therefore
+\[
+  T(n)=\Th{n^k}+o(n^k)=\boxed{\Th{n^k}} .
+\]
+(The lower bound is immediate anyway: the root alone contributes $c\,n^k$.) \qed
+\emph{Interpretation:} $r<1$ means the work \emph{shrinks} geometrically down the tree, so the
+root dominates --- Master Theorem Case 3.
+
+\qhead{10}
+\textbf{Algorithm.} For $i=1,\dots,n-k+1$ compute $a_{i+k-1}-a_i$ and return the minimum (and the
+interval attaining it). $\Oh n$ time, $\Oh 1$ space.
+
+\emph{Correctness.} Let $I$ be any interval containing at least $k$ points of $S$. Since $S$ is
+sorted, the points of $S$ inside $I$ are \textbf{consecutive}: $a_i,a_{i+1},\dots,a_j$ with
+$j-i+1\ge k$. Then
+\[
+  |I|\ \ge\ a_j-a_i\ \ge\ a_{i+k-1}-a_i,
+\]
+the second inequality because $j\ge i+k-1$ and the $a$'s increase. So no interval beats the best
+window. Conversely each window $[a_i,a_{i+k-1}]$ genuinely contains the $k$ points
+$a_i,\dots,a_{i+k-1}$, so the minimum over windows is attained. \qed
+
+\emph{Remark.} The 2022 paper asked the dual --- \emph{fixed} length $1$, maximise the count. That
+one needs a two-pointer sweep: advance $j$ while $a_j\le a_i+1$, take $j-i$, then advance $i$.
+Both pointers only move forward, so it is $\Oh n$. Know both directions.
+
+\qhead{10}
+\textbf{Algorithm --- merge-sort variant.} \code{CountAndSort}$(A[\ell..r])$:
+\begin{enumerate}
+  \item If $\ell\ge r$, return $0$.
+  \item Split at the midpoint; recursively count-and-sort each half, obtaining sorted $L$, $R$
+        and their counts.
+  \item \textbf{Cross count.} Both halves are now sorted ascending. Walk $j$ over $R$ in
+        increasing order; maintain a pointer $p$ into $L$ marking the first position with
+        $L[p]>3R[j]+5$. Add $|L|-p$ to the count. Since $3R[j]+5$ increases with $j$, $p$ is
+        non-decreasing --- one monotone sweep.
+  \item Merge $L$ and $R$ normally and return the total count.
+\end{enumerate}
+\emph{Correctness.} Every pair $(i,j)$ with $i<j$ lies wholly in the left half, wholly in the
+right half, or is split with $i$ in the left and $j$ in the right --- because merge sort splits by
+\emph{index}, so all left-half indices precede all right-half indices. The first two cases are
+handled by recursion; the third is counted in step 3, which for each $j$ counts exactly the
+$L$-elements exceeding $3A[j]+5$. Sorting the halves is harmless: the count for a split pair
+depends only on the two \emph{values}, not on their order within a half.
+
+\emph{Complexity.} Steps 3 and 4 are each a single linear sweep, so
+$T(n)=2T(n/2)+\Oh n=\boxed{\Oh{n\log n}}$ by the Master Theorem, Case 2.
+
+\emph{Remark.} The same skeleton solves 2022 Q6 ($A[i]>2A[j]$) and inversion counting
+($A[i]>A[j]$): only the threshold function changes. It must be \textbf{monotone} in $A[j]$ for the
+single-pointer sweep to be valid.
+
+\qhead{10}
+\textbf{Weighted interval scheduling.}
+\begin{enumerate}
+  \item Sort jobs by finishing time so $f_1\le f_2\le\cdots\le f_n$: $\Oh{n\log n}$.
+  \item For each $j$ compute $p(j)=\max\{i<j: f_i\le s_j\}$ (or $0$), by binary search in the
+        sorted finish times: $\Oh{\log n}$ each, $\Oh{n\log n}$ total.
+  \item DP with $\mathrm{opt}(0)=0$ and
+        \[
+          \mathrm{opt}(j)=\max\Bigl\{\,w_j+\mathrm{opt}(p(j)),\ \ \mathrm{opt}(j-1)\,\Bigr\}.
+        \]
+  \item Answer $\mathrm{opt}(n)$; recover the set by tracing which branch achieved each maximum.
+\end{enumerate}
+\emph{Optimal substructure.} Consider an optimal solution $O_j$ for jobs $1,\dots,j$.
+\begin{itemize}
+  \item If job $j\in O_j$: no job $i$ with $p(j)<i<j$ can be in $O_j$, since every such job
+        finishes after $s_j$ and starts before $f_j$, hence overlaps $j$. So
+        $O_j\setminus\{j\}$ is a feasible solution on $1,\dots,p(j)$, and it must be optimal
+        there --- otherwise replacing it by a better one and re-adding $j$ would beat $O_j$.
+        Value $w_j+\mathrm{opt}(p(j))$.
+  \item If job $j\notin O_j$: $O_j$ is a feasible solution on $1,\dots,j-1$ and must be optimal
+        there by the same exchange argument. Value $\mathrm{opt}(j-1)$.
+\end{itemize}
+These two cases are exhaustive, so the maximum of the two values is $\mathrm{opt}(j)$; induction
+on $j$ completes the proof. \qed
+
+\emph{Complexity.} $\Oh{n\log n}$ (sort $+$ binary searches) $+\ \Oh n$ (DP) $=\boxed{\Oh{n\log n}}$.
+
+\emph{The connection.} Build the interval graph $G$ whose vertices are the jobs, with an edge
+between overlapping jobs. A set of pairwise non-overlapping jobs is exactly an
+\textbf{independent set} of $G$, so this is \textbf{maximum-weight independent set on an interval
+graph}. That is significant because MWIS is NP-hard on general graphs, yet interval graphs are
+chordal, hence perfect, and the structure (here: a linear order by finishing time) makes the
+problem solvable in $\Oh{n\log n}$ --- the same phenomenon as \S13, where a PEO makes maximum
+independent set easy on chordal graphs.
+
+\qhead{10}
+\textbf{Algorithm.} Three BFS runs.
+\begin{enumerate}
+  \item BFS from an arbitrary $s$; let $u$ be a farthest vertex.
+  \item BFS from $u$, recording $d_u(\cdot)$; let $v$ be a farthest vertex. Then $(u,v)$ is a
+        diametral pair.
+  \item BFS from $v$, recording $d_v(\cdot)$.
+  \item Output $\mathrm{ecc}(x)=\max\{d_u(x),d_v(x)\}$ for every $x$.
+\end{enumerate}
+\emph{Correctness.} Step 2 gives a diametral pair by the two-BFS trick (\S9). It remains to show:
+for \emph{every} $x$ and any diametral pair $(u,v)$,
+$\mathrm{ecc}(x)=\max\{d(x,u),d(x,v)\}$.
+
+``$\ge$'' is trivial. For ``$\le$'', let $P$ be the (unique) $u$--$v$ path, let $w$ be any vertex,
+and let $m$, $m_w$ be the vertices of $P$ closest to $x$ and to $w$ respectively.
+First, since $d(u,w)=d(u,m_w)+d(m_w,w)\le\mathrm{diam}=d(u,m_w)+d(m_w,v)$, we get
+$d(m_w,w)\le d(m_w,v)$, and symmetrically $d(m_w,w)\le d(m_w,u)$.
+\begin{itemize}
+  \item If $m=m_w$: $d(x,w)=d(x,m)+d(m,w)\le d(x,m)+\max\{d(m,u),d(m,v)\}=\max\{d(x,u),d(x,v)\}$.
+  \item If $m\ne m_w$, say $m$ lies between $u$ and $m_w$ on $P$. Then
+        \[
+          d(x,v)=d(x,m)+d(m,v)=d(x,m)+d(m,m_w)+d(m_w,v)\ \ge\ d(x,m)+d(m,m_w)+d(m_w,w)=d(x,w).
+        \]
+        (The symmetric case gives $d(x,u)\ge d(x,w)$.)
+\end{itemize}
+Either way $d(x,w)\le\max\{d(x,u),d(x,v)\}$ for every $w$, proving the claim. \qed
+
+\emph{Complexity.} Three BFS runs on a tree: $\boxed{\Oh{n}}$ (since $|E|=n-1$).
+
+\qhead{5+5}
+\pt{a} Every face of a plane drawing of a simple graph with $n\ge3$ is bounded by at least $3$
+edges, and every edge borders exactly $2$ faces. Counting edge--face incidences two ways,
+$2E\ge3F$, i.e.\ $F\le\tfrac23E$. Substituting into Euler's formula $n-E+F=2$:
+\[
+  2=n-E+F\ \le\ n-E+\tfrac23E=n-\tfrac13E
+  \quad\Longrightarrow\quad E\le3n-6 .
+\]
+\textbf{$K_5$:} $n=5$, $E=\binom52=10$, but $3n-6=9<10$. So $K_5$ violates the bound and is not
+planar. \qed
+
+\pt{b} If $G$ is triangle-free then every face is bounded by at least $4$ edges, so $2E\ge4F$,
+i.e.\ $F\le\tfrac12E$. Euler again:
+\[
+  2=n-E+F\le n-E+\tfrac12E=n-\tfrac12E
+  \quad\Longrightarrow\quad E\le2n-4 .
+\]
+\textbf{$K_{3,3}$:} it is bipartite, hence triangle-free, with $n=6$ and $E=9$; but
+$2n-4=8<9$. So $K_{3,3}$ is not planar. \qed
+
+\emph{Note:} the first bound alone does \emph{not} rule out $K_{3,3}$ --- $3n-6=12\ge9$. That is
+exactly why the triangle-free refinement is needed, and it is a favourite exam trap.
+
+\qhead{10}
+\textbf{Algorithm.} Let $v_1,\dots,v_n$ be the given PEO. Process it in order; for each $i$
+compute
+\[
+  d_i=\bigl|N(v_i)\cap\{v_1,\dots,v_{i-1}\}\bigr|
+\]
+and give $v_i$ the lowest-indexed colour not used by those earlier neighbours. Output
+$\max_i(d_i+1)$ as both $\chrom(G)$ and $\clq(G)$, together with the colouring.
+
+\emph{Complexity.} Computing all the $d_i$ is one scan of the adjacency lists with a position
+array, $\Oh{n+m}$. Choosing $v_i$'s colour needs a scratch array of size $d_i+1$ marking the
+colours of its earlier neighbours, so the total colouring work is $\sum_i\Oh{d_i+1}=\Oh{n+m}$.
+Total $\boxed{\Oh{n+m}}$.
+
+\emph{Proof that $\chrom=\clq$.}
+\begin{itemize}
+  \item \textbf{Upper bound on $\chrom$.} When $v_i$ is coloured, its earlier neighbours form a
+        \emph{clique} (PEO property) of size $d_i$, so they carry $d_i$ \emph{distinct} colours,
+        and some colour in $\{1,\dots,d_i+1\}$ is free. Hence the greedy uses at most
+        $1+\max_i d_i$ colours, so $\chrom(G)\le1+\max_i d_i$.
+  \item \textbf{Lower bound on $\clq$.} For the index $i$ attaining the maximum, the set
+        $\{v_i\}\cup\bigl(N(v_i)\cap\{v_1,\dots,v_{i-1}\}\bigr)$ is a clique of size $d_i+1$
+        (the earlier neighbours are mutually adjacent, and $v_i$ is adjacent to all of them). So
+        $\clq(G)\ge1+\max_i d_i$.
+  \item \textbf{Universal inequality.} $\chrom(G)\ge\clq(G)$ always.
+\end{itemize}
+Chaining: $\clq\le\chrom\le1+\max_i d_i\le\clq$, so all are equal:
+\[
+  \boxed{\chrom(G)=\clq(G)=1+\max_i d_i .}
+\]
+\qed \emph{This is the constructive proof that chordal graphs are perfect} (the argument applies
+verbatim to every induced subgraph, since an induced subgraph of a chordal graph is chordal and
+inherits a PEO).
+
+\qhead{10}
+\textbf{Key observation.} If $\{x,y\}$ and $\{z,w\}$ are \emph{distinct} pairs with $x+y=z+w$,
+they are automatically \textbf{disjoint}: if they shared an element, cancelling it would force
+the other two to be equal, impossible among distinct elements. So we need only find two distinct
+pairs with equal sums --- distinctness of all four is then free.
+
+\textbf{Algorithm.} Form all $\binom n2$ pairwise sums, each tagged with its pair. Insert them
+into a dictionary keyed by the sum. If any key is hit twice, output the two pairs; if no
+collision occurs, answer ``no''.
+
+\emph{Correctness.} A ``yes'' instance is precisely a repeated sum, by the key observation. The
+algorithm reports exactly that.
+
+\emph{Complexity.} $\binom n2=\Th{n^2}$ sums to generate.
+\begin{itemize}
+  \item With a hash table: $\Oh{n^2}$ expected time, $\Oh{n^2}$ space.
+  \item Deterministically, by sorting the sums and scanning for adjacent duplicates:
+        $\Oh{n^2\log n}$ time (which is $\Oh{n^2\log n}=\Oh{n^2\cdot\log n}$; note
+        $\log\binom n2=\Th{\log n}$), $\Oh{n^2}$ space.
+\end{itemize}
+\emph{Remark.} One can stop as soon as a collision appears, so on ``yes'' instances the algorithm
+often terminates far earlier --- but the worst case (a Sidon set, where all pairwise sums are
+distinct) forces all $\Th{n^2}$ sums to be examined.
+
+\qhead{10}
+\textbf{Why preorder alone suffices for a BST.} The inorder traversal of a BST with distinct keys
+is forced --- it is the keys in increasing order. So preorder $+$ inorder is available, and by the
+standard reconstruction (\S4) that determines the tree uniquely. Sorting would cost
+$\Oh{n\log n}$; the bounds method below achieves $\Oh n$.
+
+\textbf{Algorithm (bounds method).} Keep a global index $\mathit{idx}=0$ into the preorder array
+$P$. Define
+\[
+  \code{Build}(\mathit{lo},\mathit{hi}):
+\]
+\begin{enumerate}
+  \item If $\mathit{idx}=n$, or $P[\mathit{idx}]\notin(\mathit{lo},\mathit{hi})$, return
+        \code{null}.
+  \item Let $\kappa=P[\mathit{idx}]$; create a node with key $\kappa$; $\mathit{idx}{+}{+}$.
+  \item Left child $\leftarrow\code{Build}(\mathit{lo},\kappa)$;
+        right child $\leftarrow\code{Build}(\kappa,\mathit{hi})$.
+  \item Return the node.
+\end{enumerate}
+Call \code{Build}$(-\infty,+\infty)$.
+
+\emph{Correctness.} By the BST property, in the preorder sequence the root $\kappa$ is followed
+first by the entire preorder of its left subtree --- all of whose keys are $<\kappa$ --- and then
+by the preorder of its right subtree, all of whose keys are $>\kappa$. So the split point is
+exactly the first position after $\kappa$ carrying a key $>\kappa$, which is precisely what the
+bound test $P[\mathit{idx}]\in(\mathit{lo},\mathit{hi})$ detects. Induction on subtree size gives
+correctness.
+
+\emph{Complexity.} $\mathit{idx}$ advances exactly once per node, and each node generates $\Oh1$
+calls, so the total number of calls (including those returning \code{null}) is $\Oh n$, each
+doing $\Oh1$ work: $\boxed{\Oh n}$.
+
+\emph{Why a general binary tree is impossible.} With $n$ distinct keys there are far more binary
+trees than preorder sequences can distinguish: concretely, a preorder ``$a$, then $b$'' is
+consistent with $b$ being either the left child or the right child of $a$, two genuinely
+different trees producing identical preorder output. Hence no algorithm can reconstruct. The BST
+case escapes only because the extra ordering constraint supplies the missing inorder information.
+
+\qhead{5}
+\textbf{Adversary argument.} Consider inputs in which the correct merged output alternates
+between the two arrays:
+\[
+  a_1<b_1<a_2<b_2<\cdots<a_n<b_n .
+\]
+The merged sequence has $2n$ elements, hence $2n-1$ adjacent pairs, and each adjacent pair
+consists of one element from each array (by the alternation).
+
+Suppose some algorithm halts having never compared some adjacent pair $(u,v)$ from different
+arrays, where $u$ immediately precedes $v$ in the true output. Build a second input identical
+except that the values of $u$ and $v$ are swapped. This second input is still a legal pair of
+sorted arrays (swapping two adjacent values across the two arrays preserves the sorted order
+within each array), and it is consistent with \emph{every} comparison the algorithm actually made
+--- the only comparison whose outcome would change is the one between $u$ and $v$, which was never
+performed. Yet the correct output differs, since $u$ and $v$ are transposed. So the algorithm
+gives a wrong answer on one of the two inputs.
+
+Hence a correct algorithm must compare all $2n-1$ adjacent pairs, requiring at least $2n-1$
+comparisons in the worst case. \qed
+
+\emph{Matching upper bound:} standard merging uses at most $2n-1$ comparisons, so the bound is
+tight.
+
+\vfill
+\begin{center}\small\itshape
+Sections 1--13 follow the lecture notes exactly; the practice set is modelled on the
+mid-semester examination of 22 September 2022.
+\end{center}

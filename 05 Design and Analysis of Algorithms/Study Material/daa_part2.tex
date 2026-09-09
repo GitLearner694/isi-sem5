@@ -1,0 +1,611 @@
+%==================================================================
+\section{Graphs: Representation and Breadth-First Search}
+
+\begin{facts}{the recipe, and how to store a graph}
+\textbf{Recipe for every graph question:} identify the property to compute or characterisation
+to test $\to$ design the algorithm $\to$ choose the data structure that makes it efficient.
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Representation & Space & Test a specific edge \\
+\midrule
+Adjacency matrix ($n\times n$ 0/1) & $\Th{n^2}$ regardless of sparsity & $\Oh1$ \\
+Adjacency list (neighbours per vertex) & $\Th{|V|+|E|}$ & $\Oh{\deg}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Use lists for sparse graphs (almost always in this course, since all the $\Oh{|V|+|E|}$ bounds
+below assume lists).
+\end{facts}
+
+\begin{prob}{BFS and its uses}
+Explore a graph outward from a source $s$ in layers of increasing distance; use it to test
+connectivity, compute unweighted shortest paths, test bipartiteness, and find tree diameters.
+\end{prob}
+
+\begin{algo}{Breadth-First Search}
+Three colours track progress: \textbf{white} (undiscovered), \textbf{grey} (discovered, in the
+queue), \textbf{black} (fully processed).
+\begin{enumerate}
+  \item All vertices white. Colour $s$ grey, enqueue it, set $d(s)=0$.
+  \item While the queue is non-empty: pop $u$, colour it black; for every \emph{white} neighbour
+        $v$ of $u$: colour $v$ grey, set $d(v)=d(u)+1$ and $\mathrm{parent}(v)=u$, enqueue $v$.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+\textbf{Claim.} BFS discovers vertices in non-decreasing order of true shortest-path distance
+from $s$, and the parent pointers form a shortest-path tree.
+
+\prf Induction on the distance $d$. All vertices at distance $0$ ($=s$) are handled first.
+Suppose every vertex at distance $<d$ has been discovered with the correct label, and that the
+queue processes them before anything farther. A vertex $v$ at distance exactly $d$ has some
+neighbour $u$ at distance $d-1$; when $u$ is dequeued, $v$ is either still white (so it is
+discovered now with $d(v)=d(u)+1=d$) or was already discovered --- and it cannot have been
+discovered from a vertex at distance $<d-1$, since that would give $v$ distance $<d$. So $v$ is
+labelled exactly $d$. The FIFO queue guarantees layer $d-1$ is fully processed before layer $d$
+begins. \qed
+\end{correct}
+
+\begin{cplx}
+Every vertex is enqueued and dequeued exactly once ($\Oh{|V|}$); every edge is examined at most
+twice, once from each endpoint ($\Oh{|E|}$). Total $\boxed{\Oh{|V|+|E|}}$.
+\end{cplx}
+
+\subsection*{Trees: diameter and farthest vertex}
+
+\begin{prob}{Diameter of a tree}
+Given a tree $T$, compute $\mathrm{diam}(T)=\max_{u,v}d(u,v)$.
+\end{prob}
+
+\begin{algo}{The two-BFS trick (trees only)}
+\begin{enumerate}
+  \item BFS from an arbitrary vertex $s$; let $u$ be a vertex farthest from $s$.
+  \item BFS from $u$; let $v$ be a vertex farthest from $u$.
+  \item Return $d(u,v)$.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+\textbf{Key fact.} In a tree, for \emph{any} vertex $s$, a vertex farthest from $s$ is an
+endpoint of some diametral pair.
+
+Granting this: $u$ is farthest from the arbitrary $s$, so $u$ pairs with some $b$ having
+$d(u,b)=\mathrm{diam}(T)$. Since $v$ is farthest from $u$, $d(u,v)\ge d(u,b)=\mathrm{diam}(T)$.
+But no pairwise distance can exceed the diameter, so $d(u,v)=\mathrm{diam}(T)$ exactly. \qed
+\end{correct}
+
+\begin{cplx}
+Two BFS runs: $\boxed{\Oh{|V|+|E|}}=\Oh{n}$ for a tree.
+\end{cplx}
+
+\begin{trap}{the two-BFS trick is \emph{special to trees}}
+It is \textbf{not valid} for general graphs. For a general graph, computing the exact diameter
+essentially requires BFS from every vertex --- $\Oh{|V|(|V|+|E|)}$.
+
+Also: to find the vertex farthest from a given $v$, use \textbf{BFS, not DFS}. DFS goes deep down
+one branch and may report a vertex that is deep in the DFS tree but not farthest in true
+shortest-path distance.
+\end{trap}
+
+\begin{facts}{recursive diameter, and eccentricities in $\Oh n$}
+\textbf{Recursive formulation.} For a subtree rooted at $v$ whose children lead to subtrees with
+(diameter, depth) pairs $(d_1,h_1),(d_2,h_2),\dots$, the diameter of the whole is the larger of
+\begin{itemize}
+  \item $\max_i d_i$ (the path avoids $v$), and
+  \item (sum of the two largest $h_i$) $+2$ (the path passes through $v$ between its two deepest
+        branches).
+\end{itemize}
+\textbf{All eccentricities at once.} If $(u,v)$ is a diametral pair, then for every vertex $x$,
+\[
+  \mathrm{ecc}(x)=\max\{d(x,u),\,d(x,v)\}.
+\]
+So two more BFS runs (from $u$ and from $v$) give every eccentricity in $\Oh n$ total.
+\end{facts}
+
+\subsection*{Edge classification, DAGs, topological sort}
+
+\begin{facts}{edge types relative to a search tree}
+\begin{itemize}
+  \item \textbf{Tree edge} --- used to first discover a vertex.
+  \item \textbf{Back edge} --- to an ancestor in the tree.
+  \item \textbf{Forward edge} --- to a non-child descendant.
+  \item \textbf{Cross edge} --- between vertices with no ancestor/descendant relation.
+\end{itemize}
+\textbf{In a BFS tree of an \emph{undirected} graph, only tree and cross edges occur}, and cross
+edges join vertices at the same or adjacent levels. Forward and back edges cannot appear. In
+\emph{directed} graphs all four types are possible.
+\end{facts}
+
+\begin{prob}{Topological sort}
+A \textbf{DAG} is a directed graph with no directed cycle. A \textbf{topological order} lists the
+vertices so that for every edge $(u,v)$, $u$ precedes $v$. Compute one, or report that none
+exists.
+\end{prob}
+
+\begin{algo}{Two standard methods}
+\textbf{Kahn's algorithm.} Repeatedly output a vertex of in-degree $0$ and delete it with its
+outgoing edges. If vertices remain but none has in-degree $0$, the graph has a cycle and no
+topological order exists.
+
+\textbf{DFS-based.} Run DFS on the whole graph and output vertices in \emph{decreasing order of
+finishing time}.
+\end{algo}
+
+\begin{correct}
+\textbf{Kahn.} A vertex of in-degree $0$ has no constraint forcing anything before it, so
+outputting it first is safe; deleting it leaves a DAG, and induction finishes. Conversely, if no
+in-degree-$0$ vertex exists in a non-empty digraph, follow in-edges backwards --- with finitely
+many vertices you must repeat one, exhibiting a cycle.
+
+\textbf{DFS.} For every edge $(u,v)$: if $v$ is white when the edge is explored, $v$ finishes
+before $u$; if $v$ is black, it already finished before $u$; $v$ cannot be grey, since that would
+make $(u,v)$ a back edge, i.e.\ a cycle. So in all cases $f(v)<f(u)$, and sorting by decreasing
+finish time puts $u$ before $v$. \qed
+\end{correct}
+
+\begin{cplx}
+Both are $\boxed{\Oh{|V|+|E|}}$ (Kahn with an in-degree array and a queue of zero-in-degree
+vertices).
+\end{cplx}
+
+%==================================================================
+\section{Planar Graphs and Graph Colouring}
+
+\begin{facts}{planarity and Euler's formula}
+$G$ is \textbf{planar} if it can be drawn in the plane with no two edges crossing.
+
+\textbf{Kuratowski (1930).} $G$ is planar $\iff$ it contains no subgraph that is a subdivision of
+$K_5$ or $K_{3,3}$. (Equivalently, by Wagner, no $K_5$ or $K_{3,3}$ \emph{minor}.)
+
+\textbf{Euler's formula.} For a \emph{connected} planar graph drawn in the plane with $V$
+vertices, $E$ edges and $F$ faces (counting the unbounded outer face),
+\[
+  \boxed{V+F-E=2.}
+\]
+\textbf{Testing planarity} is $\Oh{|V|}$ (Hopcroft--Tarjan), built from an incremental DFS
+embedding --- \emph{not} by searching for forbidden subgraphs. Know it by name.
+\end{facts}
+
+\begin{correct}
+\textbf{Claim (sparsity).} Every simple planar graph with $n\ge3$ vertices has $E\le3n-6$.
+
+\prf Every face is bounded by at least $3$ edges, and every edge borders exactly $2$ faces, so
+counting incidences two ways gives $2E\ge3F$, i.e.\ $F\le\tfrac23E$. Substituting into Euler:
+\[
+  2=n-E+F\le n-E+\tfrac23E=n-\tfrac13E
+  \quad\Longrightarrow\quad \tfrac13E\le n-2 \quad\Longrightarrow\quad E\le3n-6 . \qquad\square
+\]
+
+\smallskip
+\textbf{Claim (min degree).} Every planar graph has a vertex of degree $\le5$.
+
+\prf Suppose every vertex had degree $\ge6$. Then $2E=\sum_v\deg(v)\ge6n$, so $E\ge3n$. But
+planarity forces $E\le3n-6$, giving $3n\le3n-6$ --- a contradiction. \qed
+\end{correct}
+
+\begin{prob}{Colour a planar graph}
+Assign colours to vertices so adjacent vertices differ, using as few colours as possible.
+$\chi(G)$ denotes the minimum.
+\end{prob}
+
+\begin{correct}
+\textbf{Six-Colour Theorem.} Every planar graph is $6$-colourable.
+
+\prf Induction on $n=|V|$. Trivial for $n\le6$. For larger $n$: by the min-degree claim there is
+a vertex $v$ with $\deg(v)\le5$. Delete $v$; the rest is still planar with fewer vertices, so by
+induction it is $6$-colourable. Restore $v$: its $\le5$ neighbours use at most $5$ of the $6$
+colours, so a colour remains free for $v$. \qed
+\end{correct}
+
+\begin{algo}{$6$-colouring, constructively}
+\begin{enumerate}
+  \item Repeatedly remove a minimum-degree vertex (always $\le5$), recording the removal order
+        $v_n,v_{n-1},\dots,v_1$ (so $v_n$ was removed first).
+  \item Colour in \textbf{reverse} of the removal order: give $v_1$ any colour; for each
+        subsequent $v_i$, assign the lowest-indexed colour unused by its already-coloured
+        neighbours --- of which there are at most $5$.
+\end{enumerate}
+\end{algo}
+
+\begin{cplx}
+Step 1 is a sequence of extract-min and decrease-key operations on vertex degrees, supported by a
+binary heap or balanced BST:
+\[
+  \boxed{\Oh{(|V|+|E|)\log|V|}} .
+\]
+(With bucket-by-degree instead of a heap this drops to $\Oh{|V|+|E|}$, since degrees are small
+integers.) Step 2 is $\Oh{|V|+|E|}$.
+\end{cplx}
+
+\begin{correct}
+\textbf{Five-Colour Theorem.} Every planar graph is $5$-colourable.
+
+\prf(sketch --- the Kempe chain) Induct as before: remove $v$ with $\deg(v)\le5$, $5$-colour the
+rest, restore $v$.
+\begin{itemize}
+  \item If $v$'s neighbours use $\le4$ distinct colours (either $\deg(v)<5$, or two neighbours
+        happen to share a colour), a fifth colour is free --- done.
+  \item \textbf{Hard case:} $\deg(v)=5$ with neighbours $v_1,\dots,v_5$ in cyclic order around
+        $v$ (planarity gives the cyclic order), coloured with $5$ distinct colours
+        $c_1,\dots,c_5$.
+\end{itemize}
+Consider the subgraph induced by vertices coloured $c_1$ or $c_3$.
+\begin{itemize}
+  \item If $v_1$ and $v_3$ lie in \emph{different} components of it, swap $c_1\leftrightarrow c_3$
+        throughout $v_1$'s component. Still a proper colouring, and now $v_1$ is $c_3$, freeing
+        $c_1$ for $v$.
+  \item If they lie in the \emph{same} component, there is a $c_1/c_3$-alternating path from
+        $v_1$ to $v_3$. That path plus the edges $vv_1$ and $vv_3$ forms a closed curve in the
+        plane which \textbf{separates $v_2$ from $v_4$}. Any $c_2/c_4$-alternating path from
+        $v_2$ to $v_4$ would have to cross it --- forbidden by planarity. So $v_2,v_4$ lie in
+        different $c_2/c_4$-components, and we swap in $v_2$'s component instead, freeing $c_2$.
+\end{itemize}
+Either way a colour is freed. \qed
+\end{correct}
+
+\begin{facts}{four colours, edge colouring, and bipartiteness}
+\begin{itemize}
+  \item \textbf{Four-Colour Theorem.} Every planar graph is $4$-colourable (Appel--Haken, 1976),
+        but every known proof needs a computer-assisted check of a large finite family of
+        configurations. \textbf{It was not proved in this course} --- only $5$ and $6$ were. If
+        asked to \emph{prove} a colouring bound for planar graphs, prove $6$ (short) or $5$
+        (Kempe chain); never claim to prove $4$.
+  \item \textbf{Edge colouring.} Colour edges so that edges sharing an endpoint differ; the
+        minimum is the chromatic index $\chi'(G)$. Trivially $\chi'(G)\ge\Delta(G)$.
+        \textbf{Vizing:} $\chi'(G)\in\{\Delta(G),\Delta(G)+1\}$ --- always within one of the
+        trivial bound, unlike vertex colouring where $\chi$ can be far above $\omega$.
+  \item \textbf{Bipartiteness.} $G$ (with at least one edge) is bipartite $\iff\chi(G)=2$
+        $\iff$ $G$ has no odd cycle.
+\end{itemize}
+\end{facts}
+
+\begin{algo}{Bipartiteness test via BFS --- $\Oh{|V|+|E|}$}
+Run BFS from any vertex, colouring by level parity (level $0$ Red, level $1$ Black, level $2$
+Red, \dots). If any edge is found joining two vertices at the \emph{same} level, report ``not
+bipartite''; otherwise report ``bipartite''. Repeat per connected component.
+\end{algo}
+
+\begin{correct}
+If no edge joins two same-level vertices, then every edge joins consecutive levels, so the
+level-parity colouring is a proper $2$-colouring and $G$ is bipartite.
+
+Conversely, every BFS \emph{tree} edge joins consecutive levels by construction, and a non-tree
+edge cannot join levels differing by more than $1$ (the shallower endpoint would have discovered
+the deeper one first). So the \emph{only} possible failure is a non-tree edge inside one level ---
+which is exactly what the test looks for. Such an edge creates an odd cycle (two equal-length
+tree paths to the common ancestor, plus the edge). \qed
+\end{correct}
+
+%==================================================================
+\section{Independent Sets, Cliques and Perfect Graphs}
+
+\begin{facts}{the four parameters}
+\begin{itemize}
+  \item \textbf{Independent set:} no two vertices adjacent. \emph{Maximal} $=$ cannot be
+        extended; \textbf{maximum} $=$ largest possible. \textbf{These differ} --- a maximal
+        independent set need not be maximum. $\indep(G)$ is the maximum size.
+  \item $\clq(G)$ --- \textbf{clique number}, size of the largest complete subgraph.
+  \item $\chrom(G)$ --- \textbf{chromatic number}, fewest colours in a proper colouring.
+  \item $\cc(G)$ --- \textbf{clique cover number}, fewest cliques partitioning $V(G)$.
+\end{itemize}
+\end{facts}
+
+\begin{correct}
+\textbf{Claim.} $\indep(G)=\clq(\overline G)$.
+
+\prf A set $S$ has no two vertices adjacent in $G$ $\iff$ every pair in $S$ is adjacent in
+$\overline G$. So independent sets of $G$ are exactly the cliques of $\overline G$, and the
+largest of each coincide. \qed
+
+\smallskip
+\textbf{Claim.} $\cc(G)=\chrom(\overline G)$.
+
+\prf A proper colouring of $\overline G$ partitions $V$ into colour classes, each independent in
+$\overline G$, i.e.\ each a clique in $G$. Minimising the number of classes is therefore the same
+optimisation as minimising the number of cliques covering $G$. \qed
+
+\smallskip
+\textbf{Claim.} $\chrom(G)\ge\clq(G)$, and the inequality can be strict.
+
+\prf Every vertex of a clique needs its own colour, so $\chrom\ge\clq$. Strictness: for an odd
+cycle $C_{2k+1}$ with $k\ge2$ (length $\ge5$), $\clq=2$ (no triangle) but $\chrom=3$ (odd cycles
+are not bipartite). \qed
+\end{correct}
+
+\begin{facts}{perfect graphs --- and the definition trap}
+\textbf{Definition.} $G$ is \textbf{perfect} if $\chrom(H)=\clq(H)$ for \textbf{every induced
+subgraph} $H$ of $G$ --- \emph{not} merely for $G$ itself.
+\end{facts}
+
+\begin{trap}{$\chrom(G)=\clq(G)$ at the top level is \emph{not} enough}
+Let $G=C_5\sqcup K_3$ (disjoint union). Then
+\[
+  \chrom(G)=\max(3,3)=3,\qquad \clq(G)=\max(2,3)=3,
+\]
+so $\chrom(G)=\clq(G)$ --- yet the induced subgraph $C_5$ alone has $\chrom=3\ne\clq=2$, so $G$ is
+\textbf{not} perfect. Always check induced subgraphs.
+
+\textbf{Basic non-example:} $C_5$ itself is not perfect, since $\chrom(C_5)=3\ne2=\clq(C_5)$.
+
+\textbf{Strong Perfect Graph Theorem} (Chudnovsky--Robertson--Seymour--Thomas, 2006): $G$ is
+perfect $\iff$ $G$ contains no induced \emph{odd hole} (induced odd cycle of length $\ge5$) and no
+induced \emph{odd antihole} (complement of one).
+\end{trap}
+
+%==================================================================
+\section{Intersection, Interval and Chordal Graphs}
+
+\begin{prob}{Intersection graphs}
+Given a family of finite sets, one per vertex, put an edge between two vertices exactly when
+their sets intersect. The resulting graph is the \textbf{intersection graph} of that family.
+\end{prob}
+
+\begin{correct}
+\textbf{Marczewski's Theorem.} \emph{Every} graph is the intersection graph of some family of
+sets.
+
+\prf Given $G(V,E)$, for each vertex $v_i$ set
+\[
+  S(v_i)=\{v_i\}\cup\{e: e\text{ is an edge incident to }v_i\}.
+\]
+For $i\ne j$, the only element that $S(v_i)$ and $S(v_j)$ could possibly share is the edge label
+$\{v_i,v_j\}$ (vertex names are unique, and any other edge label touches at most one of them).
+That label lies in both sets exactly when $v_iv_j\in E$. So
+$S(v_i)\cap S(v_j)\ne\emptyset\iff v_iv_j\in E$. \qed
+\end{correct}
+
+\begin{facts}{intersection number --- and a discrepancy to be careful about}
+The \textbf{intersection number} of $G$ is the smallest ground set (union of all $S(v)$) admitting
+such a representation. The classical characterisation:
+\[
+  \text{intersection number}\ =\ \text{minimum number of cliques needed to cover every \emph{edge}}
+  \quad(\text{an \emph{edge clique cover}}),
+\]
+--- put one ground-set element per clique, and place it in $S(v)$ for every $v$ in that clique.
+
+\smallskip
+\textbf{Trees.} For a tree $T$ on $n$ vertices, the intersection number is $|E(T)|=n-1$.
+
+\prf A tree is triangle-free, so its only edge-covering cliques are single edges; no clique covers
+two edges at once. Hence exactly $|E(T)|=n-1$ cliques are needed. \qed
+
+\smallskip
+\textbf{Trap: ``$n-\#\text{leaves}$'' is wrong.} On $P_4=v_1v_2v_3v_4$ that guess gives $2$, but
+with a $2$-element ground set there are only $3$ non-empty subsets, and casework shows no
+assignment realises the $3$ required edges while avoiding the $3$ required non-edges. The correct
+value is $n-1=3$. (The guess coincidentally matches on a star, which is why it can look right.)
+
+\smallskip
+\textbf{$K_n$: two different answers depending on the phrasing --- read the question.}
+\begin{itemize}
+  \item \textbf{Sets need not be distinct} (the standard definition, matching the edge-clique-cover
+        characterisation): one clique --- all of $V$ --- covers every edge, so the intersection
+        number of $K_n$ is $\boxed{1}$: take $S(v)=\{1\}$ for every $v$.
+  \item \textbf{Sets required to be distinct} (the variant worked in the lecture notes): use only
+        subsets containing one fixed element, so any two automatically intersect. There are
+        $2^{m-1}$ such subsets of an $m$-element ground set, so we need $2^{m-1}\ge n$, i.e.
+        \[
+          m=\ceil{\log_2 n}+1 .
+        \]
+        Check: $n=4\Rightarrow m=3$; $n=5\Rightarrow m=4$; $n=8\Rightarrow m=4$ --- matching the
+        notes' worked numbers. So this variant is $\Th{\log n}$.
+\end{itemize}
+Either way the contrast with trees is the point: trees are the expensive extreme ($n-1$), complete
+graphs the cheap one.
+\end{facts}
+
+\begin{prob}{Interval graphs}
+Represent each vertex by an interval on the real line, with an edge exactly when two intervals
+overlap.
+\end{prob}
+
+\begin{facts}{what is and is not an interval graph}
+\begin{itemize}
+  \item $K_3$ \textbf{is} one (three mutually overlapping segments).
+  \item $C_4$ is \textbf{not}. Label the cycle $v_1v_2v_3v_4$: $v_3$ must overlap both $v_2$ and
+        $v_4$ but not $v_1$. Since $v_2$ and $v_4$ must sit on either side of $v_1$'s interval
+        without touching each other, anything overlapping both of them must also overlap $v_1$ ---
+        contradiction.
+  \item \textbf{Not every tree} is one. Take a subdivided claw (a spider with three legs each of
+        length $\ge2$) and let $v_1,v_5,v_6$ be the three leg-ends. The tree requires a path
+        between each pair avoiding the third --- an \textbf{asteroidal triple} --- which three
+        intervals on a line cannot realise, whatever their order.
+  \item \textbf{Lekkerkerker--Boland.} $G$ is an interval graph $\iff$ $G$ is chordal and has no
+        asteroidal triple. For trees this specialises to: \textbf{a tree is an interval graph
+        $\iff$ it is a caterpillar} (no vertex has $\ge3$ non-leaf neighbours).
+\end{itemize}
+\end{facts}
+
+\begin{prob}{Chordal graphs}
+$G$ is \textbf{chordal} if it has no induced cycle of length $\ge4$; equivalently every cycle of
+length $\ge4$ has a chord.
+\end{prob}
+
+\begin{facts}{the containment chain}
+\[
+  \text{interval}\ \subset\ \text{chordal}\ \subset\ \text{perfect}.
+\]
+So interval graphs are perfect too. \textbf{Contrast:} disc graphs (intersection graphs of discs
+in the plane) are \emph{not} all perfect --- five overlapping discs in a ring realise an induced
+$C_5$, which is not perfect.
+\end{facts}
+
+\begin{prob}{Perfect elimination ordering (PEO)}
+An ordering $v_1,\dots,v_n$ of $V(G)$ is a \textbf{PEO} if for every $i$, the set
+$N(v_i)\cap\{v_1,\dots,v_{i-1}\}$ (the \emph{earlier} neighbours of $v_i$) forms a clique.
+\end{prob}
+
+\begin{correct}
+\textbf{Claim.} If $G$ has a PEO then $G$ is chordal.
+
+\prf Suppose not: let $v_{i_1},\dots,v_{i_k}$ be an induced (chordless) cycle with $k\ge4$. Put
+$M=\max\{i_1,\dots,i_k\}$, so $v_M$ is the \emph{last} cycle vertex in the ordering. Its two
+cycle-neighbours $v_p,v_q$ both come earlier and are both adjacent to $v_M$, so both lie in
+$N(v_M)\cap\{v_1,\dots,v_{M-1}\}$ --- which the PEO property says is a clique. Hence $v_p v_q$ is
+an edge. But $v_p$ and $v_q$ are non-consecutive on the cycle (they are the two neighbours of
+$v_M$, and $k\ge4$), so that edge is a \textbf{chord} --- contradicting chordlessness. \qed
+
+\smallskip
+\textbf{Converse (sketch).} Every chordal graph has a PEO. Every chordal graph has a
+\textbf{simplicial vertex} (one whose entire neighbourhood is a clique); deleting it leaves a
+chordal graph (deletion cannot create a chordless cycle), so induction builds the ordering one
+vertex at a time. Constructively, Lex-BFS produces such an ordering.
+\end{correct}
+
+\begin{trap}{greedy colouring depends on the order}
+Colouring greedily (each vertex gets the lowest colour unused by its already-coloured neighbours)
+in an \emph{arbitrary} order can use more than $\chrom(G)$ colours --- e.g.\ a $5$-vertex graph
+with $\chrom=3$ can be forced to $4$ by a bad ordering. This is exactly why one wants a
+\emph{good} ordering, which is what a PEO provides.
+\end{trap}
+
+\begin{facts}{why a PEO is so useful --- $\chrom=\clq$ for chordal graphs}
+Colour greedily \emph{along} the PEO $v_1,v_2,\dots,v_n$. When $v_i$ is coloured, its earlier
+neighbours form a clique of some size $d_i$, so they use exactly $d_i$ distinct colours and
+$v_i$ takes colour number $\le d_i+1$. Hence
+\[
+  \chrom(G)\ \le\ 1+\max_i d_i .
+\]
+But $\{v_i\}\cup\bigl(N(v_i)\cap\{v_1,\dots,v_{i-1}\}\bigr)$ is a clique of size $d_i+1$, so
+$\clq(G)\ge1+\max_i d_i$. Combined with the universal $\chrom\ge\clq$:
+\[
+  \boxed{\chrom(G)=\clq(G)=1+\max_i d_i\quad\text{for chordal }G,}
+\]
+computable in $\Oh{|V|+|E|}$ once the PEO is known. This is the constructive reason chordal
+graphs are perfect.
+\end{facts}
+
+%==================================================================
+\section{Lex-BFS: Worked Exercise}
+
+\begin{prob}{The exercise}
+On the graph $V=\{1,2,3,4,5\}$ with
+\[
+  E=\{12,\,15,\,13,\,14,\,34,\,35,\,45,\,25\},
+\]
+(i) state Lex-BFS rigorously, (ii) run it and verify the output is a PEO, (iii) use the PEO to
+build a maximum independent set.
+\end{prob}
+
+\noindent\textbf{Structure of the graph.} $\{1,3,4,5\}$ induces a $K_4$ (all six pairs
+$13,14,15,34,35,45$ are edges), and vertex $2$ attaches only to $1$ and $5$ (so $\{1,2,5\}$ is a
+triangle). Degrees: $\deg(1)=\deg(5)=4$, $\deg(3)=\deg(4)=3$, $\deg(2)=2$.
+
+\begin{algo}{Lex-BFS}
+Each vertex carries a \textbf{label}: a sequence of round numbers, most recent first, initially
+empty. Labels compare lexicographically entry by entry (a larger first entry beats a smaller or
+absent one).
+\begin{enumerate}
+  \item For every $v$: $\mathrm{label}(v)\leftarrow()$. Let $U\leftarrow V(G)$ and
+        $\mathrm{order}\leftarrow()$.
+  \item For $k=1,2,\dots,n$:
+        \begin{enumerate}
+          \item Choose $v\in U$ with lexicographically \emph{largest} label (break ties by a
+                fixed rule, e.g.\ smallest index).
+          \item Append $v$ to $\mathrm{order}$ as $v_k$; remove $v$ from $U$.
+          \item For every $u\in U\cap N(v)$: \textbf{prepend} $k$ to $\mathrm{label}(u)$.
+        \end{enumerate}
+  \item Return $\mathrm{order}=(v_1,\dots,v_n)$.
+\end{enumerate}
+\end{algo}
+
+\begin{cplx}
+Naively, scanning all of $U$ each round to find the lex-largest label costs $\Oh{n^2}$. With
+\textbf{partition refinement} (bucket vertices by label so the current maximum is $\Oh1$ to find,
+and split buckets incrementally) it is $\boxed{\Oh{|V|+|E|}}$.
+\end{cplx}
+
+\subsection*{Running it}
+
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+Round $k$ & Pick $v_k$ & Unvisited nbrs updated & Labels after \\
+\midrule
+$1$ & $1$ (all tied at $()$) & $2,3,4,5$ & $\ell(2){=}\ell(3){=}\ell(4){=}\ell(5)=(1)$ \\
+$2$ & $2$ (tie at $(1)$, smallest index) & $5$ & $\ell(5)=(2,1)$; $\ell(3){=}\ell(4)=(1)$ \\
+$3$ & $5$ ($(2,1)\succ(1)$) & $3,4$ & $\ell(3)=\ell(4)=(3,1)$ \\
+$4$ & $4$ (genuine tie at $(3,1)$) & $3$ & $\ell(3)=(4,3,1)$ \\
+$5$ & $3$ (only one left) & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\[
+  \textbf{Output: }(v_1,\dots,v_5)=(1,\,2,\,5,\,4,\,3).
+\]
+
+\begin{correct}
+\textbf{Verifying it is a PEO.} Check $N(v_i)\cap\{v_1,\dots,v_{i-1}\}$ is a clique at each step:
+\begin{center}
+\begin{tabular}{@{}clll@{}}
+\toprule
+$i$ & $v_i$ & $N(v_i)\cap\{\text{earlier}\}$ & Clique? \\
+\midrule
+$1$ & $1$ & $\emptyset$ & trivially \\
+$2$ & $2$ & $\{1\}$ & single vertex \checkmark \\
+$3$ & $5$ & $\{1,2\}$ & $12\in E$ \checkmark \\
+$4$ & $4$ & $\{1,5\}$ & $15\in E$ \checkmark \\
+$5$ & $3$ & $\{1,4,5\}$ & $14,15,45\in E$ \checkmark \\
+\bottomrule
+\end{tabular}
+\end{center}
+Every step checks out, so $(1,2,5,4,3)$ is a valid PEO --- and hence the graph is chordal.
+\end{correct}
+
+\begin{facts}{key fact: simplicial vertices and maximum independent sets}
+\textbf{Claim.} If $v$ is simplicial in $G$ (i.e.\ $N(v)$ is a clique), then \emph{some} maximum
+independent set of $G$ contains $v$.
+
+\prf Let $S$ be any maximum independent set. If $v\in S$, done. Otherwise, since $N(v)$ is a
+clique and $S$ is independent, $|S\cap N(v)|\le1$.
+\begin{itemize}
+  \item If $S\cap N(v)=\emptyset$, then $S\cup\{v\}$ is independent and strictly larger --- which
+        contradicts $S$ being maximum. So this cannot happen.
+  \item So $S\cap N(v)=\{u\}$ for exactly one $u$. Then $S'=(S\setminus\{u\})\cup\{v\}$ is
+        independent ($v$ is adjacent to nothing else in $S$, since $u$ was its only neighbour
+        there) and $|S'|=|S|$. So $S'$ is also maximum, and contains $v$. \qed
+\end{itemize}
+\end{facts}
+
+\begin{algo}{Maximum independent set on a chordal graph}
+\begin{enumerate}
+  \item Compute a PEO by Lex-BFS.
+  \item \textbf{Reverse} it to get an elimination order (each vertex simplicial in the graph
+        remaining when it is processed).
+  \item Scan in that order, greedily adding $v$ to $I$ if none of its neighbours is already in
+        $I$, then marking $N(v)$ unavailable.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+By the key fact applied inductively --- each time to the graph induced on the not-yet-processed
+vertices --- some maximum independent set is consistent with every greedy choice made. Hence the
+final $I$ is maximum. \qed
+\end{correct}
+
+\subsection*{Running the greedy on our example}
+
+Reversing the PEO $(1,2,5,4,3)$ gives the elimination order $(3,4,5,2,1)$. Sanity-check
+simpliciality: $N(3)=\{1,4,5\}$ is a clique \checkmark; in $G-3$, $N(4)\cap\{1,2,5\}=\{1,5\}$
+\checkmark; in $G-\{3,4\}$, $N(5)\cap\{1,2\}=\{1,2\}$ \checkmark.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Vertex & Action & $I$ \\
+\midrule
+$3$ & available $\to$ add; mark $N(3)=\{1,4,5\}$ & $\{3\}$ \\
+$4$ & marked $\to$ skip & $\{3\}$ \\
+$5$ & marked $\to$ skip & $\{3\}$ \\
+$2$ & available $\to$ add; mark $N(2)=\{1,5\}$ & $\{3,2\}$ \\
+$1$ & marked $\to$ skip & $\{2,3\}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Result:} $I=\{2,3\}$, size $2$ (indeed $23\notin E$). \textbf{Genuinely
+maximum:} any independent set contains at most one vertex of the clique $\{1,3,4,5\}$, and vertex
+$2$ can be added on top only if that vertex is $3$ or $4$ (since $2$ is adjacent to $1$ and $5$).
+So $2$ is the best possible --- no independent set of size $\ge3$ exists.

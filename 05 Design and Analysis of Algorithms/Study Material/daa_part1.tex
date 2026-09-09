@@ -1,0 +1,644 @@
+%==================================================================
+\section{The 1-Center Problem (Minimum Enclosing Circle)}
+
+\begin{prob}{1-centre / MEC}
+Given points $p_1,\dots,p_n\in\R^2$, find $p$ minimising $\max_i d(p,p_i)$ --- the point whose
+worst-case distance to the data is smallest. Equivalently: find the centre of the
+\textbf{minimum enclosing circle} (MEC) of the point set.
+\end{prob}
+
+\noindent\textbf{Why these are the same.} If $p$ is the centre of the MEC of radius $r$ then
+$\max_i d(p,p_i)=r$. No point can do better: a $p'$ with $\max_i d(p',p_i)<r$ would give a
+strictly smaller enclosing circle centred at $p'$, contradicting minimality of $r$.
+
+\begin{algo}{Brute force over candidate circles}
+The geometric hook: \textbf{three non-collinear points determine a unique circle}. The MEC's
+boundary must touch either $2$ or $3$ of the input points, so:
+\begin{enumerate}
+  \item \textbf{3-point circles.} For each of the $\binom n3$ triples, form the unique circle
+        through them.
+  \item \textbf{2-point circles.} For each of the $\binom n2$ pairs, form the circle having
+        that pair as a diameter (covers the case where the boundary touches only two points).
+  \item For each of these $\binom n2+\binom n3$ candidates, test in $\Oh n$ whether it encloses
+        all $n$ points.
+  \item Return the smallest candidate that encloses everything.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+Every enclosing circle can be shrunk until its boundary touches the point set. Once it cannot
+shrink further, the touching points \emph{pin} it: either two points diametrically opposite, or
+three points not all on a semicircle. Both cases are in the candidate list, so the true MEC is
+among the candidates; taking the smallest enclosing candidate returns it. \qed
+\end{correct}
+
+\begin{cplx}
+$\binom n3=\Oh{n^3}$ dominates $\binom n2=\Oh{n^2}$, and each candidate costs $\Oh n$ to test:
+\[
+  \Oh n\cdot\Big(\tbinom n2+\tbinom n3\Big)=\Oh n\cdot\Oh{n^3}=\boxed{\Oh{n^4}} .
+\]
+\end{cplx}
+
+\begin{facts}{comparisons for max, and min \& max together}
+A separate, very examinable sub-topic on \emph{comparison counting}.
+\begin{itemize}
+  \item \textbf{Maximum alone:} exactly $n-1$ comparisons (linear scan). This is optimal ---
+        each comparison eliminates at most one candidate, and $n-1$ candidates must be
+        eliminated.
+  \item \textbf{Min and max, naive:} max in $n-1$, then min of the remaining $n-1$ in $n-2$:
+        total $2n-3$.
+  \item \textbf{Min and max, pairwise (better):} process elements \emph{in pairs}. Compare the
+        pair internally ($1$ comparison); compare only the smaller against the running min and
+        only the larger against the running max ($2$ more). So $3$ comparisons per pair:
+        \[
+          3\cdot\frac n2=\frac{3n}{2}\ \text{comparisons (}\approx\tfrac{3n}{2}-2\text{ exactly)},
+        \]
+        beating $2n-3$. This is the classical tight bound.
+  \item \emph{Correctness (induction on pairs).} After $k$ pairs the running min/max are correct
+        for the $2k$ elements seen. A new pair $(x,y)$ can only affect the global min through
+        $\min(x,y)$ and the global max through $\max(x,y)$, so the internal comparison plus two
+        updates extends the invariant to $2k+2$.
+  \item Faster MEC algorithms exist (Welzl's, expected linear time); $\Oh{n^4}$ is only what
+        the elementary argument gives. Say this if asked ``can you do better?''
+\end{itemize}
+\end{facts}
+
+%==================================================================
+\section{Recurrences and the Master Theorem}
+
+\begin{prob}{Solving divide-and-conquer recurrences}
+Given a recurrence for the running time of a recursive algorithm, produce a closed-form
+$\Theta$ or $O$ bound.
+\end{prob}
+
+\subsection*{Two standard unrollings}
+\[
+  f(n)=f(n-1)+dn \implies f(n)=\Th{n^2},
+  \qquad
+  f(n)=2f(n/2)+dn \implies f(n)=\Th{n\log n}.
+\]
+The first is an arithmetic sum $d(n+(n-1)+\cdots)$; the second is exactly merge sort.
+
+\begin{facts}{The Master Theorem}
+Applies \emph{only} to the single-branching shape
+\[
+  T(n)=a\,T\!\left(\frac nb\right)+f(n),\qquad a\ge1,\ b>1,
+\]
+where all $a$ subproblems have the \textbf{same} size $n/b$. Compare $f(n)$ with $n^{\log_b a}$:
+\begin{itemize}
+  \item \textbf{Case 1.} $f(n)=\Oh{n^{\log_b a-\epsilon}}$ for some $\epsilon>0$
+        $\implies T(n)=\Th{n^{\log_b a}}$. \hfill(leaves dominate)
+  \item \textbf{Case 2.} $f(n)=\Th{n^{\log_b a}}$ $\implies T(n)=\Th{n^{\log_b a}\log n}$.
+        \hfill(balanced)
+  \item \textbf{Case 3.} $f(n)=\Om{n^{\log_b a+\epsilon}}$ for some $\epsilon>0$ \emph{and} the
+        regularity condition $a f(n/b)\le c f(n)$ holds for some $c<1$ and large $n$
+        $\implies T(n)=\Th{f(n)}$. \hfill(root dominates)
+\end{itemize}
+\textbf{Extended Case 2:} if $f(n)=\Th{n^{\log_b a}\log^k n}$ with $k\ge0$, then
+$T(n)=\Th{n^{\log_b a}\log^{k+1}n}$.
+\end{facts}
+
+\begin{trap}{when the Master Theorem does \emph{not} apply}
+It fails the moment the subproblems have \textbf{different sizes}, e.g.
+\[
+  T(n)=T(n/5)+T(7n/10)+\Oh n .
+\]
+This is exactly the median-of-medians recurrence. Writing ``by the Master Theorem'' here is a
+guaranteed mark loss. Use the lemma below instead.
+\end{trap}
+
+\begin{facts}{Substitution lemma for multi-branch shrinking recurrences}
+\textbf{Claim.} If $T(n)\le T(a_1n)+T(a_2n)+\cdots+T(a_kn)+cn$ with each $a_i\in(0,1)$ and
+\[
+  \alpha:=a_1+a_2+\cdots+a_k<1,
+\]
+then $T(n)=\Oh n$.
+
+\prf Guess $T(n)\le dn$ and substitute:
+\[
+  T(n)\le d(a_1n)+\cdots+d(a_kn)+cn=dn\alpha+cn .
+\]
+Choosing $d=\dfrac{c}{1-\alpha}$ gives $dn\alpha+cn=dn$, closing the induction. \qed
+
+\textbf{The whole content is $\alpha<1$}: the subproblem sizes must sum to strictly less than
+the original. If $\alpha=1$ you get $\Th{n\log n}$; if $\alpha>1$ it is superlinear.
+\end{facts}
+
+\subsection*{Proving a Master-Theorem case by unrolling (exam-standard)}
+
+\begin{prob}{$T(n)=a\,T(n/b)+c\,n^k$, $T(1)=d$, with $a>b^k$}
+Show $T(n)=\Th{n^{\log_b a}}$. (This exact question was asked in 2022.)
+\end{prob}
+
+\prf Unroll for $n=b^L$, $L=\log_b n$:
+\[
+  T(n)=\sum_{i=0}^{L-1}a^i\,c\left(\frac{n}{b^i}\right)^{\!k}+a^L\,d
+      =c\,n^k\sum_{i=0}^{L-1}\left(\frac{a}{b^k}\right)^{\!i}+d\,n^{\log_b a},
+\]
+using $a^L=a^{\log_b n}=n^{\log_b a}$. Put $r=a/b^k$. The hypothesis $a>b^k$ gives $r>1$, so the
+geometric sum is dominated by its \emph{last} term:
+\[
+  \sum_{i=0}^{L-1}r^i=\frac{r^L-1}{r-1}=\Th{r^L},
+  \qquad
+  r^L=\frac{a^{\log_b n}}{b^{k\log_b n}}=\frac{n^{\log_b a}}{n^k}.
+\]
+Therefore $c\,n^k\cdot\Th{n^{\log_b a}/n^k}=\Th{n^{\log_b a}}$, and adding $d\,n^{\log_b a}$
+leaves the order unchanged:
+\[
+  \boxed{T(n)=\Th{n^{\log_b a}}.} \qquad\square
+\]
+
+\begin{facts}{the three regimes, in one sentence each}
+Comparing $a$ with $b^k$ decides who wins:
+\[
+  a>b^k:\ \Th{n^{\log_b a}}\ \text{(leaves)},\qquad
+  a=b^k:\ \Th{n^k\log n}\ \text{(all levels equal)},\qquad
+  a<b^k:\ \Th{n^k}\ \text{(root)}.
+\]
+The geometric series is increasing, constant, or decreasing respectively --- that is the entire
+proof, and it is worth stating that way.
+\end{facts}
+
+%==================================================================
+\section{Linear-Time Selection (Median of Medians)}
+
+\begin{prob}{Selection}
+Given an unordered (multi)set $S=\{x_1,\dots,x_n\}$ of reals and an index $i$, find the $i$-th
+smallest element of $S$. The case $i=\ceil{n/2}$ is the median. We want $\Oh n$ in the
+\textbf{worst case} --- not merely in expectation, as randomised quickselect gives.
+\end{prob}
+
+\begin{algo}{Median of Medians}
+\begin{enumerate}
+  \item \textbf{Group.} Split $S$ into $\ceil{n/5}$ groups of $5$ (the last may be short).
+  \item \textbf{Baby medians.} Find each group's median directly in $\Oh1$ (sort $5$ elements).
+        Call them $y_1,\dots,y_k$, $k=\ceil{n/5}$.
+  \item \textbf{Recurse for the pivot.} Recursively find the median $z$ of $\{y_1,\dots,y_k\}$
+        using this same algorithm.
+  \item \textbf{Partition.} Split $S$ into $S_1=\{x<z\}$ and $S_2=\{x>z\}$, setting $z$ aside.
+  \item \textbf{Recurse on one side.}
+        \begin{itemize}
+          \item If $|S_1|=i-1$: return $z$.
+          \item If $|S_1|\ge i$: recurse for the $i$-th smallest in $S_1$.
+          \item Else: recurse for the $(i-|S_1|-1)$-th smallest in $S_2$.
+        \end{itemize}
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+\textbf{The split guarantee.} At least $\tfrac{3n}{10}-6$ elements are $\le z$, and at least
+$\tfrac{3n}{10}-6$ are $\ge z$.
+
+\prf $z$ is the median of the $k=\ceil{n/5}$ group medians, so at least $k/2$ groups have their
+own median $\le z$. In each such \emph{full} group, the median and the two elements below it are
+all $\le z$ --- that is $3$ of the $5$. Hence
+\[
+  \#\{x\le z\}\ \ge\ 3\left(\frac12\ceil{\frac n5}-1\right)\ \ge\ \frac{3n}{10}-6,
+\]
+the $-6$ absorbing the group containing $z$ and a possibly incomplete last group. Symmetrically
+for $\ge z$. \qed
+
+\textbf{Consequence.} $|S_1|,|S_2|\le n-\left(\tfrac{3n}{10}-6\right)=\tfrac{7n}{10}+6$: neither
+recursive call in Step 5 ever sees more than $\tfrac{7n}{10}+6$ elements.
+
+\textbf{Selection correctness.} Immediate induction on $|S|$: after partitioning, the rank of $z$
+in $S$ is exactly $|S_1|+1$, so comparing $i$ with $|S_1|+1$ identifies which side contains the
+$i$-th smallest, with the rank correctly re-indexed on the right side. \qed
+\end{correct}
+
+\begin{cplx}
+Steps 1--2 cost $\Oh n$. Step 3 recurses on $\ceil{n/5}$; Step 5 on at most $\tfrac{7n}{10}+6$:
+\[
+  f(n)\ \le\ f\!\left(\frac n5\right)+f\!\left(\frac{7n}{10}+6\right)+\Oh n .
+\]
+\textbf{This is not a Master Theorem instance} --- the two subproblems have different sizes.
+Apply the substitution lemma with $a_1=\tfrac15$, $a_2=\tfrac7{10}$:
+\[
+  \alpha=\frac15+\frac{7}{10}=\frac{9}{10}<1
+  \quad\Longrightarrow\quad \boxed{f(n)=\Oh n}.
+\]
+Explicitly, guessing $f(n)\le dn$:
+\[
+  f(n)\le \frac{dn}{5}+\frac{7dn}{10}+6d+cn=\frac{9dn}{10}+6d+cn\le dn
+\]
+for $d$ large enough relative to $c$ (and $n$ past a threshold, with a separate base case).
+\end{cplx}
+
+\begin{facts}{why groups of $5$ --- the classic viva question}
+With groups of size $g$, the guaranteed fraction on the small side is about
+$\tfrac12\cdot\tfrac{g/2}{g}$, so the recursion total is roughly
+\[
+  \underbrace{\frac1g}_{\text{median-of-medians call}}+\underbrace{1-\frac12\cdot\frac{\ceil{g/2}}{g}}_{\text{larger side}} .
+\]
+\begin{itemize}
+  \item $g=5$: $\ \tfrac15+\tfrac7{10}=\tfrac9{10}<1$ \ \checkmark\ the lemma applies, $\Oh n$.
+  \item $g=3$: $\ \tfrac13+\tfrac23=1$ \ $	imes$\ not \emph{strictly} less than $1$; the
+        recursion degrades to $\Th{n\log n}$.
+  \item $g=7$ also works, but $5$ is the smallest odd size that does.
+\end{itemize}
+Odd $g$ keeps the group median unambiguous. \textbf{Also worth knowing:} randomised quickselect
+is $\Oh n$ \emph{expected} with a much smaller constant; MoM's value is the worst-case guarantee.
+\end{facts}
+
+\begin{facts}{the two standard applications}
+\begin{itemize}
+  \item \textbf{$k$ smallest elements in $\Oh n$ (unordered).} Select the $k$-th smallest in
+        $\Oh n$, then partition in $\Oh n$ and output the left side. To output them
+        \emph{sorted} costs $\Oh{n+k\log k}$ --- and $\Om{k\log k}$ is forced by the sorting
+        lower bound.
+  \item \textbf{$k$ numbers nearest the median in $\Oh n$.} (i) Find the median $M$ ($\Oh n$);
+        (ii) form $d_i=|a_i-M|$ ($\Oh n$); (iii) select the $k$-th smallest $d_i$ ($\Oh n$);
+        (iv) output all $a_i$ with $d_i$ below that threshold, breaking ties arbitrarily
+        ($\Oh n$). Total $\Oh n$. This was 2022 Q7.
+\end{itemize}
+\end{facts}
+
+%==================================================================
+\section{Binary Search Trees}
+
+\begin{prob}{Dynamic dictionary}
+Binary search on a \emph{sorted array} gives $\Oh{\log n}$ search but $\Oh n$ insertion. An
+unsorted array gives $\Oh1$ insertion but $\Oh n$ search. We want a structure supporting
+search, insert and delete efficiently under arbitrary interleaving.
+\end{prob}
+
+\begin{facts}{definitions you must be able to state}
+\begin{itemize}
+  \item \textbf{Binary tree (recursive):} empty, or a root together with a left subtree and a
+        right subtree, each itself a binary tree.
+  \item \textbf{Height:} number of \emph{edges} on the longest root-to-leaf path. (Some texts
+        count vertices --- watch for a problem that redefines it, and be consistent.)
+  \item \textbf{BST property:} for every node $v$, all keys in $v$'s left subtree are $<v$'s key,
+        and all keys in $v$'s right subtree are $>v$'s key.
+  \item \textbf{Traversals:} \textsc{Inorder} $=$ L,\,Root,\,R; \textsc{Preorder} $=$
+        Root,\,L,\,R; \textsc{Postorder} $=$ L,\,R,\,Root.
+  \item \textbf{Inorder successor} of $v$: if $v$ has a right subtree, the minimum of that
+        subtree. \textbf{Inorder predecessor}: if $v$ has a left subtree, the maximum of it.
+\end{itemize}
+\end{facts}
+
+\begin{algo}{Insert $k$}
+\begin{enumerate}
+  \item If the tree is empty, make $k$ the root.
+  \item Else walk down from the root: go left if $k<$ current key, right if $k>$; on equality
+        either skip or follow a fixed convention.
+  \item Insert at the first null child reached.
+\end{enumerate}
+\end{algo}
+
+\begin{algo}{Delete node $v$ with key $k$}
+Find $v$ by search, then:
+\begin{itemize}
+  \item \textbf{Case 1 --- $v$ is a leaf.} Remove it.
+  \item \textbf{Case 2 --- $v$ has one child.} Splice $v$ out: connect $v$'s parent directly to
+        $v$'s only child.
+  \item \textbf{Case 3 --- $v$ has two children.} Find $v$'s inorder successor $w$ (minimum of
+        $v$'s right subtree --- necessarily has at most one child). Copy $w$'s key into $v$,
+        then delete $w$ by Case 1 or 2. (The predecessor works equally, by symmetry.)
+\end{itemize}
+\end{algo}
+
+\begin{correct}
+Case 1 removes a node with no descendants --- no ordering constraint is disturbed.
+Case 2 is valid because everything in $v$'s subtree is on the same side of $v$'s parent, so
+promoting the single child preserves that side's inequality.
+Case 3: $w$ is the smallest key greater than $k$, so every key in $v$'s left subtree is $<w$ and
+every remaining key in $v$'s right subtree is $>w$ --- exactly the BST property at $v$ with the
+new key. Deleting $w$ from the right subtree then falls under Case 1 or 2. \qed
+\end{correct}
+
+\begin{cplx}
+Search, insert and delete each walk one root-to-leaf path, so all cost
+$\Oh{\text{height}}$. In the worst case a BST degenerates to a path (insert already-sorted data),
+giving height $n-1$ and $\Oh n$ per operation --- \textbf{no better than an unsorted list}. This
+is precisely the motivation for balancing.
+\end{cplx}
+
+\begin{facts}{height-balanced (AVL) trees and the Fibonacci bound}
+A tree is \textbf{height-balanced} if for every node $v$,
+$\bigl|h(\text{left}(v))-h(\text{right}(v))\bigr|\le1$.
+
+\textbf{Minimum nodes at height $h$} (vertex-counted): hang a minimal tree of height $h-1$ on one
+side and $h-2$ on the other (the largest imbalance still legal):
+\[
+  N(h)=1+N(h-1)+N(h-2),\qquad N(1)=1,\ N(2)=2 .
+\]
+This is Fibonacci-like, so $N(h)$ grows \emph{exponentially} in $h$ --- which is exactly why
+$h=\Oh{\log n}$. Worked value: $N(4)=7$.
+
+\textbf{Maximum nodes at height $h$}: a perfect binary tree, $M(h)=2^h-1$. So for a
+height-balanced tree with $n$ nodes and height $h$, $\ n\in[N(h),\,2^h-1]$.
+
+\textbf{The balanced families:}
+\begin{itemize}
+  \item \textbf{AVL:} balance condition above; repaired after insert/delete by single or double
+        \textbf{rotations} at the lowest unbalanced ancestor. $\Oh{\log n}$ ancestors, $\Oh1$ per
+        rotation $\Rightarrow$ $\Oh{\log n}$ rebalancing.
+  \item \textbf{Red-black:} root black; no red node has a red child; every root-to-null path has
+        the same number of black nodes. That last property forces $\Oh{\log n}$ height (longest
+        path $\le2\times$ shortest, since reds cannot be consecutive). Cheaper rebalancing than
+        AVL, slightly looser balance.
+  \item \textbf{B-/B$^+$-trees:} many keys per node (order $m$: up to $m-1$ keys, $m$ children),
+        keeping the tree shallow to minimise \emph{disk reads}. B$^+$-trees put all data in the
+        leaves and chain them for range queries.
+\end{itemize}
+\end{facts}
+
+\begin{facts}{reconstructing a tree from traversals}
+\textbf{Claim.} Inorder together with \emph{either} preorder or postorder uniquely determines a
+binary tree. Preorder $+$ postorder does \textbf{not} (except when every node has $0$ or $2$
+children).
+
+\prf(idea) With inorder $+$ preorder: the first preorder element is the root; its position in the
+inorder sequence splits the rest into left and right subtrees; recurse. Same with postorder (root
+is last). Without inorder, a preorder ``root, then one child'' cannot reveal whether that child is
+a left or right child --- genuinely ambiguous. \qed
+
+\textbf{Special case worth remembering:} for a \emph{BST} with distinct keys, preorder \emph{alone}
+suffices --- because the inorder traversal is forced to be the sorted order.
+\end{facts}
+
+%==================================================================
+\section{Segmented Least Squares}
+
+\begin{prob}{Segmented least squares}
+Given $P=\{p_1,\dots,p_n\}$ with $x_1<x_2<\cdots<x_n$ and a penalty $c>0$: partition $P$ into
+\textbf{contiguous} segments $\{p_i,\dots,p_j\}$, fit each with its own least-squares line, and
+minimise
+\[
+  E+cL,
+\]
+where $E$ is the total squared error over all segments and $L$ is the number of segments.
+\end{prob}
+
+\noindent\textbf{Why the penalty is needed.} One line underfits data with several trends; one
+segment per pair of points drives $E$ to $0$ while grossly overfitting. The term $cL$ buys the
+trade-off.
+
+\noindent\textbf{OLS recap.} For a single segment, $y=ax+b$ with
+\[
+  a=\frac{\sum_i(y_i-\bar y)(x_i-\bar x)}{\sum_i(x_i-\bar x)^2},\qquad b=\bar y-a\bar x .
+\]
+
+\begin{algo}{Dynamic programming}
+Let $e_{i,j}$ be the minimum squared error of a single line through $p_i,\dots,p_j$, and let
+$\mathrm{opt}(j)$ be the optimal cost for $p_1,\dots,p_j$, with $\mathrm{opt}(0)=0$.
+\begin{enumerate}
+  \item Precompute prefix sums of $\sum x$, $\sum y$, $\sum xy$, $\sum x^2$ in $\Oh n$.
+  \item For all $1\le i\le j\le n$, compute $e_{i,j}$ in $\Oh1$ each from those prefix sums.
+  \item For $j=1,\dots,n$:
+        \[
+          \mathrm{opt}(j)=\min_{1\le i\le j}\Bigl(e_{i,j}+c+\mathrm{opt}(i-1)\Bigr),
+        \]
+        recording the minimising $i$.
+  \item Answer $\mathrm{opt}(n)$; recover the partition by following the recorded indices back.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+\textbf{Optimal substructure.} In any optimal partition, the last point $p_j$ lies in a single
+segment, which begins at some $p_i$. Given that segment, the remaining points $p_1,\dots,p_{i-1}$
+must themselves be partitioned optimally --- otherwise substituting their optimum would strictly
+improve the whole solution, contradicting optimality. Since the true starting index $i$ is unknown,
+minimising over all $i$ considers the optimum among all possibilities, so the recurrence is exact.
+Induction on $j$ then gives $\mathrm{opt}(j)$ correct for every $j$. \qed
+\end{correct}
+
+\begin{cplx}
+\begin{itemize}
+  \item \textbf{Naive:} each $e_{i,j}$ from scratch costs $\Oh n$; there are $\Oh{n^2}$ pairs, so
+        $\Oh{n^3}$ for the table, plus $\Oh{n^2}$ for the DP $\Rightarrow$ $\Oh{n^3}$.
+  \item \textbf{With prefix sums:} $\Oh n$ preprocessing, then each $e_{i,j}$ in $\Oh1$, so the
+        table costs $\Oh{n^2}$ and the DP costs $\Oh{n^2}$ (it fills $n$ entries, each a min over
+        $\le n$ choices).
+\end{itemize}
+\[
+  \boxed{\Oh{n^2}\ \text{overall}}\qquad\text{(the }\Oh{n^3}\text{ figure is only the naive route).}
+\]
+Space: $\Oh{n^2}$ for the table, reducible to $\Oh n$ if $e_{i,j}$ is recomputed on the fly.
+\end{cplx}
+
+\begin{facts}{the DP template this instantiates}
+Every ``partition a sequence optimally'' problem in this course has the same shape:
+\[
+  \mathrm{opt}(j)=\min_{i\le j}\Bigl(\text{cost of segment }[i,j]+\text{penalty}+\mathrm{opt}(i-1)\Bigr).
+\]
+The only design work is (i) identifying the last segment as the thing to case on, and (ii) making
+the segment cost $\Oh1$ via preprocessing. Say both explicitly for full marks.
+\end{facts}
+
+%==================================================================
+\section{Lower Bound for Comparison-Based Sorting}
+
+\begin{prob}{How fast can sorting be?}
+Show that any algorithm that sorts $n$ elements using only pairwise comparisons needs
+$\Om{n\log n}$ comparisons in the worst case.
+\end{prob}
+
+\begin{correct}
+\textbf{Decision-tree argument.} Model the algorithm as a binary tree: each internal node is one
+comparison, each of the two branches is an outcome, and each leaf is an output permutation.
+\begin{itemize}
+  \item There are $n!$ possible orderings of $n$ distinct elements, and each must be reachable
+        --- otherwise some input is sorted incorrectly. So the tree has \textbf{at least $n!$
+        leaves}.
+  \item A binary tree of depth $d$ has at most $2^d$ leaves. Hence
+        \[
+          2^d\ \ge\ n!\quad\Longrightarrow\quad d\ \ge\ \log_2(n!) .
+        \]
+  \item By Stirling, $\log_2(n!)=\Th{n\log n}$.
+\end{itemize}
+The worst-case number of comparisons is the depth $d$, so it is $\Om{n\log n}$. \qed
+
+\emph{Equivalent phrasing:} each comparison at best halves the set of permutations still
+consistent with what has been seen, $n!\to n!/2\to n!/4\to\cdots$, so $\log_2(n!)$ comparisons
+are needed before one permutation remains.
+\end{correct}
+
+\begin{facts}{how this bound gets used}
+\begin{itemize}
+  \item Merge sort and heap sort achieve $\Oh{n\log n}$, hence are \textbf{worst-case optimal}
+        among comparison sorts: none can run in $o(n\log n)$.
+  \item \textbf{Non-comparison sorts beat it} --- counting sort, radix sort --- but only under
+        extra assumptions (bounded integer keys). If an exam problem says
+        ``$A[i]\in\{1,2,3,4\}$'' or ``keys are integers in $[0,k)$'', it is \emph{inviting}
+        counting sort, and there is no contradiction with this theorem.
+  \item \textbf{Reduction template (very examinable).} To prove some problem $\Pi$ needs
+        $\Om{n\log n}$: show that an $\Oh{T(n)}$ algorithm for $\Pi$, plus $\Oh n$ extra work,
+        would sort. Then $T(n)=\Om{n\log n}$.
+        \begin{itemize}
+          \item \textbf{Convex hull.} Map $x_i\mapsto(x_i,x_i^2)$ onto the parabola. Every point
+                is on the hull (the parabola is convex), and reading the hull off in order gives
+                the $x_i$ sorted. So convex hull is $\Om{n\log n}$.
+          \item \textbf{Element uniqueness, closest pair} --- same style.
+        \end{itemize}
+\end{itemize}
+\end{facts}
+
+%==================================================================
+\section{3SUM and Reductions}
+
+\begin{prob}{3SUM}
+Given a set $S$ of $n$ numbers, decide whether there exist $x,y,z\in S$ with $x+y+z=0$.
+\end{prob}
+
+\begin{algo}{Sort and two-pointer sweep --- $\Oh{n^2}$}
+\begin{enumerate}
+  \item Sort $S$ in $\Oh{n\log n}$.
+  \item For each fixed $x\in S$: look for $y+z=-x$ among the sorted elements with a two-pointer
+        sweep --- start a pointer $\ell$ at the smallest and $r$ at the largest; if
+        $S[\ell]+S[r]$ is too small increment $\ell$, if too large decrement $r$, if equal
+        report success. $\Oh n$ per $x$.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+The sweep is correct because the array is sorted: if $S[\ell]+S[r]<-x$ then $S[\ell]$ cannot pair
+with anything at or below $S[r]$ to reach $-x$, so $\ell$ can be safely advanced (and symmetrically
+for $r$). No candidate pair is ever skipped, so if a valid $(y,z)$ exists it is found. \qed
+\end{correct}
+
+\begin{cplx}
+$n$ iterations of an $\Oh n$ sweep, dominating the $\Oh{n\log n}$ sort:
+$\boxed{\Oh{n^2}}$.
+\end{cplx}
+
+\begin{prob}{Problem X (three-set variant)}
+Given sets $A,B,C$ with $|A|+|B|+|C|=n$, decide whether $\exists\,a\in A,b\in B,c\in C$ with
+$a+b=c$.
+\end{prob}
+
+\noindent Solved identically (sort, then two-pointer): $\Oh{n^2}$.
+
+\begin{correct}
+\textbf{Claim.} $\mathrm{3SUM}\le_p X$ and $X\le_p \mathrm{3SUM}$, so they are equally hard.
+
+\smallskip\noindent\textbf{$\mathrm{3SUM}\le_p X$.} Given $S$, set
+\[
+  A=S,\qquad B=S,\qquad C=-S=\{-s:s\in S\}.
+\]
+Then $a+b=c$ for some $a\in A,b\in B,c\in C$ $\iff$ $x+y=-z$ for some $x,y,z\in S$ $\iff$
+$x+y+z=0$. Construction is $\Oh n$.
+
+\smallskip\noindent\textbf{$X\le_p \mathrm{3SUM}$.} Choose $\mu$ larger than $|v|$ for every
+$v\in A\cup B\cup C$, and set
+\[
+  A_S=\{a+\mu\},\qquad B_S=\{b+3\mu\},\qquad C_S=\{-c-4\mu\} .
+\]
+Run 3SUM on $S=A_S\cup B_S\cup C_S$. For $u\in A_S$, $v\in B_S$, $w\in C_S$ arising from $a,b,c$:
+\[
+  u+v+w=(a+\mu)+(b+3\mu)+(-c-4\mu)=a+b-c,
+\]
+which is $0$ exactly when $a+b=c$. Because $\mu$ dominates every original number, the offsets
+$\mu,3\mu,-4\mu$ are spread far enough apart that \textbf{a zero-sum triple can only take one
+element from each shifted set} --- never two from the same one. So yes-instances correspond
+exactly. \qed
+\end{correct}
+
+\begin{facts}{what to say about 3SUM's status}
+\begin{itemize}
+  \item Whether 3SUM admits a \emph{truly subquadratic} $\Oh{n^{2-\epsilon}}$ algorithm is a
+        major open problem (the \textbf{3SUM conjecture}). Algorithms shaving polylog factors
+        exist, e.g.\ $\Oh{n^2/\mathrm{polylog}\,n}$; nothing better is known.
+  \item A problem is \textbf{3SUM-hard} if 3SUM reduces to it --- so a subquadratic algorithm for
+        it would break the conjecture. This is a \emph{conditional} lower bound, not an
+        unconditional one. Say ``conditional'' in the exam.
+  \item The reduction direction matters: to show $\Pi$ is 3SUM-hard you must reduce
+        \textbf{3SUM $\to$ $\Pi$}, not the other way.
+\end{itemize}
+\end{facts}
+
+%==================================================================
+\section{3SUM-Hardness in Computational Geometry}
+
+\begin{prob}{Three collinear points}
+Given $n$ points in $\R^2$, decide whether any three of them are collinear.
+\end{prob}
+
+\begin{algo}{Slope sorting --- $\Oh{n^2\log n}$}
+Checking all $\binom n3$ triples costs $\Oh{n^3}$. Better:
+\begin{enumerate}
+  \item For each point $p_i$: compute the slope from $p_i$ to each of the other $n-1$ points
+        ($\Oh n$), and sort those slopes ($\Oh{n\log n}$).
+  \item If two of them are equal, those two points together with $p_i$ are collinear.
+\end{enumerate}
+\end{algo}
+
+\begin{correct}
+Three points are collinear iff, viewed from any one of them, the other two subtend the same slope.
+Fixing $p_i$ and detecting a repeated slope therefore detects exactly the collinear triples
+containing $p_i$; ranging over all $i$ covers every triple. \qed
+\end{correct}
+
+\begin{cplx}
+$n$ points, each costing $\Oh{n\log n}$ to sort slopes: $\boxed{\Oh{n^2\log n}}$.
+\end{cplx}
+
+\subsection*{Reduction 1: the cubic curve}
+
+\begin{correct}
+\textbf{Claim.} $\mathrm{3SUM}\le_p\{\text{three collinear points}\}$.
+
+\prf Given $x_1,\dots,x_n$, map $x_i\mapsto(x_i,x_i^3)$ --- all points onto the curve $y=x^3$
+(an $\Oh n$ construction). For distinct $a,b,c$ the points $(a,a^3),(b,b^3),(c,c^3)$ are collinear
+iff the slope from $a$ to $c$ equals the slope from $a$ to $b$:
+\[
+  \frac{c^3-a^3}{c-a}=\frac{b^3-a^3}{b-a}
+  \iff c^2+ca+a^2=b^2+ab+a^2
+  \iff c^2-b^2=a(b-c).
+\]
+Factor the left side: $(c-b)(c+b)=-a(c-b)$. Since $b\ne c$ we may cancel $(c-b)$:
+\[
+  a+b+c=0 .
+\]
+So the three points are collinear \emph{iff} $a+b+c=0$ --- exactly the 3SUM condition. Hence any
+algorithm for three-collinear-points solves 3SUM at the same cost. \qed
+\end{correct}
+
+\subsection*{Reduction 2: three horizontal lines}
+
+\begin{correct}
+\textbf{Claim.} Problem $X$ (hence 3SUM) $\le_p\{\text{three collinear points}\}$.
+
+\smallskip\noindent\textbf{Construction.} Given $A,B,C$, place
+\[
+  (a,0)\ \ \forall a\in A,\qquad (b,2)\ \ \forall b\in B,\qquad \left(\tfrac c2,1\right)\ \ \forall c\in C .
+\]
+So $A$ sits on $y=0$, $B$ on $y=2$, and $C$ (halved) on $y=1$ exactly in between. This is
+$\Oh{|A|+|B|+|C|}$ time.
+
+\smallskip\noindent\textbf{The collinearity computation.} For $P_1=(a,0)$, $P_3=(c/2,1)$,
+$P_2=(b,2)$:
+\[
+  m_{13}=\frac{1-0}{\frac c2-a}=\frac{1}{\frac c2-a},
+  \qquad
+  m_{32}=\frac{2-1}{b-\frac c2}=\frac{1}{b-\frac c2} .
+\]
+Collinear $\iff m_{13}=m_{32}\iff \frac c2-a=b-\frac c2\iff c=a+b$.
+
+\smallskip\noindent\textbf{Numeric check.} $a=1$, $b=4$, so $c$ should be $5$. Points
+$(1,0),(4,2),(2.5,1)$: slopes $\frac{1-0}{2.5-1}=\frac1{1.5}=\frac23$ and
+$\frac{2-1}{4-2.5}=\frac1{1.5}=\frac23$ --- equal, collinear. \checkmark\ With $c=6$ instead
+(point $(3,1)$) the slopes are $\frac12$ and $1$ --- not collinear, matching $1+4\ne6$.
+
+\smallskip\noindent\textbf{Why only ``non-trivial'' triples matter.} Every point lies on one of
+the three horizontal lines $y=0,1,2$. Two points on the same line already determine that
+horizontal line, so a third collinear point would have to lie on it too --- impossible if it came
+from a different set. Hence \emph{any} collinear triple mixing the sets takes exactly one point
+from each line. Triples inside a single line are trivially collinear and carry no information, so
+excluding them is exactly right. \qed
+\end{correct}
+
+\begin{facts}{on 3SUM-hard geometry}
+\begin{itemize}
+  \item Two independent reductions (cubic curve, three horizontal lines) give the same
+        conclusion: \textbf{three-collinear-points is 3SUM-hard} (Gajentaan--Overmars).
+  \item The gap is real: the best known algorithm is $\Oh{n^2\log n}$ (or $\Oh{n^2}$ with
+        duality/topological sweep), while the conditional lower bound is ``no
+        $\Oh{n^{2-\epsilon}}$''.
+  \item \textbf{Minimum-area triangle} (given $n$ points, no three collinear, find the triangle
+        of least area) is the natural companion: brute force fixes a base pair ($\binom n2$) and
+        scans the other $n-2$ points, giving $\Oh{n^3}$. Whether it is 3SUM-hard is exactly the
+        sort of open-ended question the notes flag.
+\end{itemize}
+\end{facts}
