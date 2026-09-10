@@ -1,0 +1,485 @@
+%==================================================================
+\section{Syllabus map: what each class covered}
+
+\begin{center}
+\begin{longtable}{@{}p{1.4cm}p{13.4cm}@{}}
+\toprule
+\textbf{Class} & \textbf{Content} \\
+\midrule
+\endhead
+\textbf{1} &
+Motivation and vocabulary. Mahalanobis, jute production, the NSS (1950), IPNS, pilot surveys;
+the Mahabharata anecdote. \textbf{The ABCD}: observation unit, target population, sampled
+population, sampling unit, sampling frame. Census vs.\ sample survey. \textbf{The \emph{Literary
+Digest} 1936 failure}. What sampling buys. \textbf{Total error $=$ sampling $+$ non-sampling}.
+Probability vs.\ non-probability sampling; convenience, judgment, self-selection, snowball,
+quota. \\[2pt]
+\textbf{2} &
+Finite-population framework: $U=\{1,\dots,N\}$, $Y_j$ \textbf{fixed}, parameters $\Ybar$,
+$\sigma^2$. \textbf{Sampling design} $p:\mathcal S\to[0,1]$; \textbf{sampling scheme}. SRSWR and
+SRSWOR. Implementation: lottery, random number tables (rejection and remainder methods),
+\texttt{sample()}. SRSWR design $p(s)=1/N^n$, $\pi_j=1-(1-1/N)^n$. SRSWR estimation: $\ybar$
+unbiased, $\Var(\ybar)=\sigma^2/n$, $\E(s^2)=\sigma^2$. SRSWOR design $p(s)=1/\binom Nn$,
+$\pi_j=n/N$, $\pi_{jj'}=\frac{n(n-1)}{N(N-1)}$. \\[2pt]
+\textbf{3} &
+SRSWOR estimation: $\Var(\ybar)=\frac{N-n}{N-1}\frac{\sigma^2}{n}=(1-f)\frac{S^2}{n}$,
+\textbf{finite population correction}; $\E(s^2)=S^2$. SRSWOR beats SRSWR for $n\ge2$; when SRSWR
+is used (bootstrap). \textbf{Effective sample size} $n_{\text{eff}}$, $\ybar_{\text{eff}}$. Total,
+variance, covariance. \textbf{Proportions}. Accuracy: SE, \textbf{CV/RSD}, Statistics Canada
+guidelines. \\[2pt]
+\textbf{4} &
+\textbf{Confidence intervals}: why exact CIs are impossible; \textbf{H\'ajek (1960)}; the
+approximate CI; $t_{n-1}$ for small $n$. \textbf{Choosing $n$}: margin of error, absolute $e$ and
+relative $r$; $n_{WR}=z^2_{\alpha/2}\sigma^2/e^2$, $n_{WOR}\approx n_{WR}/(1+n_{WR}/N)$;
+proportions and the $P(1-P)\le\frac14$ bound. \\[2pt]
+\textbf{5} &
+Worst case $P=0.5$ ($e=0.05\Rightarrow n=385$). Supplying $S^2$: worst-case, \textbf{pilot
+survey}, previous studies, guess. Relative error $\Rightarrow$ the \textbf{CV}. \textbf{Testing
+perspective}: $\alpha$, $\beta$, power, \textbf{effect size} $\Delta$;
+$n_{WR}=(z_\alpha+z_\beta)^2\sigma^2/\Delta^2$; proportions. Worked: diabetes ($n=31$),
+Framingham LDL ($n=809$). \\[2pt]
+\textbf{6} &
+\textbf{Stratified random sampling.} Why SRS can fail (representative only \emph{in
+expectation}); auxiliary information. Setup: $H$ strata, $N_h$, $n_h$, $\sum N_h=N$,
+$\sum n_h=n$. $\ybar_{st}=\frac1N\sum N_h\ybar_h$ is unbiased;
+$\Var(\ybar_{st})=\frac1{N^2}\sum N_h^2(1-f_h)\frac{S_h^2}{n_h}$; variance estimation and CI.
+\textbf{Allocation}: equal, proportional. \\[2pt]
+\textbf{7} &
+\textbf{Comparison of variances}: the exact identity for
+$\Var_{SRS}(\ybar)-\Var_{st}(\ybar_{st})$ under proportional allocation; when stratification
+helps (small WSS, large BSS). \textbf{Neyman allocation} $n_h\propto N_hS_h$, and that it
+minimises $\Var(\ybar_{st})$ subject to $\sum n_h=n$. \textbf{Optimal allocation with a cost
+constraint}: $n_h\propto N_hS_h/\sqrt{C_h}$. \\[2pt]
+\textbf{8} &
+Remarks on stratification (strata-level parameters, different frames and field procedures per
+stratum, formation of strata). \textbf{Systematic sampling}: $N=nk$, random start in
+$\{1,\dots,k\}$, sampling interval $k$; uses; behaviour under sorted vs.\ periodic frames.
+Estimation: $\ybar$ unbiased, $\Var(\ybar)=\sigma_b^2$ (between-cluster).
+\textbf{Intraclass correlation} $\rho_c$ and
+$\Var(\ybar)=\frac{\sigma^2}{n}\{1+(n-1)\rho_c\}$. \\[2pt]
+\textbf{9} &
+Systematic sampling inference. \textbf{The variance cannot be estimated unbiasedly} from one
+sample (a cluster-level sample of size 1). Pretending it is SRSWOR: $\hat V=(1-f)s^2/n$ is
+\textbf{biased}, unbiased iff $\rho_c=-\frac1{N-1}$. Alternatives: $m$ independent systematic
+samples (\textbf{IPNS}), multiple random starts, splitting one sample, Wolter (1984)
+successive-difference estimator. \textbf{$N$ not a multiple of $n$}; \textbf{circular systematic
+sampling}. \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\begin{note}{The results that carry the course}
+\[
+  \textbf{SRSWR:}\quad \E(\ybar)=\Ybar,\qquad \Var(\ybar)=\frac{\sigma^2}{n},\qquad \E(s^2)=\sigma^2 .
+\]
+\[
+  \textbf{SRSWOR:}\quad \Var(\ybar)=\frac{N-n}{N-1}\cdot\frac{\sigma^2}{n}=(1-f)\frac{S^2}{n},
+  \qquad \E(s^2)=S^2,\qquad S^2=\frac{N}{N-1}\sigma^2 .
+\]
+\[
+  \textbf{Stratified:}\quad \ybar_{st}=\sum_h W_h\ybar_h,\qquad
+  \Var(\ybar_{st})=\frac{1}{N^2}\sum_h N_h^2(1-f_h)\frac{S_h^2}{n_h},\qquad W_h=\frac{N_h}{N}.
+\]
+\[
+  \textbf{Allocation:}\quad \text{prop. }n_h=nW_h;\quad \text{Neyman }n_h=\frac{nN_hS_h}{\sum N_{h'}S_{h'}};\quad
+  \text{cost }n_h\propto\frac{N_hS_h}{\sqrt{C_h}} .
+\]
+\[
+  \textbf{Systematic:}\quad \Var(\ybar)=\sigma_b^2=\frac{\sigma^2}{n}\{1+(n-1)\rho_c\},
+  \qquad -\frac{1}{n-1}\le\rho_c\le1 .
+\]
+\[
+  \textbf{Sample size:}\quad n_{WR}=\frac{z^2_{\alpha/2}\sigma^2}{e^2}\ \text{or}\
+  \frac{(z_\alpha+z_\beta)^2\sigma^2}{\Delta^2},\qquad
+  n_{WOR}\approx\frac{n_{WR}}{1+n_{WR}/N}.
+\]
+\end{note}
+
+\begin{trap}{the three ``opposite'' facts that get mixed up}
+\begin{itemize}
+  \item \textbf{Stratified} sampling wants strata \emph{internally homogeneous} (small $S_h$) and
+        strata means far apart. \textbf{Systematic} sampling wants clusters \emph{internally
+        heterogeneous} (small $\rho_c$) and clusters resembling one another. \textbf{Exactly
+        opposite.}
+  \item $s^2$ is unbiased for $\sigma^2$ under SRSWR but for $S^2$ under SRSWOR. Same statistic,
+        different target.
+  \item Under systematic sampling $\ybar$ \emph{is} unbiased, but its \emph{variance} cannot be
+        estimated unbiasedly at all --- a distinction worth stating explicitly.
+\end{itemize}
+\end{trap}
+
+%==================================================================
+\section{Concepts and vocabulary}
+
+\Q{}{5}
+Define, and illustrate each with the running example \emph{``estimate the average monthly
+out-of-pocket medical expenditure of all adults in West Bengal''}: (i) observation unit,
+(ii) target population, (iii) sampled population, (iv) sampling unit, (v) sampling frame.
+Explain what goes wrong when the sampled population differs from the target population.
+
+\Q{}{5}
+Distinguish a \emph{census} from a \emph{sample survey}. Give three distinct reasons why a sample
+survey can be \textbf{more accurate} than a complete enumeration.
+
+\Q{}{8}
+In 1936 the \emph{Literary Digest} mailed 10 million questionnaires, received 2.3 million
+replies, and predicted Landon would beat Roosevelt. Identify the \textbf{two distinct} sources of
+error, explain the mechanism of each, and explain precisely why 2.3 million responses did not
+rescue the prediction. What does this say about the relation between sample size and bias?
+
+\Q{}{5}
+Write down the decomposition \emph{total error $=$ sampling error $+$ non-sampling error}. Define
+each, give two examples of non-sampling error, and explain why increasing $n$ can leave the total
+error unchanged or increase it.
+
+\Q{}{8}
+Define probability sampling. For each of \emph{convenience}, \emph{judgment}, \emph{self-selection},
+\emph{snowball} and \emph{quota} sampling give a one-line description, one situation where it is
+the pragmatic choice, and the specific bias it is most vulnerable to.
+
+\Q{}{8}
+Carefully distinguish a \textbf{sampling design} from a \textbf{sampling scheme}. Give an example
+of two genuinely different schemes inducing the \emph{same} design, and explain why the design is
+what inference depends on.
+
+%==================================================================
+\section{Designs, selection and inclusion probabilities}
+
+\Q{}{8}
+Let $U=\{1,2,3\}$ and $n=2$.
+\pt{a} Write down $\mathcal S$ and the SRSWOR design, and verify $\sum_sp(s)=1$.
+\pt{b} Compute $\pi_j$ and $\pi_{jj'}$ directly and check against the general formulas.
+\pt{c} Verify $\sum_j\pi_j=n$ and explain why this holds for \emph{any} fixed-size design.
+
+\Q{}{10}
+\pt{a} Show SRSWR induces the uniform design $p(\bm s)=1/N^n$ on \emph{ordered} samples.
+\pt{b} Derive $\pi_j=1-\left(1-\frac1N\right)^n$.
+\pt{c} Show $\pi_j<n/N$ for $n\ge2$ and interpret the gap.
+\pt{d} What is $\lim_{n\to\infty}\pi_j$, and what does this permit that SRSWOR does not?
+
+\Q{}{10}
+\pt{a} Show SRSWOR induces the uniform design $p(\bm s)=1/\binom Nn$ on \emph{unordered} samples.
+\pt{b} Derive $\pi_j=n/N$ and $\pi_{jj'}=\frac{n(n-1)}{N(N-1)}$.
+\pt{c} Verify $\sum_{j\ne j'}\pi_{jj'}=n(n-1)$.
+
+\Q{}{8}
+Under SRSWOR show that the \emph{marginal} probability that unit $j$ is selected at the $k$-th
+draw equals $1/N$ for every $k$. \src{This is the ``why?'' on the Class-2 slide.}
+
+\Q{}{5}
+With $N=17$ and $n=4$, describe the \textbf{rejection} and \textbf{remainder} methods for drawing
+an SRSWR from a table of random digits, carry out one draw of each from a stated row, and compare
+their rejection rates.
+
+%==================================================================
+\section{Estimation under SRSWR and SRSWOR}
+
+\Q{}{10}
+Under SRSWR: \pt{a} show $\ybar$ is unbiased for $\Ybar$; \pt{b} show $\Var(\ybar)=\sigma^2/n$;
+\pt{c} state precisely where the ``with replacement'' assumption is used in each part, and why
+$\Var(\ybar)$ does not depend on $N$ except through $\sigma^2$.
+
+\Q{}{8}
+Show $\E(s^2)=\sigma^2$ under SRSWR, and deduce that $\wh\Var(\ybar)=s^2/n$ is unbiased.
+
+\Q{}{8}
+For any known $h(\cdot)$, show $\frac1n\sum_ih(y_i)$ is unbiased for $\frac1N\sum_jh(Y_j)$ under
+SRSWR. Explain why this needs \textbf{no distributional assumption}, and what exactly makes it
+true.
+
+\Q{}{12}
+Under SRSWOR, with $y_1,\dots,y_n$ the values at the $n$ draws:
+\pt{a} Show $\E(y_i)=\Ybar$, $\Var(y_i)=\sigma^2$.
+\pt{b} Show $\Cov(y_i,y_{i'})=-\dfrac{\sigma^2}{N-1}$ for $i\ne i'$.
+\pt{c} Derive $\Var(\ybar)=\dfrac{N-n}{N-1}\cdot\dfrac{\sigma^2}{n}=(1-f)\dfrac{S^2}{n}$.
+\pt{d} Interpret the sign of the covariance and why it makes SRSWOR more efficient.
+
+\Q{}{10}
+Show $\E(s^2)=S^2$ under SRSWOR and deduce that $\wh\Var(\ybar)=(1-f)s^2/n$ is unbiased.
+\src{Note the target is $S^2$, not $\sigma^2$.}
+
+\Q{}{8}
+\pt{a} Prove $\Var_{WOR}(\ybar)<\Var_{WR}(\ybar)$ for $n\ge2$, with equality iff $n=1$.
+\pt{b} Interpret the fpc $(1-f)$ and describe the regimes $f\to0$ and $f\to1$.
+\pt{c} Give three reasons SRSWR is nonetheless used in practice.
+
+\Q{}{8}
+For the population total $T=\sum_jY_j$ and $\wh T=N\ybar$:
+\pt{a} Show $\wh T$ is unbiased and find $\Var(\wh T)$ under SRSWOR.
+\pt{b} Give an unbiased estimator of $\Var(\wh T)$.
+\pt{c} Show $\CV(\wh T)=\CV(\ybar)$ and say why that is useful in a survey report.
+
+%==================================================================
+\section{Effective sample size and proportions}
+
+\Q{}{10}
+Under SRSWR let $n_{\text{eff}}$ be the number of \emph{distinct} units sampled.
+\pt{a} Explain why it is random.
+\pt{b} Show $\E(n_{\text{eff}})=N\left[1-\left(1-\frac1N\right)^n\right]$.
+\pt{c} Evaluate for $N=100$, $n=20$ and comment.
+\pt{d} Show $\E(n_{\text{eff}})\le n$ and say when the two are close.
+
+\Q{}{8}
+Let $\ybar_{\text{eff}}$ be the mean of $Y$ over the distinct units of an SRSWR sample. Show
+$\E(\ybar_{\text{eff}})=\Ybar$. \src{Hint: condition on the set of distinct units and use
+symmetry.} Compare $\ybar_{\text{eff}}$ with the SRSWOR mean of size $n$.
+
+\Q{}{10}
+Let $Y_j=\I(\text{unit }j\text{ has the characteristic})$ and $P$ the population proportion.
+\pt{a} Show $P=\Ybar$.
+\pt{b} Show $\sigma^2=P(1-P)$ and $S^2=\frac{N}{N-1}P(1-P)$.
+\pt{c} Write $\Var(p)$ under SRSWR and SRSWOR.
+\pt{d} Show $\wh\Var(p)=(1-f)\dfrac{p(1-p)}{n-1}$ is unbiased under SRSWOR.
+
+\Q{}{8}
+\pt{a} Show $np\sim\text{Binomial}(n,P)$ under SRSWR, and state the distribution under SRSWOR.
+\pt{b} Using these, identify the exact factor by which the SRSWOR variance is smaller.
+
+%==================================================================
+\section{Accuracy, confidence intervals, sample size}
+
+\Q{}{5}
+Define the standard error and the coefficient of variation of an estimator, give
+$\wh\SE(\ybar)$ and $\wh\CV(\ybar)$ under SRSWOR, and state the Statistics Canada guidelines.
+
+\Q{}{10}
+An SRSWOR with $N=5{,}000$, $n=100$ gives $\ybar=\text{Rs.}\,2{,}400$, $s=\text{Rs.}\,1{,}800$.
+\pt{a} Compute $\wh\Var(\ybar)$, $\wh\SE(\ybar)$, $\wh\CV(\ybar)$.
+\pt{b} Classify by the Statistics Canada guidelines.
+\pt{c} Give an approximate 95\% CI for $\Ybar$.
+\pt{d} Estimate the total and give its estimated CV.
+\pt{e} By what factor must $n$ increase to halve the CV?
+
+\Q{}{10}
+\pt{a} Explain why an \emph{exact} 95\% CI for $\Ybar$ cannot be computed in finite-population
+sampling, even though the sampling distribution of $\ybar$ is fully determined by the design.
+\pt{b} State H\'ajek's (1960) result and its conditions.
+\pt{c} Write the resulting approximate CI under SRSWOR and say when $t_{n-1}$ should replace
+$1.96$.
+
+\Q{}{8}
+A survey reports a 95\% CI of $[4735,7265]$ for mean monthly rent, from $n=15$.
+\pt{a} State precisely what the coverage probability refers to.
+\pt{b} A student says ``there is a 95\% probability that $\Ybar$ lies in this interval''. Explain
+why that is wrong here, and give the correct statement.
+\pt{c} Comment on the interval's usefulness and on what should have been done instead.
+
+\Q{}{12}
+\pt{a} From $\Prob(|\ybar-\Ybar|\le e)=1-\alpha$ and the normal approximation, derive
+$n_{WR}=\frac{z^2_{\alpha/2}\sigma^2}{e^2}$.
+\pt{b} Derive $n_{WOR}=\frac{z^2_{\alpha/2}S^2}{e^2+z^2_{\alpha/2}S^2/N}$.
+\pt{c} Hence show $n_{WOR}=\frac{n_{WR}}{1+n_{WR}/N}$, and deduce $n_{WOR}<N$ always.
+\pt{d} Comment on the claim that one should sample ``a fixed percentage of the population''.
+
+\Q{}{10}
+\pt{a} Derive $n_{WR}=\frac{z^2_{\alpha/2}P(1-P)}{e^2}$ for a proportion.
+\pt{b} Show $P(1-P)\le\frac14$ and obtain the worst-case $n$.
+\pt{c} At 95\% confidence compute the worst-case $n$ for $e=0.10,\,0.05,\,0.03$ and comment on
+the scaling.
+\pt{d} If in truth $P=0.2$, quantify how wasteful the worst-case choice was.
+
+\Q{}{8}
+\pt{a} Show that with a \emph{relative} margin of error $r$, the required $n$ depends on the
+population \textbf{coefficient of variation}. Derive the formula.
+\pt{b} Explain why the CV is easier to guess in advance than $\sigma^2$.
+
+\Q{}{12}
+For $H_0:\Ybar=\mu_0$ against $H_1:\Ybar=\mu_1>\mu_0$, with $\Delta=\mu_1-\mu_0$:
+\pt{a} Write the test statistic and level-$\alpha$ rejection rule, stating the approximation used.
+\pt{b} Derive $n_{WR}=\frac{(z_\alpha+z_\beta)^2\sigma^2}{\Delta^2}$ from the power requirement.
+\pt{c} State the two-sided and SRSWOR versions.
+\pt{d} Explain the role of the \emph{minimum detectable effect} and why $\Delta$ is a
+subject-matter choice.
+
+\Q{}{10}
+Among people free of diabetes, mean fasting glucose is $95.0$ mg/dL with sd $9.8$; a mean of
+$100$ in coffee drinkers would be clinically important. Under SRSWR, how many patients give a
+two-sided 5\% test power 80\%? Show all working and state assumptions.
+\src{$z_{0.025}=1.96$, $z_{0.20}=0.8416$.}
+
+\Q{}{10}
+26\% of people free of heart disease have elevated LDL. How many patients are needed for a
+two-sided 5\% test to have power 90\% to detect a difference of $0.05$ in the proportion?
+\src{$z_{0.025}=1.96$, $z_{0.10}=1.2816$.}
+
+\Q{}{8}
+Your required $n$ is three times the budget. Describe three distinct ways to reduce it, state
+exactly what each costs you, and say which you would choose and why.
+
+%==================================================================
+\section{Stratified random sampling}
+
+\Q{}{8}
+A campus health centre wants the mean height of $1{,}000$ undergraduates, half male and half
+female. An SRSWOR of size $10$ happens to return $9$ men and $1$ woman.
+\pt{a} Is the estimator $\ybar$ biased? Answer precisely, and explain the difference between
+being representative \emph{in expectation} and being representative \emph{in this sample}.
+\pt{b} Explain how stratification fixes the problem, and what extra information it requires.
+\pt{c} Is a stratified sample still a probability sample? Justify.
+
+\Q{}{12}
+Set up stratified random sampling with $H$ strata, $N_h$, $n_h$, and SRSWOR drawn
+\textbf{independently} within each stratum.
+\pt{a} Show that $\ybar=\frac1n\sum\text{(all sampled values)}$ is in general \emph{biased} for
+$\Ybar$, and state exactly when it is unbiased.
+\pt{b} Show that $\ybar_{st}=\frac1N\sum_hN_h\ybar_h$ is unbiased.
+\pt{c} Derive $\Var(\ybar_{st})=\frac1{N^2}\sum_hN_h^2(1-f_h)\frac{S_h^2}{n_h}$, stating clearly
+where the independence across strata is used.
+\pt{d} Write down an unbiased estimator of this variance and the approximate 95\% CI for $\Ybar$.
+
+\Q{}{10}
+\pt{a} Define equal, proportional and Neyman allocation, and state the one-line rationale for
+each.
+\pt{b} Show that under \textbf{proportional} allocation $f_h=f$ for every $h$, and hence
+$\Var_{prop}(\ybar_{st})=\frac{1-f}{n}\sum_hW_hS_h^2$.
+\pt{c} Show that under \textbf{Neyman} allocation
+$\Var_{Ney}(\ybar_{st})=\frac{1}{n}\left(\sum_hW_hS_h\right)^2-\frac1N\sum_hW_hS_h^2$.
+\pt{d} Deduce $\Var_{prop}\ge\Var_{Ney}$, and state exactly when equality holds.
+
+\Q{}{10}
+Prove that Neyman allocation minimises $\Var(\ybar_{st})$ subject to $\sum_hn_h=n$.
+\src{Use a Lagrange multiplier, or the Cauchy--Schwarz inequality.}
+
+\Q{}{10}
+Suppose the cost of the survey is $A+\sum_hn_hC_h$, where $A$ is overhead and $C_h$ the cost per
+unit in stratum $h$.
+\pt{a} Formulate the problem of minimising $\Var(\ybar_{st})$ subject to a total budget $C$.
+\pt{b} Show the optimum is $n_h\propto\dfrac{N_hS_h}{\sqrt{C_h}}$, and write $n_h$ explicitly.
+\pt{c} Show this reduces to Neyman allocation when $C_h$ is constant, and explain intuitively why
+expensive strata get smaller samples.
+
+\Q{}{12}
+Compare an SRSWOR of size $n$ with a stratified WOR sample of the same size $n$ under
+proportional allocation. The exact identity is
+\[
+  \Var_{SRS}(\ybar)-\Var_{st}(\ybar_{st})
+  =\frac{N-n}{n(N-1)}\left[\sum_{h=1}^HW_h(\Ybar_h-\Ybar)^2-\frac1N\sum_{h=1}^H(1-W_h)S_h^2\right].
+\]
+\pt{a} Identify the two bracketed terms as between-stratum and within-stratum contributions.
+\pt{b} State the condition under which stratification helps, in words.
+\pt{c} What happens in the special case $\Ybar_1=\cdots=\Ybar_H$? What has gone wrong, and what
+does it tell you about how to form strata?
+\pt{d} Why is stratification nevertheless ``almost always beneficial'' in realistic surveys?
+
+\Q{}{12}
+A district has $N=1{,}000$ households in three strata: urban ($N_1=200$), semi-urban
+($N_2=300$), rural ($N_3=500$). From a pilot, $S_1=60$, $S_2=40$, $S_3=20$ and
+$\Ybar_1=300$, $\Ybar_2=200$, $\Ybar_3=100$ (rupees per month). Take $n=100$.
+\pt{a} Compute the proportional and the Neyman allocations.
+\pt{b} Compute $\Var_{prop}(\ybar_{st})$ and $\Var_{Ney}(\ybar_{st})$.
+\pt{c} Compute $\Ybar$ and (using $S^2\approx\sum W_hS_h^2+\sum W_h(\Ybar_h-\Ybar)^2$) the
+variance under SRSWOR of the same size. Compare all three and comment.
+\pt{d} Neyman allocation gives non-integer $n_h$. How would you round, and what problem does
+rounding create?
+
+\Q{}{8}
+Give four practical reasons, beyond variance reduction, for using stratified sampling. For each,
+give a concrete example. \src{Class 8, ``Stratification: some remarks''.}
+
+%==================================================================
+\section{Systematic sampling}
+
+\Q{}{10}
+Let $N=nk$ with $k$ an integer.
+\pt{a} State the linear systematic sampling scheme precisely.
+\pt{b} Write down $\mathcal S$, the sampling design, and show $\pi_j=n/N$ for every $j$.
+\pt{c} Compute $\pi_{jj'}$ and show it is $0$ for some pairs. Explain why this single fact is
+responsible for the variance-estimation problem of Class 9.
+
+\Q{}{12}
+With $N=nk$, write $Y_{ij}$ for the $j$-th unit of cluster $i$, $i=1,\dots,k$.
+\pt{a} Show that a systematic sample is exactly one randomly chosen cluster, and hence a special
+case of cluster sampling.
+\pt{b} Show $\E(\ybar)=\Ybar$.
+\pt{c} Show $\Var(\ybar)=\frac1k\sum_{i=1}^k(\Ybar_i-\Ybar)^2=\sigma_b^2$, the
+\textbf{between-cluster} variance.
+\pt{d} Deduce the design rule: for systematic sampling to be efficient, should clusters be
+internally homogeneous or heterogeneous? Contrast with stratified sampling.
+
+\Q{}{10}
+Let $\rho_c$ be the intraclass correlation coefficient.
+\pt{a} Using $\Var(\ybar)=\frac{\sigma^2}{n}\{1+(n-1)\rho_c\}$, show that systematic sampling
+beats SRSWR iff $\rho_c\le0$.
+\pt{b} Show that it beats SRSWOR iff $\rho_c\le-\dfrac1{N-1}$.
+\pt{c} Show $-\dfrac1{n-1}\le\rho_c\le1$ and interpret both extremes.
+
+\Q{}{12}
+Take $N=12$, $n=3$, $k=4$.
+\pt{a} Population A has $Y=(1,2,\dots,12)$ in that order. List the four possible systematic
+samples, compute $\Var(\ybar)$ directly, and compare with the SRSWR and SRSWOR variances.
+\pt{b} Population B has $Y=(10,20,30,40)$ repeated three times. Repeat the computation.
+\pt{c} Compute $\rho_c$ in each case from
+$\Var(\ybar)=\frac{\sigma^2}{n}\{1+(n-1)\rho_c\}$, and explain the two results in terms of the
+ordering of the sampling frame.
+
+\Q{}{10}
+\pt{a} Explain why $\Var(\ybar)$ cannot be estimated unbiasedly from a single systematic sample.
+\pt{b} Suppose we pretend the sample is SRSWOR and use $\hat V=(1-f)\frac{s^2}{n}$. Given that
+$\E(\hat V)=(1-f)\frac{S^2}{n}\cdot\frac{N-1}{N}(1-\rho_c)$, determine the direction of the bias
+as a function of $\rho_c$, and state when $\hat V$ is unbiased.
+\pt{c} When is this pretence a \emph{conservative} (safe) thing to do?
+
+\Q{}{10}
+Describe three practical ways of obtaining a usable variance estimate under systematic sampling,
+and state the cost or assumption each one carries:
+(i) $m$ independent systematic samples (IPNS);
+(ii) $m$ random starts within the first $mk$ units;
+(iii) the successive-difference estimator of Wolter (1984).
+Write down the estimator in each case.
+
+\Q{}{8}
+The ISI canteen has $N=14$ staff and you want $n=4$.
+\pt{a} Show that linear systematic sampling breaks down, and describe the two ad hoc fixes with
+$k=3$ and $k=4$, listing the resulting samples and sizes.
+\pt{b} Describe \textbf{circular systematic sampling} and carry it out with $k=4$ and random
+start $i=13$.
+\pt{c} Show that circular systematic sampling gives $\pi_j=n/N$ for every $j$, and explain why
+this is an improvement on the ad hoc fixes.
+
+\Q{}{8}
+State four situations in which systematic sampling is preferred to SRS in practice, and two
+situations in which it can go badly wrong. Give a concrete example of each failure.
+
+%==================================================================
+\section{Applied and mixed problems}
+
+\Q{}{12}
+A district has $N=1{,}200$ registered small businesses. An SRSWOR of $n=150$ finds that $42$
+rely on local moneylenders rather than bank loans.
+\pt{a} Estimate $P$ and give the estimated standard error.
+\pt{b} Give an approximate 95\% CI for $P$.
+\pt{c} Estimate the total number of such businesses, with its standard error.
+\pt{d} Compute the estimated CV and classify it.
+\pt{e} A follow-up wants margin of error $0.03$ at 95\%. Find the required $n$ (i) using the
+worst-case bound and (ii) using this survey as a pilot.
+
+\Q{}{10}
+Critically evaluate the following design, identifying every flaw and classifying each as a
+sampling or a non-sampling error.
+\begin{quote}\small
+\emph{To estimate the average monthly household expenditure on private tuition in a city, a
+researcher stands outside three well-known coaching centres on a weekday evening and interviews
+the first 200 parents who agree to talk. Of the 200 approached, 120 respond. The questionnaire
+asks ``How much do you spend on your child's tuition?'' The researcher reports the sample mean as
+the city average, with standard error $s/\sqrt{120}$.}
+\end{quote}
+
+\Q{}{10}
+A population of $N=6$ units has $Y=(2,4,4,6,8,12)$.
+\pt{a} Compute $\Ybar$, $\sigma^2$, $S^2$ and verify $S^2=\frac{N}{N-1}\sigma^2$.
+\pt{b} For $n=2$ under SRSWOR, list all $\binom62$ samples, verify $\E(\ybar)=\Ybar$ directly and
+check $\Var(\ybar)$ against $(1-f)S^2/n$.
+\pt{c} Compute $\Var_{WR}(\ybar)$ and confirm the inequality.
+
+\Q{}{12}
+You must design a survey to estimate mean household electricity consumption in a city of
+$N=100{,}000$ households. You know the ward of every household, and previous studies suggest
+consumption varies far more \emph{between} wards than \emph{within} them. The budget allows
+$n=2{,}000$.
+\pt{a} Which of SRSWOR, stratified and systematic sampling would you choose, and why? Address all
+three.
+\pt{b} If you stratify by ward, which allocation would you use, and what would you need to know?
+\pt{c} Suppose the household list is sorted by ward. What does a systematic sample of every
+$50$th household resemble, and is that good or bad here?
+\pt{d} State one non-sampling error this survey is particularly exposed to, and how you would
+mitigate it.

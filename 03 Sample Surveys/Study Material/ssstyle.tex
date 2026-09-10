@@ -1,0 +1,51 @@
+% Shared preamble for the Sample Surveys question bank.
+\usepackage[a4paper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=2pt,topsep=3pt}
+\pagestyle{fancy}\fancyhf{}
+\rhead{\small Sample Surveys, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\Ybar}{\overline{Y}}
+\newcommand{\ybar}{\bar{y}}
+\newcommand{\Xbar}{\overline{X}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\SE}{\operatorname{SE}}
+\newcommand{\CV}{\operatorname{CV}}
+\newcommand{\wh}[1]{\widehat{#1}}
+\newcommand{\prf}{\smallskip\noindent\textbf{Proof.}\ }
+\renewcommand{\qed}{\hfill$\blacksquare$}
+\newcommand{\dto}{\overset{d}{\longrightarrow}}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+
+\newtcolorbox{keybox}[1]{colback=Blue!4,colframe=Blue!60,title={#1},
+  fonttitle=\bfseries,breakable}
+\newtcolorbox{trap}[1]{colback=BrickRed!5,colframe=BrickRed!60,
+  title={\textsc{Trap} --- #1},fonttitle=\bfseries,breakable}
+\newtcolorbox{note}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={#1},
+  fonttitle=\bfseries,breakable}
+
+\newcounter{qq}[section]
+\newcommand{\Q}[2]{\medskip\refstepcounter{qq}%
+  \noindent\textbf{\color{Blue}\thesection.\theqq}\ \ \textbf{#1}%
+  \hfill\textnormal{[\textbf{#2} marks]}\par\smallskip}
+\newcommand{\sol}{\smallskip\noindent\textbf{\color{ForestGreen}Solution.}\ }
+\newcommand{\pt}[1]{\smallskip\noindent\textbf{(#1)}\ }
+\newcommand{\src}[1]{{\small\color{black!55}\textit{(#1)}}}

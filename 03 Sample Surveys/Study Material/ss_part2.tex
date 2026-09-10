@@ -1,0 +1,1074 @@
+%==================================================================
+\section{Solutions: concepts and vocabulary}
+\setcounter{qq}{0}
+
+\Q{}{5}
+\sol
+\begin{itemize}
+  \item \textbf{Observation unit} --- the object measured. Here: an adult person.
+  \item \textbf{Target population} --- the ideal complete collection we want to infer about, in a
+        stated period. Here: all adults in West Bengal.
+  \item \textbf{Sampled population} --- the accessible part, i.e.\ the units that \emph{could} be
+        chosen. Here: adults in registered households.
+  \item \textbf{Sampling unit} --- a unit that can be selected. Need not equal the observation
+        unit: with no list of adults, the sampling unit could be the \emph{household}.
+  \item \textbf{Sampling frame} --- the tangible list/map/database of sampling units with unique
+        IDs. Here: the latest West Bengal Electoral Roll.
+\end{itemize}
+\textbf{If sampled $\ne$ target:} inference is valid only for the sampled population. The
+difference is a \textbf{coverage error}, a bias that no increase in $n$ removes, because excluded
+units have zero probability of selection.
+
+\Q{}{5}
+\sol A \textbf{census} measures every unit; a \textbf{sample survey} measures a subset and infers.
+Three reasons a survey can be more accurate:
+\begin{enumerate}
+  \item \textbf{Better fieldwork} --- a small sample can be handled by few, highly trained
+        investigators, so measurement error per unit is lower.
+  \item \textbf{Enlarged scope} --- with fewer units you can ask more and probe harder within the
+        same budget.
+  \item \textbf{Speed} --- a census takes so long the population changes meanwhile.
+\end{enumerate}
+A census removes \emph{sampling} error but typically has much larger \emph{non-sampling} error,
+and only the total matters.
+
+\Q{}{8}
+\sol \textbf{Error 1 --- selection bias (frame problem).} Names came from telephone directories
+and vehicle registrations, which in 1936 over-represented richer, Republican-leaning households
+and excluded poorer, Roosevelt-leaning ones. The sampled population was not the target
+population of voters.
+
+\textbf{Error 2 --- non-response bias.} Only $2.3$ of $10$ million replied, and responding was
+correlated with preference: Landon supporters were far more motivated to return the form.
+
+\textbf{Why $2.3$ million did not help.} Both are \textbf{biases}, not variances:
+$\text{MSE}=\text{Bias}^2+\text{Variance}$. Increasing $n$ drives the variance to zero but leaves
+the bias untouched, producing a very \emph{precise} estimate of the \emph{wrong} quantity.
+
+\textbf{Moral:} sample size buys precision; only the design buys unbiasedness. A small
+probability sample beats a huge convenience sample.
+
+\Q{}{5}
+\sol
+\[
+  \text{Total error}=\underbrace{\text{Sampling error}}_{\text{from observing only part of }U}
+  +\underbrace{\text{Non-sampling error}}_{\text{everything else}} .
+\]
+Sampling error is what $\Var(\ybar)$ measures and $\to0$ as $n\to N$. Non-sampling error includes
+measurement error (bad or sensitive questions), non-response, frame/coverage error and poorly
+trained investigators.
+
+Only the first term shrinks with $n$. Worse, a larger survey usually needs more, less well
+trained investigators and suffers lower response rates, so the second term \emph{grows}. This is
+why ``bigger is always better'' is false.
+
+\Q{}{8}
+\sol \textbf{Probability sampling:} selection is governed by a randomisation mechanism giving
+every unit in the frame a \textbf{known, strictly positive} probability of selection. That known
+mechanism is what makes design-based inference possible.
+\begin{center}\small
+\begin{tabular}{@{}p{2.2cm}p{5.2cm}p{3.4cm}p{3.4cm}@{}}
+\toprule
+Method & Description & Typical use & Main vulnerability \\
+\midrule
+Convenience & take whoever is accessible and cheap & pilot test of wording & gross selection bias \\
+Judgment & researcher hand-picks informative units & expert interviews, case studies & the researcher's prior \\
+Self-selection & individuals opt in & feedback forms, internet polls & only the opinionated respond \\
+Snowball & selected units refer others & hidden populations with no frame & network homophily \\
+Quota & fill target counts per group by convenience & guaranteed demographic mix, cheap & convenience bias \emph{within} quotas \\
+\bottomrule
+\end{tabular}
+\end{center}
+All five share one fatal defect: selection probabilities are unknown, so no design-based standard
+error or CI can be computed.
+
+\Q{}{8}
+\sol A \textbf{sampling design} is a probability distribution $p$ over $\mathcal S$ with
+$\sum_sp(s)=1$ --- the mathematical object. A \textbf{sampling scheme} is an algorithm for
+drawing a sample --- the operational recipe.
+
+\textbf{Two schemes, one design.} For SRSWOR of size $n$:
+\emph{Scheme A} --- draw units one at a time, each remaining unit equally likely, then discard the
+order. \emph{Scheme B} --- enumerate all $\binom Nn$ subsets and pick one uniformly.
+Scheme A gives each ordered sequence probability $\frac{(N-n)!}{N!}$ and each unordered set
+arises from $n!$ orderings, so $p(\bm s)=\frac{n!(N-n)!}{N!}=1/\binom Nn$ --- identical to B.
+
+\textbf{Why the design matters.} $\E(\ybar)$, $\Var(\ybar)$, $\pi_j$, $\pi_{jj'}$ are functionals
+of $p(\cdot)$ alone. Two schemes with the same design are statistically indistinguishable; the
+choice between them is purely practical. Conversely a scheme is useless if you cannot write down
+the design it induces.
+
+%==================================================================
+\section{Solutions: designs and inclusion probabilities}
+\setcounter{qq}{0}
+
+\Q{}{8}
+\pt{a} $\mathcal S=\{\{1,2\},\{1,3\},\{2,3\}\}$, $p(s)=1/\binom32=\frac13$ each; sum $=1$ \checkmark
+
+\pt{b} Unit 1 lies in two samples, so $\pi_1=\frac23$; by symmetry all $\pi_j=\frac23=n/N$
+\checkmark. Each pair lies in exactly one sample, so $\pi_{jj'}=\frac13=\frac{2\cdot1}{3\cdot2}$
+\checkmark
+
+\pt{c} $\sum_j\pi_j=3\cdot\frac23=2=n$ \checkmark. In general, with $I_j$ the inclusion indicator,
+\[
+  \sum_j\pi_j=\sum_j\E(I_j)=\E\Big(\sum_jI_j\Big)=\E(\text{sample size})=n,
+\]
+for \emph{any} fixed-size design.
+
+\Q{}{10}
+\pt{a} An ordered sample is $(u_1,\dots,u_n)$; each draw independently picks any unit with
+probability $1/N$, so $p(\bm s)=1/N^n$ for all $N^n$ ordered samples --- uniform.
+
+\pt{b} Unit $j$ is excluded iff all $n$ independent draws miss it:
+$\Prob(j\notin s)=(1-\frac1N)^n$, so $\pi_j=1-(1-\frac1N)^n$.
+
+\pt{c} By the binomial expansion, $(1-\frac1N)^n>1-\frac nN$ strictly for $n\ge2$, hence
+$\pi_j<n/N$. \textbf{Interpretation:} $n/N$ is the SRSWOR inclusion probability; under SRSWR some
+draws are wasted on repeats, so a given unit is less likely to appear at all.
+
+\pt{d} $\pi_j\to1$. Also $n$ may exceed $N$ under SRSWR --- impossible under SRSWOR --- which is
+exactly what makes SRSWR the right tool for the bootstrap.
+
+\Q{}{10}
+\pt{a} A particular ordered sequence of $n$ distinct units has probability
+$\frac1N\cdot\frac1{N-1}\cdots\frac1{N-n+1}=\frac{(N-n)!}{N!}$. Each unordered sample arises from
+$n!$ orderings, so $p(\bm s)=n!\frac{(N-n)!}{N!}=1/\binom Nn$ --- uniform.
+
+\pt{b} Counting samples,
+$\pi_j=\binom{N-1}{n-1}/\binom Nn=\frac nN$ and
+$\pi_{jj'}=\binom{N-2}{n-2}/\binom Nn=\frac{n(n-1)}{N(N-1)}$.
+
+\pt{c} There are $N(N-1)$ ordered pairs, so
+$\sum_{j\ne j'}\pi_{jj'}=N(N-1)\cdot\frac{n(n-1)}{N(N-1)}=n(n-1)$ \checkmark
+(Sanity: $\E[(\sum_jI_j)^2]=n+n(n-1)=n^2$, as required for a fixed-size design.)
+
+\Q{}{8}
+\sol Unit $j$ is selected at draw $k$ iff it survives the first $k-1$ draws and is then chosen:
+\[
+  \Prob=\underbrace{\frac{N-1}{N}\cdot\frac{N-2}{N-1}\cdots\frac{N-k+1}{N-k+2}}_{\text{telescopes to }\frac{N-k+1}{N}}
+  \times\frac{1}{N-k+1}=\frac1N ,
+\]
+independent of $k$. \qed \ \textbf{This is the ``S'' in SRS}: equal marginal selection probability
+at \emph{every} stage, even though the conditional probabilities $\frac1{N-k+1}$ change.
+
+\Q{}{5}
+\sol \textbf{Rejection method.} Read two-digit numbers; accept if in $01$--$17$, reject if $>17$
+or $=00$. Only $17\%$ of numbers are usable --- about $83\%$ wasted.
+
+\textbf{Remainder method.} The largest two-digit multiple of $17$ is $17\times5=85$. Reject only
+if $>85$ or $=00$; otherwise take $x\bmod17$ (remainder $0\mapsto$ unit 17). Only $14\%$ wasted.
+Each residue class receives exactly five of the $85$ admissible numbers, so selection remains
+exactly uniform --- which is why trimming to $85$ is essential and cannot be skipped.
+
+From row 07 ($77783\,00015\,10806\,\dots$): rejection gives $15,10,\dots$; remainder gives
+$17,10,13,15$.
+
+%==================================================================
+\section{Solutions: estimation under SRSWR and SRSWOR}
+\setcounter{qq}{0}
+
+\Q{}{10}
+\pt{a} Each draw is uniform on $U$, so $\E(y_i)=\sum_j\frac1NY_j=\Ybar$, and
+$\E(\ybar)=\frac1n\sum_i\E(y_i)=\Ybar$. \qed
+
+\pt{b} $\Var(y_i)=\frac1N\sum_jY_j^2-\Ybar^2=\sigma^2$. Because draws are \textbf{with
+replacement}, $y_1,\dots,y_n$ are \emph{independent}, so
+$\Var(\ybar)=\frac{1}{n^2}\cdot n\sigma^2=\frac{\sigma^2}{n}$. \qed
+
+\pt{c} The WR assumption is \emph{not} used in (a) --- unbiasedness needs only the marginal
+distribution of each draw and holds for SRSWOR too. It is essential in (b), to kill the
+covariances. $N$ does not appear because each draw is an independent uniform pick from the same
+distribution, exactly like iid sampling from an infinite population putting mass $1/N$ on each
+$Y_j$; $N$ enters only through the shape of that distribution, i.e.\ through $\sigma^2$.
+
+\Q{}{8}
+\sol With $s^2=\frac1{n-1}(\sum_iy_i^2-n\ybar^2)$,
+\[
+  \E\Big(\sum_iy_i^2\Big)=n(\sigma^2+\Ybar^2),\qquad
+  \E(\ybar^2)=\frac{\sigma^2}{n}+\Ybar^2 ,
+\]
+so $\E(s^2)=\frac{1}{n-1}[n\sigma^2-\sigma^2]=\sigma^2$. \qed\ Hence
+$\E(s^2/n)=\sigma^2/n=\Var(\ybar)$.
+
+\begin{trap}{the divisor}
+$s^2$ (divisor $n-1$) is unbiased for $\sigma^2$ (divisor $N$) under SRSWR, but for $S^2$
+(divisor $N-1$) under SRSWOR. \textbf{Same statistic, different target.}
+\end{trap}
+
+\Q{}{8}
+\sol Since $y_i$ is a uniform draw from $\{Y_1,\dots,Y_N\}$,
+$\E(h(y_i))=\frac1N\sum_jh(Y_j)$; averaging over $i$ gives the result. \qed
+
+\textbf{Why no distributional assumption is needed.} The $Y_j$ are \textbf{fixed} numbers --- there
+is no population distribution to assume anything about. The only randomness is the randomness
+\emph{we introduced} when choosing units, and its distribution is known exactly because we
+designed it. Unbiasedness therefore holds \textbf{by design}, for every conceivable population:
+\emph{the randomisation is the assumption}.
+
+Taking $h(y)=y$ gives the mean; $h(y)=y^2$ gives $\frac1N\sum Y_j^2$; $h(y)=\I(y\le t)$ gives the
+population distribution function at $t$.
+
+\Q{}{12}
+\pt{a} By Question 3.4 the unit drawn at any single stage is uniform on $U$, so the marginals are
+as in the WR case: $\E(y_i)=\Ybar$, $\Var(y_i)=\sigma^2$; hence $\E(\ybar)=\Ybar$ --- the sample
+mean is unbiased under SRSWOR too.
+
+\pt{b} For $i\ne i'$ the pair is uniform over the $N(N-1)$ ordered pairs of distinct units:
+\[
+  \E(y_iy_{i'})=\frac{1}{N(N-1)}\Big[\Big(\sum_jY_j\Big)^2-\sum_jY_j^2\Big]
+  =\frac{N^2\Ybar^2-N(\sigma^2+\Ybar^2)}{N(N-1)}=\Ybar^2-\frac{\sigma^2}{N-1},
+\]
+so $\Cov(y_i,y_{i'})=-\dfrac{\sigma^2}{N-1}$. \qed
+
+\pt{c} With $n$ variance terms and $n(n-1)$ ordered covariance terms,
+\[
+  \Var(\ybar)=\frac1{n^2}\Big[n\sigma^2-n(n-1)\frac{\sigma^2}{N-1}\Big]
+  =\frac{\sigma^2}{n}\cdot\frac{N-n}{N-1}.
+\]
+Since $S^2=\frac{N}{N-1}\sigma^2$, i.e.\ $\sigma^2=\frac{N-1}{N}S^2$,
+\[
+  \Var(\ybar)=\frac{N-1}{N}\cdot\frac{S^2}{n}\cdot\frac{N-n}{N-1}=\frac{N-n}{N}\cdot\frac{S^2}{n}
+  =(1-f)\frac{S^2}{n}. \qquad\square
+\]
+
+\pt{d} The covariance is \textbf{negative} because the draws compete: a large value taken at draw
+$i$ is removed from the pool, making draw $i'$ slightly more likely to be small. This negative
+dependence spreads the sample more evenly over the population, so $\ybar$ varies less --- exactly
+the reduction expressed by $\frac{N-n}{N-1}<1$.
+
+\Q{}{10}
+\sol As before,
+$\E(s^2)=\frac{1}{n-1}\big[n\sigma^2-(1-f)S^2\big]$. Substituting
+$\sigma^2=\frac{N-1}{N}S^2$ and $1-f=\frac{N-n}{N}$,
+\[
+  n\sigma^2-(1-f)S^2=\frac{S^2}{N}\big[n(N-1)-(N-n)\big]=\frac{S^2}{N}\cdot N(n-1)=(n-1)S^2,
+\]
+so $\E(s^2)=S^2$. \qed\ Hence $\E[(1-f)s^2/n]=(1-f)S^2/n=\Var(\ybar)$.
+
+\Q{}{8}
+\pt{a} $\dfrac{\Var_{WOR}}{\Var_{WR}}=\dfrac{N-n}{N-1}<1\iff n>1$; equality at $n=1$, as it must
+be since one draw is identical under the two schemes. \qed
+
+\pt{b} $(1-f)$ is the \textbf{finite population correction} --- the price SRSWR pays for allowing
+repeats.
+$f\to0$: $(1-f)\to1$ and the schemes agree (why national surveys ignore the distinction).
+$f\to1$: $\Var(\ybar)\to0$ --- a census has no sampling error. The WR variance $\sigma^2/n$ never
+does this, a good check that the fpc must be present.
+
+\pt{c} (i) For large $N$ the difference is negligible and the bookkeeping is simpler;
+(ii) it saves computation and memory --- no need to track what was drawn;
+(iii) \textbf{bootstrap} methods resample with replacement, and there $n$ may legitimately exceed
+the number of distinct units.
+
+\Q{}{8}
+\pt{a} $\E(\wh T)=N\Ybar=T$ and
+$\Var(\wh T)=N^2(1-f)\frac{S^2}{n}=N(N-n)\frac{S^2}{n}$.
+
+\pt{b} $\wh\Var(\wh T)=N(N-n)\dfrac{s^2}{n}$, unbiased since $\E(s^2)=S^2$.
+
+\pt{c} $\CV(\wh T)=\frac{N\SE(\ybar)}{N\Ybar}=\CV(\ybar)$. \textbf{Useful} because the CV is
+scale-free: one reliability statement covers the mean, the total, and anything obtained by
+multiplying by a known constant, so a report can quote one CV and apply the Statistics Canada
+classification to all of them.
+
+%==================================================================
+\section{Solutions: effective sample size and proportions}
+\setcounter{qq}{0}
+
+\Q{}{10}
+\pt{a} Under SRSWR a unit may be drawn more than once; how many distinct units appear depends on
+which repeat, and that is determined by the random draws.
+
+\pt{b} Write $n_{\text{eff}}=\sum_jI_j$ with $I_j=\I(j\text{ appears at least once})$. By
+Question 3.2(b), $\E(I_j)=1-(1-\frac1N)^n$, so by linearity (no independence needed)
+$\E(n_{\text{eff}})=N[1-(1-\frac1N)^n]$. \qed
+
+\pt{c} $N=100,n=20$: $(0.99)^{20}=0.8179$, so $\E(n_{\text{eff}})=18.21$ --- about $1.8$ of the
+$20$ draws wasted, a $9\%$ loss.
+
+\pt{d} $\pi_j\le n/N$ gives $\E(n_{\text{eff}})=N\pi_j\le n$. For $n\ll N$,
+$\E(n_{\text{eff}})\approx n-\frac{n(n-1)}{2N}$, so the loss is negligible when $n^2\ll N$ --- the
+birthday-problem threshold.
+
+\Q{}{8}
+\sol Let $D$ be the random \emph{set} of distinct units and condition on $|D|=m$.
+
+\textbf{Symmetry.} The SRSWR design is symmetric in the unit labels (every ordered sample has
+probability $1/N^n$), so relabelling by any permutation leaves the distribution of $D$ unchanged.
+Hence given $|D|=m$, $D$ is \textbf{uniform over all $\binom Nm$ subsets of size $m$}.
+
+\textbf{Conditional expectation.} Given $|D|=m$, $D$ is an SRSWOR sample of size $m$, so
+$\E(\ybar_{\text{eff}}\mid|D|=m)=\Ybar$ for every $m$.
+
+\textbf{Tower property.} The conditional expectation is the constant $\Ybar$, so
+$\E(\ybar_{\text{eff}})=\Ybar$. \qed
+
+\textbf{Comparison.} $\ybar_{\text{eff}}$ is an SRSWOR mean of \emph{random} size
+$n_{\text{eff}}\le n$, so it cannot beat a genuine SRSWOR of size $n$; but it does beat the
+ordinary SRSWR mean, since it discards the redundant repeats:
+$\Var_{WOR,n}\le\Var(\ybar_{\text{eff}})\le\Var_{WR,n}$.
+
+\Q{}{10}
+\pt{a} $\Ybar=\frac1N\sum_jY_j=\frac{\#\{j:Y_j=1\}}{N}=P$. A proportion \textbf{is} a mean, so
+every earlier result applies and $p=\ybar$.
+
+\pt{b} $Y_j^2=Y_j$, so $\sum_jY_j^2=NP$ and
+$\sigma^2=P-P^2=P(1-P)$, $S^2=\frac{N}{N-1}P(1-P)$.
+
+\pt{c} $\Var_{WR}(p)=\dfrac{P(1-P)}{n}$;
+$\Var_{WOR}(p)=(1-f)\dfrac{S^2}{n}=\dfrac{N-n}{N-1}\cdot\dfrac{P(1-P)}{n}$.
+
+\pt{d} For binary data $\ybar=p$, $y_i^2=y_i$, so
+$s^2=\frac{np-np^2}{n-1}=\frac{n\,p(1-p)}{n-1}$ and
+$\wh\Var(p)=(1-f)\frac{s^2}{n}=(1-f)\frac{p(1-p)}{n-1}$, unbiased since $\E(s^2)=S^2$. \qed
+
+\begin{trap}{$n-1$, not $n$}
+$\frac{p(1-p)}{n}$ is the iid formula and is \textbf{biased} here. The finite-population
+estimator needs $n-1$ \emph{and} the factor $(1-f)$. Both corrections carry marks.
+\end{trap}
+
+\Q{}{8}
+\pt{a} Under SRSWR the draws are independent Bernoulli$(P)$, so
+$np\sim\text{Binomial}(n,P)$ and $\Var(p)=P(1-P)/n$. Under SRSWOR the sample is a uniform
+$n$-subset of a population with $NP$ ones, so $np\sim\text{Hypergeometric}(N,NP,n)$.
+
+\pt{b} The hypergeometric variance is $nP(1-P)\frac{N-n}{N-1}$, so
+\[
+  \Var_{WOR}(p)=\Var_{WR}(p)\times\frac{N-n}{N-1}.
+\]
+The factor is $\frac{N-n}{N-1}$ --- the same fpc as for a general $Y$, which is no coincidence:
+the binary case is a special case, not a separate theory.
+
+%==================================================================
+\section{Solutions: accuracy, CIs, sample size}
+\setcounter{qq}{0}
+
+\Q{}{5}
+\sol $\SE(\ybar)=\sqrt{\Var(\ybar)}$ measures sampling variability on the data scale;
+$\CV(\ybar)=\SE(\ybar)/\Ybar$ measures it relative to the truth and is scale-free. Under SRSWOR,
+$\wh\SE(\ybar)=\sqrt{1-f}\,\frac{s}{\sqrt n}$ and $\wh\CV(\ybar)=\wh\SE(\ybar)/\ybar$.
+
+\textbf{Statistics Canada:} $\CV\le16.6\%$ reliable; $16.6\%<\CV\le33.3\%$ publish with a
+warning; $\CV>33.3\%$ unreliable.
+
+\Q{}{10}
+\sol $f=100/5000=0.02$.
+\pt{a} $\wh\Var(\ybar)=0.98\times\frac{1800^2}{100}=31{,}752$;
+$\wh\SE=178.19$; $\wh\CV=178.19/2400=7.42\%$.
+\pt{b} $7.42\%\le16.6\%$: \textbf{reliable}.
+\pt{c} $2400\pm1.96(178.19)=2400\pm349.3$, i.e.\ $[\text{Rs.}\,2051,\ \text{Rs.}\,2749]$.
+\pt{d} $\wh T=12{,}000{,}000$ with $\wh\SE=890{,}950$ and $\wh\CV=7.42\%$ --- identical, as
+Question 4.7(c) requires.
+\pt{e} Halving the CV quarters the variance:
+$\big(1-\frac{n}{5000}\big)\frac{1800^2}{n}=7938\Rightarrow\frac{3{,}240{,}000}{n}=8586\Rightarrow n=377.4$.
+So $n\approx378$, a factor of $3.8$ --- slightly less than the naive $4\times$ because the fpc
+helps as $n$ grows. Halving the error costs nearly four times the fieldwork.
+
+\Q{}{10}
+\pt{a} The sampling distribution of $\ybar$ is determined by the design \emph{and} by
+$Y_1,\dots,Y_N$. To compute an exact quantile of $\ybar-\Ybar$ we would need those values --- but
+if we knew them we would know $\Ybar$ and would not be sampling. The distribution is also
+discrete on the $\binom Nn$ sample means with no closed form.
+
+\pt{b} \textbf{H\'ajek (1960).} Under regularity conditions on the finite population (a
+Lindeberg-type condition ensuring no $Y_j$ dominates), and provided $N$, $n$ \emph{and} $N-n$ are
+all large, $\frac{\ybar-\Ybar}{\SE(\ybar)}\overset{\text{approx}}{\sim}\N(0,1)$. The requirement
+that $N-n$ be large is distinctive to finite populations --- as $n\to N$ the estimator degenerates.
+
+\pt{c} $\big[\ybar\pm1.96\,\wh\SE(\ybar)\big]$ with
+$\wh\SE(\ybar)=\sqrt{1-f}\,\frac{s}{\sqrt n}$. For \textbf{small $n$} the extra variability from
+estimating $\SE$ matters, and $t_{n-1,0.975}$ should replace $1.96$.
+
+\Q{}{8}
+\pt{a} $0.95$ is a property of the \textbf{procedure}: over repeated samples from the same
+population, about $95\%$ of the random intervals so constructed contain $\Ybar$.
+
+\pt{b} $\Ybar$ is a \textbf{fixed unknown number}; the only randomness is the sampling. Once the
+interval is computed it either contains $\Ybar$ or not --- probability $0$ or $1$. The correct
+statement is (a). (A genuine probability statement about $\Ybar$ needs a Bayesian prior, which
+was not used.)
+
+\pt{c} $6000\pm1265$ is a margin of error over $21\%$ of the estimate --- not actionable. With
+$n=15$ the normal approximation is doubtful and $t_{14}$ should have been used, widening it
+further. \textbf{What to do instead:} fix the tolerable margin of error first (say $e=300$) and
+solve for the $n$ that delivers it.
+
+\Q{}{12}
+\pt{a} By the normal approximation, matching
+$\Prob(|\ybar-\Ybar|\le z_{\alpha/2}\SE)\approx1-\alpha$ to the requirement gives
+$e=z_{\alpha/2}\frac{\sigma}{\sqrt n}$, hence $n_{WR}=\frac{z^2_{\alpha/2}\sigma^2}{e^2}$.
+
+\pt{b} Under SRSWOR $\SE^2=\frac{S^2}{n}-\frac{S^2}{N}$, so
+$\frac{e^2}{z^2}=\frac{S^2}{n}-\frac{S^2}{N}$, giving
+$n_{WOR}=\frac{z^2S^2}{e^2+z^2S^2/N}$.
+
+\pt{c} Dividing through by $e^2$ and writing $n_{WR}=z^2S^2/e^2$:
+$n_{WOR}=\frac{n_{WR}}{1+n_{WR}/N}<n_{WR}$. Also
+$n_{WOR}=\frac{Nn_{WR}}{N+n_{WR}}<N$ --- the required sample never exceeds the population, which
+the WR formula fails to guarantee.
+
+\pt{d} The claim is wrong: $n_{WR}$ \textbf{does not involve $N$ at all}; $N$ enters only through
+$1/(1+n_{WR}/N)$, which \emph{reduces} the requirement for small populations. A city of $10^5$
+and a country of $10^9$ need essentially the same sample for the same precision --- which is why
+national polls of $\sim1000$ work.
+
+\Q{}{10}
+\pt{a} Put $\sigma^2=P(1-P)$: $n_{WR}=\frac{z^2_{\alpha/2}P(1-P)}{e^2}$.
+\pt{b} $P(1-P)=\frac14-(P-\frac12)^2\le\frac14$, equality iff $P=\frac12$; so
+$n_{WR}\le\frac{z^2_{\alpha/2}}{4e^2}$, achievable without knowing $P$.
+\pt{c} With $z^2/4=0.9604$:
+\begin{center}
+\begin{tabular}{@{}ccc@{}}
+\toprule $e$ & $0.9604/e^2$ & round up \\ \midrule
+$0.10$ & $96.04$ & $97$ \\ $0.05$ & $384.16$ & $385$ \\ $0.03$ & $1067.1$ & $1068$ \\
+\bottomrule\end{tabular}
+\end{center}
+$n\propto1/e^2$: halving the margin \textbf{quadruples} the sample.
+\pt{d} If $P=0.2$ then $n=3.8416\times0.16/0.0025=245.9\Rightarrow246$, against $385$ --- about
+$139$ extra interviews, $56\%$ more than needed. Wasteful but \emph{safely} so; use a pilot if
+one is available.
+
+\Q{}{8}
+\pt{a} A relative margin $r$ means an absolute margin $e=r\Ybar$, so
+\[
+  n_{WR}=\frac{z^2_{\alpha/2}\sigma^2}{r^2\Ybar^2}=\frac{z^2_{\alpha/2}}{r^2}\Big(\frac{\sigma}{\Ybar}\Big)^2
+  =\frac{z^2_{\alpha/2}\CV_Y^2}{r^2},
+\]
+where $\CV_Y=\sigma/\Ybar$ is the CV \emph{of the population}. Only the ratio matters.
+
+\pt{b} (i) \textbf{Scale invariance} --- the CV is unit-free, unchanged by inflation, currency, or
+measuring in thousands, so an old $\sigma$ is stale while the old CV usually is not.
+(ii) \textbf{Empirical stability} --- for economic variables the spread grows roughly
+proportionally with the level, so the CV stays nearly constant over time and across regions.
+
+\Q{}{12}
+\pt{a} $t=\frac{\ybar-\mu_0}{\SE(\ybar)}$, reject if $t>z_\alpha$. This uses the H\'ajek normal
+approximation and (for now) pretends $\SE$ is known.
+
+\pt{b} Under $H_1$, $\ybar$ has mean $\mu_1$:
+\[
+  1-\beta=\Prob\Big(Z>z_\alpha-\frac{\Delta}{\SE}\Big)
+  \Longrightarrow z_\alpha-\frac{\Delta}{\SE}=-z_\beta
+  \Longrightarrow \SE=\frac{\Delta}{z_\alpha+z_\beta}.
+\]
+With $\SE=\sigma/\sqrt n$, $\ n_{WR}=\frac{(z_\alpha+z_\beta)^2\sigma^2}{\Delta^2}$. \qed
+
+\pt{c} Two-sided: replace $z_\alpha$ by $z_{\alpha/2}$ (approximate, neglecting the wrong-tail
+probability). SRSWOR: $n_{WOR}\approx\frac{n_{WR}}{1+n_{WR}/N}$ --- the same correction as in the
+estimation approach.
+
+\pt{d} $\Delta$ is the \textbf{minimum detectable effect}: the smallest departure you care about.
+It is a subject-matter decision (a Rs.\,500 jump in rent; a Rs.\,50 rise in fuel cost that wipes
+out one delivery's payout). Since $n\propto1/\Delta^2$, \emph{any} non-zero difference is
+detectable with a big enough sample, so without a substantively chosen $\Delta$ the question
+``what $n$?'' has no answer.
+
+\Q{}{10}
+\sol $\Delta=5$, $\sigma=9.8$, $z_{\alpha/2}=1.96$, $z_\beta=0.8416$.
+\textbf{Assumptions:} SRSWR (no fpc), H\'ajek approximation, $\sigma$ known at the historical
+value, simple alternative $\Ybar=100$.
+\[
+  n_{WR}=\frac{(1.96+0.8416)^2(9.8)^2}{5^2}=\frac{(2.8016)^2\times96.04}{25}
+  =\frac{7.849\times96.04}{25}=\frac{753.8}{25}=30.15 .
+\]
+\textbf{Round up:} $\boxed{n=31}$. (With a finite $N=200$ this would fall to
+$31/(1+31/200)\approx27$.)
+
+\Q{}{10}
+\sol $P_0=0.26$, $\Delta=0.05$, $z_{\alpha/2}=1.96$, $z_\beta=1.2816$. Under $H_0$ the variance
+is known: $P_0(1-P_0)=0.1924$ --- \textbf{nothing has to be guessed}, which is the attraction of
+the proportion case.
+\[
+  n_{WR}=\frac{(1.96+1.2816)^2\times0.1924}{0.05^2}=\frac{10.508\times0.1924}{0.0025}
+  =\frac{2.0218}{0.0025}=808.75\Longrightarrow\boxed{n=809}.
+\]
+Detecting a $5$ percentage-point shift needs a sample in the high hundreds --- proportions are
+noisy, which is why epidemiological studies are large.
+
+\Q{}{8}
+\sol Since $n\propto\frac{(z_\alpha+z_\beta)^2\sigma^2}{\Delta^2}$ there are three levers:
+\begin{center}
+\begin{tabular}{@{}p{3.6cm}p{3.6cm}p{6.4cm}@{}}
+\toprule Lever & Effect & Cost \\ \midrule
+Increase $\alpha$ & $z_\alpha\downarrow$, $n\downarrow$ & more \emph{false positives}; rarely acceptable \\
+Accept lower power & $z_\beta\downarrow$, $n\downarrow$ & more \emph{false negatives}; an underpowered study may be a waste \\
+Increase $\Delta$ & $n\propto1/\Delta^2$ --- strongest lever & you can now detect only larger changes \\
+\bottomrule\end{tabular}
+\end{center}
+\textbf{Choose $\Delta$}: it is the only lever that is an honest scientific statement (``we care
+only about changes of at least this size'') rather than a degradation of the inference, and it has
+quadratic leverage. Raising $\alpha$ is worst, since false positives propagate into published
+claims. If none of the three suffices, the correct conclusion is the one the notes state bluntly:
+\emph{consider whether the survey should be conducted at all}.
+
+%==================================================================
+\section{Solutions: stratified random sampling}
+\setcounter{qq}{0}
+
+\Q{}{8}
+\pt{a} \textbf{$\ybar$ is not biased.} $\E(\ybar)=\Ybar$ holds under SRSWOR whatever the sample
+happens to look like. What has gone wrong is \emph{variance}, not bias.
+
+``Representative \textbf{in expectation}'' means that \emph{averaged over repeated sampling} the
+composition matches the population --- here $\E(\text{\# men})=5$. ``Representative \textbf{in
+this sample}'' is a different claim, and SRS does not make it. With $n=10$ from a 50/50
+population, $\Prob(\text{9 or 10 of one sex})\approx2\times\frac{11}{1024}\approx2\%$: about one
+sample in fifty is this lopsided.
+
+\pt{b} \textbf{Stratify by gender}: treat men and women as two strata and draw an independent
+SRSWOR of $5$ from each. The gender split is then fixed at the population value by construction,
+not left to chance. This requires \textbf{auxiliary information} --- the gender of every unit in
+the frame --- which SRS is completely blind to.
+
+\pt{c} \textbf{Yes.} Every unit still has a known, strictly positive inclusion probability
+($\pi_{hj}=n_h/N_h=5/500=1/100$ here, in fact equal across strata), so design-based inference
+remains available. Stratification restricts \emph{which} samples are possible; it does not
+abandon randomisation.
+
+\Q{}{12}
+\pt{a} $\ybar=\frac1n\sum_h\sum_iy_{hi}$ has
+\[
+  \E(\ybar)=\frac1n\sum_h n_h\Ybar_h=\sum_h\frac{n_h}{n}\Ybar_h .
+\]
+This equals $\Ybar=\sum_hW_h\Ybar_h$ for \emph{all} populations iff $\frac{n_h}{n}=W_h=\frac{N_h}{N}$
+for every $h$ --- that is, iff the allocation is \textbf{proportional}. (It is also unbiased in
+the degenerate case $\Ybar_1=\cdots=\Ybar_H$.) In general it is \textbf{biased}, because the
+sample over-represents strata that were allocated more than their share.
+
+\pt{b} $\E(\ybar_{st})=\frac1N\sum_hN_h\E(\ybar_h)=\frac1N\sum_hN_h\Ybar_h=\Ybar$ \qed ---
+the weights $N_h/N$ are exactly what undoes the unequal allocation.
+
+\pt{c} The SRSWORs are drawn \textbf{independently} across strata, so the $\ybar_h$ are
+independent and all cross-covariances vanish:
+\[
+  \Var(\ybar_{st})=\frac1{N^2}\sum_hN_h^2\Var(\ybar_h)
+  =\frac1{N^2}\sum_hN_h^2(1-f_h)\frac{S_h^2}{n_h},\qquad f_h=\frac{n_h}{N_h},
+\]
+using the within-stratum SRSWOR variance from Question 4.4. \textbf{Independence is used exactly
+once}, in dropping the covariances --- say so.
+
+\pt{d} Since $\E(s_h^2)=S_h^2$ within each stratum,
+\[
+  \wh\Var(\ybar_{st})=\frac1{N^2}\sum_hN_h^2(1-f_h)\frac{s_h^2}{n_h}
+\]
+is unbiased, and the approximate CI is
+$\ybar_{st}\pm z_{\alpha/2}\sqrt{\wh\Var(\ybar_{st})}$.
+
+\Q{}{10}
+\pt{a} \textbf{Equal} $n_h=n/H$: ignores everything; sensible only if the strata are similar in
+size and spread. \textbf{Proportional} $n_h=nW_h$: accounts for stratum \emph{sizes}; the most
+frequently used. \textbf{Neyman} $n_h\propto N_hS_h$: accounts for sizes \emph{and} within-stratum
+variability --- sample more where there is more to learn.
+
+\pt{b} $f_h=\frac{n_h}{N_h}=\frac{nW_h}{N_h}=\frac{n}{N}=f$ for every $h$, so
+\[
+  \Var_{prop}=\frac{1-f}{N^2}\sum_h\frac{N_h^2S_h^2}{nW_h}
+  =\frac{1-f}{N^2n}\sum_hN\,N_hS_h^2=\frac{1-f}{n}\sum_hW_hS_h^2 .
+\]
+
+\pt{c} With $n_h=\frac{nN_hS_h}{\sum_{h'}N_{h'}S_{h'}}$,
+\[
+  \sum_h\frac{N_h^2S_h^2}{n_h}=\frac{\sum_{h'}N_{h'}S_{h'}}{n}\sum_hN_hS_h=\frac{\big(\sum_hN_hS_h\big)^2}{n},
+\]
+so, since $\Var(\ybar_{st})=\frac1{N^2}\big[\sum_h\frac{N_h^2S_h^2}{n_h}-\sum_hN_hS_h^2\big]$,
+\[
+  \Var_{Ney}=\frac{1}{n}\Big(\sum_hW_hS_h\Big)^2-\frac1N\sum_hW_hS_h^2 .
+\]
+
+\pt{d} Subtracting,
+\[
+  \Var_{prop}-\Var_{Ney}=\frac1n\Big[\sum_hW_hS_h^2-\Big(\sum_hW_hS_h\Big)^2\Big]
+  =\frac1n\Var_W(S_h)\ \ge\ 0,
+\]
+the $W$-weighted variance of the numbers $S_h$ (non-negative by Jensen or Cauchy--Schwarz).
+\textbf{Equality iff all $S_h$ are equal} --- when the strata are equally variable there is
+nothing for Neyman to exploit and it coincides with proportional allocation. \qed
+
+\Q{}{10}
+\sol Minimise $\Var(\ybar_{st})=\frac1{N^2}\big[\sum_h\frac{N_h^2S_h^2}{n_h}-\sum_hN_hS_h^2\big]$
+over $n_1,\dots,n_H$ subject to $\sum_hn_h=n$. The second sum is constant, so it suffices to
+minimise $g=\sum_h\frac{N_h^2S_h^2}{n_h}$.
+
+\textbf{Lagrange.} With $\mathcal L=\sum_h\frac{N_h^2S_h^2}{n_h}+\lambda\big(\sum_hn_h-n\big)$,
+\[
+  \frac{\partial\mathcal L}{\partial n_h}=-\frac{N_h^2S_h^2}{n_h^2}+\lambda=0
+  \Longrightarrow n_h=\frac{N_hS_h}{\sqrt\lambda}\ \propto\ N_hS_h ,
+\]
+and imposing $\sum_hn_h=n$ fixes the constant:
+$n_h=\dfrac{nN_hS_h}{\sum_{h'}N_{h'}S_{h'}}$. \qed
+
+\textbf{Cauchy--Schwarz (cleaner, and gives the bound directly).}
+\[
+  \Big(\sum_hN_hS_h\Big)^2=\Big(\sum_h\frac{N_hS_h}{\sqrt{n_h}}\cdot\sqrt{n_h}\Big)^2
+  \le\Big(\sum_h\frac{N_h^2S_h^2}{n_h}\Big)\Big(\sum_hn_h\Big)
+  =n\sum_h\frac{N_h^2S_h^2}{n_h},
+\]
+so $g\ge\frac{(\sum_hN_hS_h)^2}{n}$ always, with equality iff
+$\frac{N_hS_h}{\sqrt{n_h}}\propto\sqrt{n_h}$, i.e.\ $n_h\propto N_hS_h$. \qed
+
+\Q{}{10}
+\pt{a} Minimise $\Var(\ybar_{st})$ subject to $A+\sum_hn_hC_h\le C$. At the optimum the budget
+binds, so the constraint is $\sum_hn_hC_h=C-A$.
+
+\pt{b} With $\mathcal L=\sum_h\frac{N_h^2S_h^2}{n_h}+\lambda\sum_hn_hC_h$,
+\[
+  -\frac{N_h^2S_h^2}{n_h^2}+\lambda C_h=0
+  \Longrightarrow n_h=\frac{N_hS_h}{\sqrt{\lambda C_h}}\ \propto\ \frac{N_hS_h}{\sqrt{C_h}} .
+\]
+Writing $n_h=t\,\frac{N_hS_h}{\sqrt{C_h}}$ and imposing $\sum_hn_hC_h=C-A$ gives
+$t\sum_hN_hS_h\sqrt{C_h}=C-A$, hence
+\[
+  \boxed{\ n_h=(C-A)\cdot\frac{N_hS_h/\sqrt{C_h}}{\sum_{h'}N_{h'}S_{h'}\sqrt{C_{h'}}}\ } .
+\]
+
+\begin{trap}{a slip in the lecture slide}
+The Class-7 slide writes the denominator as $\sum_{h'}N_{h'}S_{h'}/\sqrt{C_{h'}}$. With that
+denominator the formula gives $\sum_hn_h=C-A$ (a sample size equal to an amount of money), not
+$\sum_hn_hC_h=C-A$. The correct normaliser is $\sum_{h'}N_{h'}S_{h'}\sqrt{C_{h'}}$, as derived
+above. Worth checking with the professor; the \emph{proportionality} $n_h\propto N_hS_h/\sqrt{C_h}$
+is not in doubt.
+\end{trap}
+
+\pt{c} If $C_h\equiv C_0$ then $n_h=(C-A)\frac{N_hS_h/\sqrt{C_0}}{\sqrt{C_0}\sum N_{h'}S_{h'}}
+=\frac{(C-A)/C_0\cdot N_hS_h}{\sum N_{h'}S_{h'}}$, and since the affordable total is
+$n=(C-A)/C_0$, this is exactly $n_h=\frac{nN_hS_h}{\sum N_{h'}S_{h'}}$ --- \textbf{Neyman}.
+\checkmark
+
+\textbf{Intuition:} $n_h$ trades information against price. $N_hS_h$ measures how much variance
+reduction a unit from stratum $h$ buys; $\sqrt{C_h}$ discounts it by what that unit costs. An
+expensive stratum must therefore be sampled less, and the discount is a \emph{square root}
+because variance falls like $1/n_h$ while cost grows like $n_h$.
+
+\Q{}{12}
+\pt{a} The first term $\sum_hW_h(\Ybar_h-\Ybar)^2$ is the \textbf{between-stratum sum of squares}
+(BSS): how far the stratum means are from the overall mean. The second,
+$\frac1N\sum_h(1-W_h)S_h^2$, is a \textbf{within-stratum} (WSS) correction of order $1/N$.
+
+\pt{b} Stratification helps ($\Var_{SRS}>\Var_{st}$) exactly when
+\[
+  \sum_hW_h(\Ybar_h-\Ybar)^2>\frac1N\sum_h(1-W_h)S_h^2 ,
+\]
+i.e.\ when the \textbf{between-stratum variation is large relative to the within-stratum term}.
+In words: the strata must genuinely differ from each other in the study variable.
+
+\pt{c} If $\Ybar_1=\cdots=\Ybar_H$ the first term is $0$, so the difference is \emph{negative}:
+\textbf{SRSWOR is better}. Nothing is wrong with the theory --- the \textbf{strata were formed
+badly}. They divide the population in a way that carries no information about $Y$, so
+stratification buys nothing while still costing the small within-term. \textbf{Moral: stratify on
+a variable correlated with the study variable.}
+
+\pt{d} In realistic surveys one stratifies on something known to be related to $Y$ (region,
+sector, size class), so the BSS term is substantial, while the WSS term carries the factor
+$\frac1N$ and is negligible for large $N$. Hence stratification is ``almost always beneficial'' ---
+but that is an empirical statement about sensible strata, not a theorem.
+
+\Q{}{12}
+\sol $W=(0.2,0.3,0.5)$, $f=100/1000=0.1$.
+
+\pt{a} \textbf{Proportional:} $n_h=0.1N_h$, giving $\boxed{(20,30,50)}$.
+
+\textbf{Neyman:} $N_hS_h=(12000,\,12000,\,10000)$ with sum $34000$, so
+\[
+  n_h=100\cdot\frac{N_hS_h}{34000}=(35.29,\ 35.29,\ 29.41)\ \Longrightarrow\ \boxed{(35,35,30)} .
+\]
+Note the urban stratum gets $35$ rather than $20$: it is small but by far the most variable.
+
+\pt{b} $\sum W_hS_h^2=0.2(3600)+0.3(1600)+0.5(400)=720+480+200=1400$;
+$\sum W_hS_h=12+12+10=34$.
+\[
+  \Var_{prop}=\frac{1-f}{n}\sum W_hS_h^2=\frac{0.9}{100}(1400)=\boxed{12.6},
+\]
+\[
+  \Var_{Ney}=\frac{34^2}{100}-\frac{1400}{1000}=11.56-1.40=\boxed{10.16}.
+\]
+Check: $\Var_{prop}-\Var_{Ney}=\frac1n[1400-34^2]=\frac{244}{100}=2.44$ \checkmark
+
+\pt{c} $\Ybar=0.2(300)+0.3(200)+0.5(100)=170$;
+$\sum W_h(\Ybar_h-\Ybar)^2=0.2(130)^2+0.3(30)^2+0.5(70)^2=3380+270+2450=6100$, so
+$S^2\approx1400+6100=7500$ and
+\[
+  \Var_{SRSWOR}=(1-f)\frac{S^2}{n}=0.9\times\frac{7500}{100}=\boxed{67.5}.
+\]
+\textbf{Comparison:} $67.5$ (SRSWOR) $\gg 12.6$ (proportional) $>10.16$ (Neyman). Stratification
+cuts the variance by a factor of more than $5$ --- almost all of it from the between-stratum term
+$6100$, which stratification removes entirely. Neyman then shaves a further $19\%$ off
+proportional by exploiting $S_1\gg S_3$.
+
+\pt{d} Round to the nearest integers keeping $\sum n_h=n$ (here $35.29,35.29,29.41\to35,35,30$).
+Problems: rounding is not guaranteed optimal; it may violate $n_h\ge1$ or $n_h\le N_h$; and with
+several study variables the optimal allocations conflict. The principled fix is to solve the
+allocation as an \textbf{integer} programme --- Wright's (2017) greedy algorithm, the R package
+\texttt{allocation}, or Brito et al.\ (2015) for multiple study variables.
+
+\Q{}{8}
+\sol Beyond variance reduction:
+\begin{enumerate}
+  \item \textbf{Strata-level parameters are wanted in their own right.} E.g.\ average income
+        \emph{within each district}, or infection rates separately for males and females. SRS
+        gives no guarantee of enough units per subgroup.
+  \item \textbf{Administrative convenience and lower cost.} Fieldwork can be organised
+        region-by-region, cutting travel and supervision costs.
+  \item \textbf{Different sampling frames per stratum.} A corporate database for big companies,
+        street maps for local vendors --- no single frame need exist.
+  \item \textbf{Different field procedures per stratum.} Email surveys for hospital staff,
+        face-to-face interviews for rural patients.
+\end{enumerate}
+\textbf{And} a good stratification \emph{protects against a badly unrepresentative sample}, which
+is the motivation the course opens with.
+
+%==================================================================
+\section{Solutions: systematic sampling}
+\setcounter{qq}{0}
+
+\Q{}{10}
+\pt{a} With $N=nk$: draw $i$ uniformly from $\{1,2,\dots,k\}$ and take
+$\{i,\,i+k,\,i+2k,\,\dots,\,i+(n-1)k\}$. $k$ is the \textbf{sampling interval}.
+
+\pt{b} There are exactly $k$ possible samples $\bm s_1,\dots,\bm s_k$, so
+$\mathcal S=\{\bm s_1,\dots,\bm s_k\}$ with $p(\bm s_i)=\frac1k$. Every unit belongs to exactly
+one of them (the one indexed by its residue mod $k$), so
+\[
+  \pi_j=\frac1k=\frac nN \qquad\text{for every }j .
+\]
+
+\pt{c} Two units lie in the same sample iff they are congruent mod $k$. Hence
+\[
+  \pi_{jj'}=\begin{cases}\frac1k=\frac nN,& j\equiv j'\ (\mathrm{mod}\ k),\\[2pt] 0,&\text{otherwise.}\end{cases}
+\]
+\textbf{Some second-order inclusion probabilities are zero}, and this single fact is fatal for
+variance estimation: an unbiased design-based variance estimator (Horvitz--Thompson) requires
+$\pi_{jj'}>0$ for every pair, since pairs that can never appear together carry no information.
+Concretely, you only ever observe one cluster, so nothing in the data speaks to the variation
+\emph{between} clusters --- which is exactly what $\Var(\ybar)$ is.
+
+\Q{}{12}
+\pt{a} The $k$ possible samples partition $U$ into $k$ disjoint groups of size $n$ --- call them
+clusters. Choosing $i$ uniformly is choosing \textbf{one cluster at random}, and every unit of
+that cluster is then measured. So systematic sampling is cluster sampling with \emph{one} cluster
+selected and complete enumeration inside it.
+
+\pt{b} With $\Ybar_i=\frac1n\sum_jY_{ij}$ the $i$-th cluster mean, $\ybar=\Ybar_I$ where $I$ is
+uniform on $\{1,\dots,k\}$, so
+\[
+  \E(\ybar)=\frac1k\sum_{i=1}^k\Ybar_i=\frac{1}{nk}\sum_i\sum_jY_{ij}=\Ybar . \qquad\square
+\]
+
+\pt{c} Since $\ybar$ takes the value $\Ybar_i$ with probability $\frac1k$,
+\[
+  \Var(\ybar)=\frac1k\sum_{i=1}^k(\Ybar_i-\Ybar)^2=\sigma_b^2 ,
+\]
+the \textbf{between-cluster} variance. \qed
+
+\pt{d} $\Var(\ybar)$ depends on \emph{nothing but} how the cluster means differ. To make it small
+we want the clusters to \textbf{resemble one another}; since the total variability of $Y$ is
+fixed, that forces each cluster to be internally \textbf{heterogeneous} --- each systematic sample
+must span the whole spread of the population.
+
+\textbf{This is the exact opposite of stratified sampling}, where we want strata internally
+homogeneous and far apart from each other. Worth one sentence: in stratification we \emph{sample
+from} every group, so we want the groups tight; in systematic sampling we \emph{take one group
+entire}, so we want that group to look like the whole population.
+
+\Q{}{10}
+\pt{a} $\Var_{sys}=\frac{\sigma^2}{n}\{1+(n-1)\rho_c\}$ and $\Var_{WR}=\frac{\sigma^2}{n}$, so
+\[
+  \Var_{sys}\le\Var_{WR}\iff(n-1)\rho_c\le0\iff\rho_c\le0\quad(n>1).
+\]
+
+\pt{b} Using $\Var_{sys}=\frac{S^2}{n}\cdot\frac{N-1}{N}[1+(n-1)\rho_c]$ and
+$\Var_{WOR}=\frac{S^2}{n}\cdot\frac{N-n}{N}$,
+\[
+  \Var_{sys}\le\Var_{WOR}\iff(N-1)[1+(n-1)\rho_c]\le N-n
+  \iff(n-1)\rho_c\le\frac{N-n}{N-1}-1=\frac{1-n}{N-1},
+\]
+and dividing by $n-1>0$ gives $\rho_c\le-\dfrac{1}{N-1}$. \qed
+
+\pt{c} $\Var(\ybar)\ge0$ forces $1+(n-1)\rho_c\ge0$, i.e.\ $\rho_c\ge-\frac1{n-1}$; and
+$\rho_c\le1$ as a correlation.
+\begin{itemize}
+  \item $\rho_c=1$: all units within a cluster are identical --- maximum internal homogeneity.
+        Then $\Var(\ybar)=\sigma^2$, i.e.\ $n$ times the SRSWR variance. \textbf{The worst case.}
+  \item $\rho_c=-\frac1{n-1}$: then $\Var(\ybar)=0$ --- every cluster has exactly the mean
+        $\Ybar$, so the systematic sample is \emph{always} right. \textbf{The ideal.}
+  \item Note $\rho_c$ cannot reach $-1$ unless $n=2$.
+\end{itemize}
+
+\Q{}{12}
+\sol $N=12$, $n=3$, $k=4$; $\Ybar$, $\sigma^2$, $S^2$ as computed below.
+
+\pt{a} \textbf{Population A}, $Y=(1,2,\dots,12)$. Clusters (by starting point):
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}
+\toprule Start $i$ & Units & Values, mean \\ \midrule
+$1$ & $1,5,9$ & $1,5,9$; \ $\Ybar_1=5$ \\
+$2$ & $2,6,10$ & $2,6,10$; \ $\Ybar_2=6$ \\
+$3$ & $3,7,11$ & $3,7,11$; \ $\Ybar_3=7$ \\
+$4$ & $4,8,12$ & $4,8,12$; \ $\Ybar_4=8$ \\
+\bottomrule\end{tabular}
+\end{center}
+$\Ybar=6.5$, so
+\[
+  \Var_{sys}=\tfrac14\big[(1.5)^2+(0.5)^2+(0.5)^2+(1.5)^2\big]=\tfrac14(5)=\boxed{1.25}.
+\]
+Here $\sum(Y_j-\Ybar)^2=143$, so $\sigma^2=143/12=11.917$ and $S^2=143/11=13$:
+\[
+  \Var_{WR}=\frac{\sigma^2}{n}=3.972,\qquad
+  \Var_{WOR}=(1-\tfrac{3}{12})\frac{13}{3}=3.25 .
+\]
+Systematic sampling is \textbf{far better} than both.
+
+\pt{b} \textbf{Population B}, $Y=(10,20,30,40)$ repeated three times. Now cluster $i$ consists
+entirely of one repeated value: $\Ybar_i=10,20,30,40$. With $\Ybar=25$,
+\[
+  \Var_{sys}=\tfrac14\big[15^2+5^2+5^2+15^2\big]=\tfrac{500}{4}=\boxed{125}.
+\]
+Here $\sigma^2=125$ and $S^2=1500/11=136.36$, so $\Var_{WR}=41.67$ and $\Var_{WOR}=34.09$.
+Systematic sampling is \textbf{catastrophically worse}.
+
+\pt{c} From $\Var_{sys}=\frac{\sigma^2}{n}\{1+(n-1)\rho_c\}$:
+\[
+  \text{A: }1.25=3.972(1+2\rho_c)\Rightarrow\rho_c=-0.343;
+  \qquad
+  \text{B: }125=41.67(1+2\rho_c)\Rightarrow\rho_c=1 .
+\]
+\textbf{Explanation.} In A the frame is \emph{sorted}, so every systematic sample picks one small,
+one medium and one large value: clusters are internally heterogeneous and nearly identical to one
+another. Since $-0.343\le-\frac1{N-1}=-0.0909$, systematic beats SRSWOR --- as observed.
+
+In B the frame is \emph{periodic with period exactly $k=4$}, so each cluster contains a single
+repeated value: perfectly homogeneous internally ($\rho_c$ attains its maximum $1$) and maximally
+different from the others. This is the classic systematic-sampling disaster.
+
+\Q{}{10}
+\pt{a} A systematic sample is \textbf{one cluster}. At the cluster level the sample size is $1$,
+and no variance can be estimated from a single observation. Formally $\Var(\ybar)=\sigma_b^2$
+involves all $k$ cluster means and you observe exactly one; equivalently, $\pi_{jj'}=0$ for units
+in different clusters (Question 8.1(c)), so no design-unbiased estimator exists.
+
+\pt{b} Comparing
+\[
+  \E(\hat V)=(1-f)\frac{S^2}{n}\cdot\frac{N-1}{N}(1-\rho_c)
+  \quad\text{with}\quad
+  \Var(\ybar)=\frac{S^2}{n}\cdot\frac{N-1}{N}\big[1+(n-1)\rho_c\big],
+\]
+and writing $c=\frac{S^2}{n}\frac{N-1}{N}>0$,
+\[
+  \E(\hat V)-\Var(\ybar)=c\Big[(1-f)(1-\rho_c)-1-(n-1)\rho_c\Big]=c\Big[-f-\rho_c(n-f)\Big].
+\]
+The bracket vanishes when $\rho_c=-\frac{f}{n-f}=-\frac1{N-1}$ (using $f=n/N$), confirming the
+stated unbiasedness condition. Moreover, since $n-f>0$:
+\[
+  \rho_c<-\tfrac{1}{N-1}\Rightarrow\hat V\ \textbf{over-estimates};\qquad
+  \rho_c>-\tfrac{1}{N-1}\Rightarrow\hat V\ \textbf{under-estimates}.
+\]
+
+\pt{c} It is \textbf{conservative exactly when $\rho_c<-\frac1{N-1}$} --- which by Question 8.3(b)
+is precisely the region where systematic sampling is genuinely beating SRSWOR, i.e.\ when the
+clusters are heterogeneous enough. Then $\hat V$ overstates the uncertainty and the resulting CIs
+are too wide, which is the safe direction. The danger is the common case
+$\rho_c>-\frac1{N-1}$ (clusters more homogeneous than neutral): there $\hat V$
+\emph{under}-states the true variance and the CIs are falsely narrow.
+
+\Q{}{10}
+\sol
+\textbf{(i) $m$ independent systematic samples (IPNS, after Mahalanobis).} Draw $m>1$ independent
+random starts, giving systematic samples of size $n$ each with means
+$\ybar^{(1)},\dots,\ybar^{(m)}$. Then
+\[
+  \bar{\bar y}=\frac1m\sum_{t=1}^m\ybar^{(t)}\ \text{ is unbiased for }\Ybar,
+  \qquad
+  \hat V=\frac{1}{m(m-1)}\sum_{t=1}^m\big(\ybar^{(t)}-\bar{\bar y}\big)^2
+\]
+is an unbiased estimator of $\Var(\bar{\bar y})$. \textbf{Cost:} you now measure $mn$ units --- you
+need $m$ times the budget.
+
+\textbf{(ii) $m$ random starts within the first $mk$ units.} Suppose $m\mid n$ and write
+$N=\frac nm\times mk$. Choose $m$ independent starts from $\{1,\dots,mk\}$ and from each take
+every $mk$-th unit, giving $m$ systematic samples of size $n/m$. Apply the same formulas.
+\textbf{Cost:} the total sample is still $n$, but each subsample is smaller, so $\hat V$ is based
+on $m$ noisier means and is itself imprecise; it also requires $m\mid n$.
+
+\textbf{(iii) Wolter's (1984) successive-difference estimator.} Using only the one sample,
+\[
+  \hat V=\frac{1-f}{n}\left[\frac{1}{2(n-1)}\sum_{j=1}^{n-1}\big(Y_{i,j+1}-Y_{ij}\big)^2\right].
+\]
+\textbf{Assumption:} an autocorrelation structure along the list --- essentially that the
+population varies smoothly with position, so neighbouring sampled units differ only by noise. No
+extra data is needed, which is its appeal; but if the frame is periodic the assumption fails
+badly.
+
+\emph{(A cheaper fourth option: split the single systematic sample of size $n$ into $m$ disjoint
+subsamples of size $n/m$ and pretend they are independent systematic samples. It costs nothing,
+but the pretence is simply false.)}
+
+\Q{}{8}
+\pt{a} $k=N/n=14/4=3.5$ is not an integer, so ``every $k$-th unit'' is undefined.
+\begin{itemize}
+  \item \textbf{$k=3$}: starts $1,2,3$ give $\{1,4,7,10,13\}$, $\{2,5,8,11,14\}$,
+        $\{3,6,9,12\}$ --- sizes $5,5,4$, mean size $14/3=4.67\ne4$.
+  \item \textbf{$k=4$}: starts $1,2,3,4$ give $\{1,5,9,13\}$, $\{2,6,10,14\}$, $\{3,7,11\}$,
+        $\{4,8,12\}$ --- sizes $4,4,3,3$, mean size $3.5\ne4$.
+\end{itemize}
+In both cases $\pi_j$ is still constant, but there is \textbf{no control over the sample size},
+which is now random.
+
+\pt{b} \textbf{Circular systematic sampling.} Arrange the $N$ units on a circle; pick a random
+start $i$ from $\{1,\dots,N\}$ (not $\{1,\dots,k\}$); take $k$ as the nearest integer to $N/n$;
+then select, for $j=0,1,\dots,n-1$, the unit $i+jk$ if $i+jk\le N$, and $i+jk-N$ otherwise.
+
+With $N=14$, $n=4$, $k=4$, start $i=13$:
+\[
+  13,\quad 17-14=3,\quad 21-14=7,\quad 25-14=11
+  \qquad\Longrightarrow\qquad \{13,\,3,\,7,\,11\},
+\]
+of size exactly $4$.
+
+\pt{c} For each unit $j$ there are exactly $n$ starting points that capture it (namely
+$j,\,j-k,\,j-2k,\,\dots$ reduced mod $N$), and each start has probability $1/N$, so
+\[
+  \pi_j=\frac nN\qquad\text{for every }j,
+\]
+and the sample size is \textbf{always exactly $n$}. Circular systematic sampling therefore fixes
+both defects of the ad hoc fixes at once: equal inclusion probabilities \emph{and} a fixed sample
+size, at the cost of $N$ possible samples instead of $k$.
+
+\Q{}{8}
+\sol \textbf{Preferred when:}
+\begin{enumerate}
+  \item The population is a \textbf{flow rather than a file} --- e.g.\ commuters at the Howrah
+        ferry ghat in a time window: there is no list to sample from, but you can take every
+        $k$-th arrival.
+  \item \textbf{Operational simplicity and speed}; there is no ``collision'' issue. In forestry,
+        auditing or agriculture it is far easier to instruct a worker to measure every 10th tree
+        than to navigate to random GPS coordinates.
+  \item The frame is \textbf{sorted by the study variable}, so the sample sweeps the whole
+        spectrum --- e.g.\ every 10th student from an admission list ordered by entrance score.
+  \item \textbf{Large-scale practice}: the 1940 US Census supplementary questions, CMFRI's marine
+        fish catch estimation, and geological, household and industrial surveys.
+\end{enumerate}
+\textbf{Goes badly wrong when:}
+\begin{enumerate}
+  \item The frame is \textbf{periodic with period related to $k$}. If males and females alternate
+        and $k$ is even, the sample is all one gender. Estimating average daily road traffic by
+        sampling every 7th day always hits the same weekday.
+  \item There is \textbf{grouped segregation}: inspecting every 50th tree in a forest where a rare
+        disease spreads in tight groups of 5--6 trees --- the sample either misses the clusters
+        entirely or, by bad luck, lands on them repeatedly.
+\end{enumerate}
+
+%==================================================================
+\section{Solutions: applied and mixed problems}
+\setcounter{qq}{0}
+
+\Q{}{12}
+\sol $N=1200$, $n=150$, $p=42/150=0.28$, $f=0.125$.
+
+\pt{a} $\wh\Var(p)=(1-f)\frac{p(1-p)}{n-1}=0.875\times\frac{0.2016}{149}=0.0011839$, so
+$\wh\SE(p)=0.0344$.
+
+\pt{b} $0.28\pm1.96(0.0344)=0.28\pm0.0674$, i.e.\ $\boxed{[0.213,\ 0.347]}$.
+
+\pt{c} $\wh T=1200(0.28)=336$ businesses, $\wh\SE(\wh T)=1200(0.0344)=41.3$.
+
+\pt{d} $\wh\CV=0.0344/0.28=12.3\%\le16.6\%$: \textbf{reliable}.
+
+\pt{e} $e=0.03$, $z^2=3.8416$.
+\emph{(i) Worst case $P=0.5$:} $n_{WR}=\frac{3.8416(0.25)}{0.0009}=1067.1$, so
+$n_{WOR}=\frac{1067.1}{1+1067.1/1200}=\boxed{565}$.
+\emph{(ii) Pilot $P=0.28$:} $n_{WR}=\frac{3.8416(0.2016)}{0.0009}=860.5$, so
+$n_{WOR}=\frac{860.5}{1+860.5/1200}=\boxed{502}$.
+The pilot saves about $63$ interviews. Note how large the fpc effect is: with $N=1200$,
+$n_{WOR}$ is barely half of $n_{WR}$.
+
+\Q{}{10}
+\sol The design is unusable.
+
+\textbf{Sampling errors / design failures (fatal):}
+\begin{enumerate}
+  \item \textbf{No frame, no randomisation} --- this is convenience sampling. Selection
+        probabilities are unknown, so no unbiased estimator, standard error or CI exists; the
+        reported $s/\sqrt{120}$ is meaningless.
+  \item \textbf{Sampled $\ne$ target population.} Households spending \emph{nothing} on tuition ---
+        exactly those that pull the average down --- have \textbf{zero} chance of selection. The
+        estimate is biased upward by construction and no $n$ fixes it.
+  \item \textbf{Coverage bias.} ``Well-known'' centres are likely the expensive ones, biasing
+        further upward.
+  \item \textbf{Unequal selection probabilities within the frame.} A household with several
+        children at the centres has several chances of selection --- an unequal-probability design
+        being analysed as an equal-probability one.
+\end{enumerate}
+
+\textbf{Non-sampling errors:}
+\begin{enumerate}\setcounter{enumi}{4}
+  \item \textbf{Non-response bias:} $40\%$ refused, and willingness to discuss spending plausibly
+        depends on how much is spent --- the \emph{Literary Digest} mechanism again.
+  \item \textbf{Measurement error:} the question leaves the reference period unspecified (month?
+        year?), the unit ambiguous (one child or all?), and is a sensitive financial question
+        inviting misreporting.
+\end{enumerate}
+
+\textbf{What should have been done:} obtain a household frame (electoral roll, municipal list);
+draw an SRSWOR or a stratified sample; fix the margin of error in advance and solve for $n$;
+pilot the questionnaire; plan callbacks to reduce non-response.
+
+\Q{}{10}
+\sol $Y=(2,4,4,6,8,12)$, $N=6$.
+
+\pt{a} $\sum Y_j=36$ so $\Ybar=6$; deviations $-4,-2,-2,0,2,6$ with squares summing to $64$:
+$\sigma^2=\frac{64}{6}=10.667$, $S^2=\frac{64}{5}=12.8$. Check
+$\frac65(10.667)=12.8$ \checkmark
+
+\pt{b} The $\binom62=15$ sample means are
+\begin{center}\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+$\{1,2\}{:}3$ & $\{1,3\}{:}3$ & $\{1,4\}{:}4$ & $\{1,5\}{:}5$ & $\{1,6\}{:}7$ \\
+$\{2,3\}{:}4$ & $\{2,4\}{:}5$ & $\{2,5\}{:}6$ & $\{2,6\}{:}8$ & $\{3,4\}{:}5$ \\
+$\{3,5\}{:}6$ & $\{3,6\}{:}8$ & $\{4,5\}{:}7$ & $\{4,6\}{:}9$ & $\{5,6\}{:}10$ \\
+\bottomrule\end{tabular}
+\end{center}
+They sum to $90$, so $\E(\ybar)=90/15=6=\Ybar$ \checkmark. Their squares sum to $604$, so
+$\E(\ybar^2)=40.267$ and $\Var(\ybar)=40.267-36=4.267$. Formula:
+$(1-f)\frac{S^2}{n}=\frac23\cdot\frac{12.8}{2}=4.267$ \checkmark
+
+\pt{c} $\Var_{WR}=\frac{10.667}{2}=5.333>4.267$ \checkmark, and the ratio
+$4.267/5.333=0.8=\frac{N-n}{N-1}=\frac45$ exactly, as Question 4.6(a) predicts.
+
+\Q{}{12}
+\sol \pt{a} \textbf{Choose stratified sampling by ward.}
+\begin{itemize}
+  \item \textbf{SRSWOR} is dominated: you \emph{know} the ward of every household, and SRS is
+        blind to that auxiliary information. Its variance carries the full between-ward
+        variability, which by hypothesis is the dominant component.
+  \item \textbf{Stratified} by ward removes the between-ward term entirely --- exactly the
+        situation of Question 7.6(b), where BSS is large and WSS small, so stratification helps
+        most.
+  \item \textbf{Systematic} is attractive operationally and, on a ward-sorted list, behaves
+        similarly (see (c)) --- but its variance cannot be estimated unbiasedly, which matters for
+        a survey that must report standard errors.
+\end{itemize}
+
+\pt{b} \textbf{Proportional allocation} if the $S_h$ are unknown: it needs only the $N_h$, which
+you have, and it guarantees $f_h=f$ and a self-weighting sample. \textbf{Neyman} if a pilot or
+previous study gives the $S_h$: it is at least as good and strictly better unless all $S_h$ are
+equal. Neyman's extra requirement is precisely knowledge of the within-ward spreads (or at least
+their relative values).
+
+\pt{c} Every $50$th household from a ward-sorted list takes roughly $N_h/50$ households from ward
+$h$ --- i.e.\ approximately \textbf{proportional allocation}. This is called \emph{implicit
+stratification}, and here it is \textbf{good}: it captures most of the benefit of stratifying by
+ward for free. The catch is the one above: no unbiased variance estimator, so you would have to
+fall back on IPNS or on pretending it is SRSWOR (which, as Question 8.5 shows, may understate the
+variance).
+
+\pt{d} \textbf{Non-response} is the obvious exposure --- households not at home, or refusing to
+disclose consumption --- and it is plausibly related to consumption itself (high users may be
+reluctant). Mitigate with repeat callbacks at different times of day, and, better, by taking the
+figure from \textbf{meter readings} rather than recall, which removes the measurement-error
+component at the same time.
+
+\vfill
+\begin{center}\small\itshape
+Constructed from Classes 1--9 (107 slides). No previous-year papers exist for this course;
+mark weights follow the stated 8--12 and 5 mark pattern.
+\end{center}
