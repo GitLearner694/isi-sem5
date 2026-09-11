@@ -1,0 +1,44 @@
+% Shared preamble for the Official Statistics revision notes.
+\usepackage[a4paper,margin=0.75in,headheight=14pt]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{needspace}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[colorlinks=true,linkcolor=Blue]{hyperref}
+\tcbuselibrary{skins,breakable}
+
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt}
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+\pagestyle{fancy}\fancyhf{}
+\rhead{\small Official Statistics, B.Stat.\ 3rd yr}
+\cfoot{\small\thepage}
+
+% Keep a section heading off the foot of a page.
+\let\oldsection\section
+\renewcommand{\section}{\needspace{9\baselineskip}\oldsection}
+
+\newcommand{\T}[1]{\mathrm{#1}}
+\newcommand{\sym}[1]{\mathit{#1}}   % the paper's multi-letter symbols: PE, PHW, ...
+\newcommand{\yes}{{\color{ForestGreen}$\checkmark$}}
+\newcommand{\no}{{\color{BrickRed}$\times$}}
+\newcommand{\df}[1]{\textbf{\color{Blue!75!black}#1}}
+
+% Grey line under each section heading: thrust areas, lectures, past-paper parts answered.
+\newcommand{\covers}[3]{{\small\color{black!60}\textsf{Thrust areas #1 \ $\cdot$\ #2 \ $\cdot$\ PYQ: #3}}\par\smallskip}
+
+\tcbset{boxsep=2pt,left=4pt,right=4pt,top=2pt,bottom=2pt,fonttitle=\bfseries\small,breakable,
+  before skip=5pt,after skip=5pt}
+\newtcolorbox{keybox}[1]{colback=Blue!4,colframe=Blue!60,title={#1}}
+\newtcolorbox{trap}[1]{colback=BrickRed!5,colframe=BrickRed!60,title={\textsc{Trap} --- #1}}
+\newtcolorbox{tmpl}[1]{colback=Orange!6,colframe=Orange!75!black,title={Numerical template --- #1}}
+\newtcolorbox{quick}[1]{colback=ForestGreen!5,colframe=ForestGreen!55,title={Quick check from the slides --- #1}}
+\newtcolorbox{pyqbox}[1]{colback=Orange!8,colframe=Orange!80!black,title={#1}}

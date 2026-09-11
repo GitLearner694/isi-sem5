@@ -1,0 +1,464 @@
+% Sections 1-9: production, flows, boundary, residence, output, prices, external trade, OS, D&D.
+
+%======================================================================
+\section{Production, value added and the circular flow}\label{sec:prod}
+\covers{T1, T2, T3}{Lectures 1--2}{2025--26 Q1(i), (ii)}
+
+Production is measured without double counting. Marshall's example is a carpet: once the carpet
+is counted at full value, the yarn and the labour in it are already counted. A producer is
+therefore credited only with the value it \emph{adds}.
+
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}l X@{}}
+IC & \df{Intermediate consumption}: goods and services a producer buys and \emph{uses up during} the
+production process of the period, such as raw materials, fuel, power, maintenance and hired services. \\
+GVO & \df{Gross value of output}: the value of all goods and services the unit produces in the period. \\
+GVA & \df{Gross value added} $=$ GVO $-$ IC: the unit's own contribution to production. \\
+GDP & \df{Gross domestic product}: the sum of GVA over all resident producers, plus net product taxes.
+This is the value of production within the economic territory. \\
+HFCE & \df{Household final consumption expenditure}: what resident households spend on goods and
+services for final consumption. \\
+GCF & \df{Gross capital formation}, or investment: acquisitions less disposals of produced assets,
+namely fixed assets (GFCF), change in inventories and valuables. \\
+GNI & \df{Gross national income} $=$ GDP $+$ net primary (earned) income from the rest of the world.
+This is the income of residents. \\
+\end{tabularx}
+
+\begin{keybox}{Relations to reproduce}
+\vspace{-8pt}
+\begin{align*}
+\T{GVA} &= \T{GVO}-\T{IC}, \qquad \T{GVA}_{bp}=\T{GVO}_{bp}-\T{IC}\\
+\T{GDP} &= \textstyle\sum \T{GVA}_{bp} + (t-s)_{\text{products}} + (t-s)_{\text{imports}}\\
+\T{GVO} &= \T{HFCE}+\T{IC}+\T{GCF}\ \Longrightarrow\ \T{GVA}=\T{HFCE}+\T{GCF},\ \text{i.e. } Y=C+I
+  \quad(\text{closed, no govt.})\\
+\T{GNI} &= \T{GDP} + \text{net primary income from RoW}, \qquad \text{Net} = \text{Gross} - \T{D\&D}
+\end{align*}
+\end{keybox}
+
+\subsection*{The two-sector circular flow (T2)}
+
+\begin{center}
+\begin{tikzpicture}[font=\small,>=Stealth,
+  box/.style={draw,thick,minimum width=2.6cm,minimum height=0.8cm}]
+\node[box,fill=Yellow!35] (H) at (0,0) {Households};
+\node[box,fill=Lavender!45] (E) at (9,0) {Enterprises};
+\draw[->,very thick,Blue] (E.north) to[out=150,in=30]
+  node[midway,above]{goods \& services} (H.north);
+\draw[->,very thick,BrickRed] ([yshift=6pt]H.east) --
+  node[midway,above]{expenditure on g\&s} ([yshift=6pt]E.west);
+\draw[->,very thick,BrickRed] ([yshift=-6pt]E.west) --
+  node[midway,below]{factor compensations (w\&s, OS)} ([yshift=-6pt]H.east);
+\draw[->,very thick,Blue] (H.south) to[out=-30,in=-150]
+  node[midway,below]{labour and other factor services} (E.south);
+\node[font=\footnotesize,align=left,anchor=west] at (10.5,0)
+  {\textcolor{Blue}{blue: real flows}\\ \textcolor{BrickRed}{red: money flows}};
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+\item Households own \emph{all} factors of production (land, labour, capital, entrepreneurship). They
+  sell factor services and are paid factor compensations: wages \& salaries and operating surplus.
+  Those payments are the economy's income.
+\item Real flows (goods and services, factor services) run opposite to money flows (expenditure,
+  compensations).
+\item The model rests on Say and Walras: there is no lag between production and income, and no
+  income goes unspent. So income equals expenditure (Say's law, ``supply creates its own demand'').
+  Keynes (1936) rejected this: spending depends on income, effective demand drives output, and
+  aggregate expenditure is $C+I$.
+\item Hence \textbf{production $\equiv$ income $\equiv$ expenditure}, which gives the three ways of
+  measuring GDP. The \emph{production} approach sums GVA over all producers. The \emph{income}
+  approach sums the incomes generated. The \emph{expenditure} approach sums \emph{final}
+  expenditure on the goods and services produced.
+\end{itemize}
+
+\subsection*{\texorpdfstring{$Y = C + I$}{Y = C + I} (T3)}
+The simple circle leaves out enterprise-to-enterprise flows: inputs (IC) and capital goods
+(investment). Once they are added, the inputs cancel in aggregation. What remains is
+consumption goods plus capital goods, so $Y \equiv C + I_g$. Output left unsold goes into
+inventories. The change in inventories (CII) is part of production \emph{and} of investment, so
+the identity still holds, and so does $I_g \equiv S$.
+
+\begin{tmpl}{Lecture 2 illustration}
+\small Sales 18,000, made up of inputs 3,000, consumption goods 14,000 and capital goods
+(tractors) 1,000. Payments: rent 1,200, interest 900, wages \& salaries 8,900.\\
+Production $Y = 18{,}000 - 3{,}000 = 15{,}000 = C\,(14{,}000) + I\,(1{,}000)$. Income
+$= 8{,}900 + 1{,}200 + 900 + \text{profit }4{,}000 = 15{,}000$, where profit is the residual.\\
+\emph{Twist:} households spend only 13,500. Then $S = 15{,}000 - 13{,}500 = 1{,}500$, the 500
+unsold goes into CII, and $I_g = 1{,}000 + 500 = 1{,}500 = S$.\\[2pt]
+\textbf{Symbolic.} Sales $V$, inputs $N$, consumption goods $C_g$, capital goods $K$:
+$Y = V-N = C_g+K$. If households spend $C<C_g$: $\T{CII}=C_g-C$, $S=Y-C$, and $I_g=K+\T{CII}=S$.
+\end{tmpl}
+
+\begin{quick}{which are true?}
+\small (a) GDP can be measured by production, income and expenditure \yes; (b) production approach
+$=$ GVA of all units \yes; (c) income approach $=$ sum of incomes of all households \yes;
+(d) expenditure approach $=$ sum of \emph{all} expenditure on goods and services \no, because that
+includes IC and only final expenditure counts; (e) total expenditure $=$ FCE $+$ GCF $+$ exports
+net of imports \yes.
+\end{quick}
+
+%======================================================================
+\section{Economic flows and transactions}\label{sec:flows}
+\covers{T4, T5, T6, T25}{Lecture 3}{2025--26 Q1(viii)}
+
+An \df{economic flow} is any change in the volume or value of a unit's economic assets. It can be
+caused by human acts, by changes in prices, or by natural events. Examples are production, sale
+and purchase, taxes, transfers, destruction by calamity, and holding gains.
+
+\begin{multicols}{2}\small
+\textbf{Economic flows}
+\begin{itemize}
+\item \textbf{Transactions}: payments and receipts for production, consumption and accumulation,
+  and transfers.
+  \begin{itemize}
+  \item \df{Exchange}: something is given in return.
+  \item \df{Transfer}: nothing is given in return.
+  \end{itemize}
+\columnbreak
+\item \textbf{Other flows}
+  \begin{itemize}
+  \item \emph{Other changes in volume}: economic value appears or disappears (discoveries,
+    destruction by calamity).
+  \item \emph{Changes in the level and structure of prices}: holding gains and losses.
+  \end{itemize}
+\end{itemize}
+\end{multicols}
+
+A \df{transaction} is an economic flow in which institutional units interact by mutual agreement.
+It can also be an action within one unit that is analytically useful to treat as a transaction,
+usually because the unit is acting in two capacities. Transactions are either actual (observed)
+or notional (not observable, so imputed). They cover production and exchange of products and
+non-produced assets, distribution of income, transfers (current and capital), and financial
+assets and liabilities.
+
+\begin{keybox}{Current vs capital transactions (asked: 2025--26 Q1(viii))}
+\small
+\df{Current transactions} relate to production, final consumption and current transfers:
+production-related flows (output, IC, CFC), primary income (CE, OS/MI), production taxes less
+subsidies, final consumption, and current transfers such as income taxes and transfers in money
+or kind. They do not change the stock of assets directly and are recorded in the \emph{current
+accounts}.\\[2pt]
+\df{Capital transactions} create or change the volume of a unit's assets: capital formation,
+acquisition and disposal of non-produced (natural) assets, capital taxes and capital transfers.
+They are recorded in the \emph{accumulation accounts}, and they change the balance sheet.
+\end{keybox}
+
+\df{Other perspectives} (T25). A transaction is \emph{between} units or \emph{within} one unit;
+within-unit transactions are always non-monetary. It is \emph{monetary} if money changes hands,
+and a monetary transaction always has two parties. \emph{Non-monetary} transactions have no
+money flow, so they cannot be observed and are imputed, usually at market value. See
+\S\ref{sec:mta} for the compiler's tree.
+
+\begin{quick}{economic flows? transactions?}
+\small \textbf{Economic flow?} Paddy cultivation \yes; destruction of property by a calamity \yes;
+father giving money to his son in the same household \no\ (within one unit); drawing river water
+to irrigate land \yes; natural growth of fish stock in a river \no\ (not an economic asset);
+price appreciation of real estate \yes.\\
+\textbf{Transaction: exchange or transfer?} Production of crops: exchange. Income tax: transfer.
+Sale of smuggled goods: exchange (illegal trade still counts). Pickpocketing: transfer. Paying a
+lost bet: transfer.
+\end{quick}
+
+%======================================================================
+\section{The production boundary and IPP}\label{sec:boundary}
+\covers{T7, T8}{Lecture 4}{---}
+
+\df{Production} (SNA) is a physical process, under the control and responsibility of an
+institutional unit, that uses labour and assets to turn inputs of goods and services into
+outputs. The output must be capable of being supplied to another unit, with or without charge.
+There are three kinds of product. \emph{Goods} are physical, in demand, and carry ownership that
+can be transferred. \emph{Services} change the condition of the consumer or help exchange
+products or financial assets (traders, banks). \emph{Data} (2025 SNA) is information produced by
+observing phenomena and stored digitally; it is capitalised if used for more than a year, and
+then depreciated.
+
+\df{General production boundary}: every activity that one unit could pay another to do for it,
+the ``third-person'' test. It excludes only basic human activities such as eating, drinking,
+sleeping and taking exercise, which nobody else can do on your behalf.
+
+\begin{keybox}{SNA (2008/2025) production boundary --- inclusion and exclusion}
+\small
+\begin{tabularx}{\linewidth}{@{}X|X@{}}
+\textbf{Included} & \textbf{Excluded} \\ \hline
+All \emph{goods}, whether for the market or for own final use (a farmer's crops eaten at home). &
+Own-account \emph{household services} by unpaid members: cooking, cleaning, care, repair of own
+durables, transporting members. \\
+\emph{Services} only if they are sold, supplied to other units, or produced by paid labour (paid
+domestic staff). & Volunteer, social and cultural activities. \\
+Housing services of owner-occupiers (imputed rent); own-account IPP. & Things that only affect
+the quality of life. \\
+Non-market output of government and NPISHs; bank services not explicitly charged (FISIM). &
+\emph{Theft} (a transfer, not production). \\
+Illegal and concealed production (narcotics trade); natural growth of \emph{cultivated} forests. &
+Natural growth that nobody manages (wild fish, wild forests). \\
+\end{tabularx}
+\end{keybox}
+
+\df{Intellectual property products} (T8) are the results of research, innovation and artistic
+work. They have been fixed assets since the 2008 SNA. There are four categories: (1) research
+and development; (2) mineral exploration and evaluation; (3) computer software, data and
+databases; (4) entertainment, literary and artistic originals.
+
+\begin{quick}{inside the SNA boundary? is it production?}
+\small \textbf{Inside?} Maintenance and repair of household durables by the household \no; crops
+kept for own consumption \yes; owner-occupied housing services \yes; transporting household
+members \no; natural growth of cultivated forests \yes; distribution of narcotics \yes.\\
+\textbf{Production?} A morning cup of tea \no\ (nothing is created); ploughing \yes; newspaper
+delivery \yes\ (trade); repairing a vending machine \yes\ (adds value); natural growth of fish in
+a river \no\ (no human effort); collecting wild honey \yes\ (human effort).
+\end{quick}
+
+%======================================================================
+\section{The domestic economy: territory, units, residence}\label{sec:res}
+\covers{--- (background for GNI, exports and imports)}{Lecture 5}{2025--26 Q1(i)}
+
+\begin{itemize}
+\item The \df{economy} is all institutional units \emph{resident} in the economic territory during
+  the period.
+\item The \df{economic territory} is the area the government administers, within which persons,
+  goods and capital circulate freely. It includes airspace, territorial waters and continental
+  shelf; the country's enclaves abroad (embassies, consulates, military bases, scientific
+  stations); and free zones and offshore activity.
+\item An \df{institutional unit} can own assets, incur liabilities, carry out economic activity
+  and transact with others in its own right. All transactions take place through institutional
+  units. A household that also produces is treated as two units, one producing and one consuming.
+\item There are \df{five sectors}: non-financial corporations, financial corporations, general
+  government, households (including unincorporated enterprises and the informal sector), and
+  NPISHs. Government enterprises run like businesses (railways, airlines, power) are
+  quasi-corporations and belong in the corporate sector. The central bank is a financial
+  corporation.
+\item \df{Residence} is the territory where a unit has its \emph{centre of predominant economic
+  interest}. It does not depend on nationality or currency. An individual takes the residence of
+  their household, and an unincorporated enterprise that of its owner. A corporation or NPI is
+  resident where it is registered, and a foreign branch is a resident quasi-corporation of the
+  host country. Land and buildings owned by non-residents are assigned a notional resident unit.
+  Non-residents that transact with residents form the \df{rest of the world (RoW)}.
+\item \df{Exports and imports} are changes of economic ownership between a resident and a
+  non-resident.
+\end{itemize}
+
+\begin{quick}{export, import or neither (for India)? true or false?}
+\small A Kolkata resident buys a Swiss watch in a Kolkata shop: \textbf{N} (the shop is
+resident). Online purchase of a UK book: \textbf{M}. An Indian magazine delivered to an Indian
+student at Oxford: \textbf{N} (the student is still resident). An Egyptian's hotel bill in
+Mumbai: \textbf{X}.\\
+Foreign students staying three years are residents \no. A Citibank branch in Kolkata is resident
+in India \yes. The Australian crew of a Japanese ship are residents of Japan \no. Non-residents
+are not treated as owners of immovable assets \yes. Unincorporated businesses without separate
+accounts belong to households \yes. A foreign NPI's branch serving residents is a resident NPISH
+\yes. The central bank is in general government \no. A Japanese firm's branch in Thailand is
+resident in Thailand \yes.
+\end{quick}
+
+%======================================================================
+\section{Economically significant prices and the three kinds of output}\label{sec:output}
+\covers{T9, T13, T14}{Lectures 5, 7}{---}
+
+\df{Economically significant prices} are prices that significantly affect how much producers are
+willing to supply and how much purchasers want to buy. In practice, sales cover the majority of
+production costs. General government, the central bank and NPISHs mostly charge nothing or prices
+that are not economically significant.
+
+\df{Output} (2025 SNA) is the goods and services an establishment produces. It excludes goods and
+services used in an activity where the establishment bears no risk, and those the establishment
+consumes itself, unless they are used for own capital formation or own final consumption.
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l X X X@{}}
+\toprule
+& \textbf{Market output} & \textbf{Non-market output} & \textbf{Output for own final use} \\
+\midrule
+What & Sold at economically significant prices & Supplied free, or at prices that are not
+economically significant, to other units or the community & Kept by the producer for its own
+final consumption or capital formation \\
+Who & Corporations, households & General government, NPISHs, central bank (2025 SNA) & Any
+producer \\
+Valued at & Quantity $\times$ market price & Sum of costs & Market-equivalent price, else sum
+of costs \\
+Examples & Rented housing, transport corporations, restaurants & Police, free schools run by
+trusts, government hospitals & A farmer's own crops, a retailer's own shelves, owner-occupied
+housing, paid domestic staff, CII kept for these uses \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\df{Sum of costs} (2025 SNA) $=$ IC $+$ remuneration of employees $+$ depreciation (and
+depletion) $+$ other taxes less subsidies on production $+$ net return to non-financial assets
+$+$ rent on non-produced non-financial assets. Products end up in one of three uses: IC,
+consumption of fixed capital (CFC), or \df{final use}, which is final consumption or capital
+formation.
+
+\begin{quick}{economically significant? which kind of output?}
+\small \textbf{ESP?} Entry ticket to a government museum \no; a pen at the local store \yes; a
+restaurant meal \yes; a token OPD registration fee at a free government hospital \no; compulsory
+payments by financial corporations to the central bank \no.\\
+\textbf{Kind?} Police: non-market. Shelves a retailer builds for his shop: own final use.
+Owner-occupied housing: own final use. Rented housing: market. Free schools run by trusts:
+non-market. Transport corporations: market.
+\end{quick}
+
+%======================================================================
+\section{Basic, producers' and purchasers' prices}\label{sec:prices}
+\covers{T11}{Lecture 6}{2025--26 Q1(iii)}
+
+A user usually pays more than the producer receives, because of taxes, trade margins and
+transport costs. The SNA therefore fixes three valuations:
+\begin{itemize}
+\item \df{Purchasers' price}: what the purchaser pays to take delivery at the time and place
+  required, including trade and transport margins (TTM) and taxes.
+\item \df{Producers' price}: what the producer receives from the purchaser, excluding separately
+  invoiced VAT and margins.
+\item \df{Basic price}: what the producer finally keeps, i.e.\ net of taxes on products and
+  including subsidies on products.
+\end{itemize}
+
+\begin{keybox}{The price chain}
+\centering
+Purchasers' price $-$ TTM (and taxes on consumers) $=$ Producers' price\\
+Producers' price $-$ (taxes $-$ subsidies) on products $=$ Basic price\\[2pt]
+\raggedright\small Output is recorded at \textbf{basic} prices; uses (IC and final use) at
+\textbf{purchasers'} prices. The 2008 SNA avoids the term ``market prices'' for value added,
+because VAT makes it ambiguous. Write $\T{GDP}=\T{GVA}_{bp}+(t-s)_{\text{products}}$ rather than
+``GDP at market prices''.
+\end{keybox}
+
+\begin{tmpl}{Lecture 6 pen}
+\small A consumer pays 20 to a trader. The trader bought the pen at 12 from the manufacturer,
+who paid a product tax of 2. Purchasers' price $=20$; TTM $=20-12=8$; producers' price $=12$;
+basic price $=12-2=10$.\\
+\textbf{Symbolic.} Consumer pays $p$, trader's cost $q$, product tax $t$, product subsidy $s$:
+$\T{TTM}=p-q$; producers' price $=q$; basic price $=q-t+s$.
+\end{tmpl}
+
+\begin{tmpl}{Lecture 7 Thai school}
+\small A fee of 110 Baht a month from each of 150 students, with a 10\% product tax on the
+pre-tax fee, so $110 = 100 + 10$. GVO at producers' prices $=150\times110=16{,}500$; at basic
+prices $=150\times100=15{,}000$.\\
+\textbf{Symbolic.} $n$ students, fee $f$ including tax at rate $\tau$: producers' $=nf$, basic
+$=nf/(1+\tau)$, tax $=nf\tau/(1+\tau)$.
+\end{tmpl}
+
+%======================================================================
+\section{External transactions and trade exclusions}\label{sec:ext}
+\covers{T12}{Lecture 6}{---}
+
+Transactions with the RoW are: exports and imports; primary income (CE and investment income);
+current transfers, including taxes on income and wealth; capital transfers; acquisitions less
+disposals of valuables and non-produced assets; and financial assets and liabilities.
+
+\begin{itemize}
+\item \df{Valuation.} Goods are valued \textbf{f.o.b.} (free on board: excluding insurance and
+  freight beyond the exporter's border) at the change of ownership. Customs record imports
+  \textbf{c.i.f.} (cost, insurance, freight), but national accounts record imports f.o.b.\ too.
+\item \df{Coverage} includes non-residents' spending in the economy (tourists count as exports),
+  services such as transport, insurance and hotels, service charges for processing goods owned by
+  others, and \df{merchanting}. In merchanting, a merchant in $X$ buys goods from $Y$ and sells
+  them to $Z$; ownership changes, but the goods never enter $X$.
+\end{itemize}
+
+\begin{keybox}{External trade exclusions (starred in the notes)}
+\small \textbf{Rule:} no change of economic ownership between a resident and a non-resident means
+no export or import. Excluded:
+(1) transactions of non-resident units with the RoW;
+(2) flows of samples and goods for exhibition;
+(3) goods sent for repair or for rent;
+(4) goods of returning residents;
+(5) goods sent for processing;
+(6) factor services (labour, financial resources), which are primary income, not trade;
+(7) goods under operational leasing or rent.
+\end{keybox}
+
+\begin{trap}{processing}
+\small The \emph{goods} sent abroad for processing are excluded, because the owner never changes.
+The processing \emph{fee} is included, as an export of services by the processor's country.
+\end{trap}
+
+%======================================================================
+\section{Factor incomes, IC, GVA and operating surplus}\label{sec:os}
+\covers{T1, T15, T17}{Lectures 5, 7}{2025--26 Q2(i)}
+
+A production process uses labour, inputs (IC), capital goods and natural resources. Part of
+the capital goods wears out (depreciation), and part of the non-renewable resources is used up
+(depletion). The factors of production are owned, directly or indirectly, by households:
+
+\begin{center}\small
+\begin{tabularx}{0.92\textwidth}{@{}l X@{}}
+\toprule
+\textbf{Factor} & \textbf{Factor payment (compensation)} \\
+\midrule
+Labour & Compensation of employees, CE (``remuneration of employees'', RE, in 2025 SNA) \\
+Land and natural resources & Rent \\
+Capital (financial) & Interest \\
+Entrepreneurship & Profit \\
+A mix of labour and other factors & Mixed income (MI): earnings of unincorporated household enterprises \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Rent, interest and profit together make up the \df{operating surplus}.
+\begin{itemize}
+\item \df{CE / RE}: the total remuneration, in cash or kind, an enterprise owes employees for the
+  period's work. It includes wages, salaries, commissions and benefits, \emph{and} the employer's
+  social security and PF contributions.
+\item \df{Operating surplus (OS)} is the residual once all costs are deducted from output:
+  $\T{OS}=\T{GVO}_{bp}-\T{IC}-\T{CE}-\text{other taxes on production (less subsidies)}$. Deduct
+  D\&D as well for net OS. OS contains the producer's profit plus the rent and interest paid for
+  land and funds owned by others.
+\item $\T{GVA}_{bp}$ of corporations and households comes from market output plus output for own
+  final use. That of government and NPISHs comes from non-market output plus own final use. For
+  the whole economy, $\T{GDP}=\T{GVA}_{bp}+(t-s)_{\text{products}}$.
+\end{itemize}
+
+\begin{tmpl}{Lecture 7 bread unit $\to$ asked as 2025--26 Q2(i)}
+\small Bread worth 15,000 (without taxes), made from flour 10,000; salaries 1,000; electricity,
+fuel and incidentals 2,000.\\
+$\T{GVO}_{bp}=15{,}000$; $\T{IC}=10{,}000+2{,}000=12{,}000$; $\T{GVA}_{bp}=3{,}000$;
+$\T{OS}=3{,}000-1{,}000=2{,}000$.\\
+\textbf{Symbolic} (the exam version: garments $X_1$, fibres $X_2$, salary $X_3$, electricity
+etc.\ $X_4$): $\T{GVO}_{bp}=X_1$; $\T{IC}=X_2+X_4$; $\T{GVA}_{bp}=X_1-X_2-X_4$;
+$\T{OS}=X_1-X_2-X_3-X_4$.
+\end{tmpl}
+
+\begin{trap}{what goes into IC}
+\small Salaries are a \emph{factor payment}, never IC. ``Worth (without taxes)'' means basic
+prices. \textbf{Factor service, IC or capital good?} Plant and machinery the enterprise owns:
+capital good. An office building it hires: IC, since the rental buys a service. Wheat in a flour
+mill: IC. Hired land: factor service (rent). A shareholder: factor service. Maintenance of owned
+machinery: IC.
+\end{trap}
+
+%======================================================================
+\section{Depreciation, depletion and gross vs net}\label{sec:dd}
+\covers{T10}{Lecture 5}{2025--26 Q1(vi)}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}l X X@{}}
+\toprule
+& \textbf{Depreciation} (CFC; called ``depreciation'' in 2025 SNA) & \textbf{Depletion} \\
+\midrule
+Asset & Produced \emph{fixed} assets & Non-produced \emph{natural} resources (minerals, fuels, wild
+stocks) \\
+Cause & Wear and tear and normal obsolescence from use in production & Physical removal and
+using up by extraction \\
+Measures & Cost of fixed capital used up in the period & Natural resources used up in the
+period \\
+Valued at & \emph{Current} prices of the assets at the time of production, \textbf{not} book
+value & Decline in the resource's value \\
+In SNA & A cost of production & A cost of production (2025 SNA) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Both reduce the potential to draw benefits from the stock in future. Depreciation can be made good
+by new investment; production cannot re-create a depleted natural resource.
+
+\begin{keybox}{Gross $-$ Net $=$ D\&D, for every SNA aggregate}
+\centering
+NVA $=$ GVA $-$ D\&D; \quad NDP $=$ GDP $-$ D\&D; \quad NNI $=$ GNI $-$ D\&D;\\
+net OS $=$ gross OS $-$ D\&D; \quad net profit $=$ gross profit $-$ D\&D; \quad net saving $=$
+gross saving $-$ D\&D.
+\end{keybox}
+
+\begin{trap}{company depreciation}
+\small The depreciation in a company's books is at historic cost, so it is \emph{not} the SNA's
+CFC, which is valued at current prices. This is a true/false item in Lecture 12.
+\end{trap}
